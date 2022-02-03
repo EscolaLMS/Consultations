@@ -17,9 +17,8 @@ class CreateConsultationsTable extends Migration
         Schema::create('consultations', function (Blueprint $table) {
             $table->id();
             $table->bigInteger('author_id')->nullable()->index();
-            $table->bigInteger('media_id')->nullable()->index();
             $table->integer('base_price')->nullable();
-            $table->string('name', 80);
+            $table->string('name', 255);
             $table->string('status')->default(ConsultationStatusEnum::DRAFT);
             $table->text('description');
             $table->text('calendar_url')->nullable();
@@ -27,7 +26,7 @@ class CreateConsultationsTable extends Migration
             $table->dateTime('finished_at')->nullable();
             $table->timestamps();
 
-            $table->foreign('author_id')->references('id')->on('users')->onDelete('SET NULL');
+            $table->foreign('author_id')->references('id')->on('users');
         });
     }
 
