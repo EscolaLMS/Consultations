@@ -1,12 +1,11 @@
 <?php
 
-namespace EscolaLms\Courses\Tests;
+namespace EscolaLms\Consultations\Tests;
 
 use EscolaLms\Auth\EscolaLmsAuthServiceProvider;
 use EscolaLms\Auth\Tests\Models\Client;
+use EscolaLms\Consultations\AuthServiceProvider;
 use EscolaLms\Consultations\EscolaLmsConsultationsServiceProvider;
-use EscolaLms\Courses\AuthServiceProvider;
-use EscolaLms\Courses\Tests\Models\User as UserTest;
 use Illuminate\Testing\TestResponse;
 use Laravel\Passport\Passport;
 use Laravel\Passport\PassportServiceProvider;
