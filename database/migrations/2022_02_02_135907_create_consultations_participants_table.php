@@ -15,7 +15,7 @@ class CreateConsultationsParticipantsTable extends Migration
     {
         Schema::create('consultations_participants', function (Blueprint $table) {
             $table->id();
-            $table->bigInteger('consultation_id')->index();
+            $table->bigInteger('consultation_id')->unsigned()->index();
             $table->bigInteger('user_id')->unsigned()->nullable();
             $table->string('status');
             $table->timestamps();
