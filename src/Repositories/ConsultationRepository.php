@@ -5,6 +5,7 @@ namespace EscolaLms\Consultations\Repositories;
 use EscolaLms\Consultations\Models\Consultation;
 use EscolaLms\Consultations\Repositories\Contracts\ConsultationRepositoryContract;
 use EscolaLms\Core\Repositories\BaseRepository;
+use Illuminate\Database\Eloquent\Builder;
 
 class ConsultationRepository extends BaseRepository implements ConsultationRepositoryContract
 {
@@ -22,5 +23,14 @@ class ConsultationRepository extends BaseRepository implements ConsultationRepos
     public function model(): string
     {
         return Consultation::class;
+    }
+
+    public function allQueryBuilder(array $search = [], array $criteria = []): Builder
+    {
+        $query = $this->allQuery($search);
+        if (!empty($criteria)) {
+            $query = $this->applyCriteria($query, $criteria);
+        }
+        return $query;
     }
 }
