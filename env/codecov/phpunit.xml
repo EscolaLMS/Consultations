@@ -26,4 +26,9 @@
             <directory suffix=".php">./src</directory>
         </include>
     </coverage>
+    <filter>
+      <whitelist processUncoveredFilesFromWhitelist="true">
+        <directory suffix=".php">./src/routes.php</directory>
+      </whitelist>
+    </filter>
 </phpunit>
