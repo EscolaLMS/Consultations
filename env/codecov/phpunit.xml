@@ -8,7 +8,7 @@
          convertWarningsToExceptions="true"
          processIsolation="false"
          stopOnFailure="false">
-    <testsuite name="Escola LMS Auth">
+    <testsuite name="Escola LMS Consultations">
         <directory suffix="Test.php">./tests</directory>
     </testsuite>
     <php>
@@ -20,6 +20,14 @@
         <env name="DB_USERNAME" value="username"/>
         <env name="DB_PASSWORD" value="password"/>
     </php>
+    <filter>
+      <whitelist processUncoveredFilesFromWhitelist="true">
+        <directory suffix=".php">./src</directory>
+        <exclude>
+          <file>./src/routes.php</file>
+        </exclude>
+      </whitelist>
+    </filter>
     <coverage cacheDirectory=".phpunit.cache/code-coverage"
               processUncoveredFiles="true">
         <include>
