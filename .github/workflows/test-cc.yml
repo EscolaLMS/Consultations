@@ -38,7 +38,7 @@ jobs:
         run: cp -r env/codecov/. .
 
       - name: Update composer
-        run: COMPOSER_ROOT_VERSION=0.9.9 composer update
+        run: composer update
 
       - name: Clear config
         run: vendor/bin/testbench config:clear
@@ -59,11 +59,10 @@ jobs:
         run: |
           curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
           chmod +x ./cc-test-reporter
-
       - name: Convert
         run: ./cc-test-reporter format-coverage coverage.xml -t clover -o codeclimate.0.json
 
       - name: Upload
         run: ./cc-test-reporter upload-coverage -i codeclimate.0.json
         env:
-          CC_TEST_REPORTER_ID: 915c317f6988c594001f3f74d7e1b1c919c04fde6ff24421291c6f0f2a345ab0
+          CC_TEST_REPORTER_ID: 8539f41f60574ac436ad0be5c4a05633ca02b4614ecbcf0acd9dd76ef4130d80
