@@ -15,7 +15,6 @@ class ConsultationFactory extends Factory
 
     public function definition()
     {
-        $this->faker->addProvider(new FakerProvider($this->faker));
         $tutor = User::role(UserRole::TUTOR)->inRandomOrder()->first();
         $now = now();
         return [

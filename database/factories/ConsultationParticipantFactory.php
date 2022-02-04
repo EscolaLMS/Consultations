@@ -15,7 +15,6 @@ class ConsultationParticipantFactory extends Factory
 
     public function definition()
     {
-        $this->faker->addProvider(new FakerProvider($this->faker));
         $consultation = Consultation::inRandomOrder()->first();
         $user = User::where('id', '<>', $consultation->author_id)->inRandomOrder()->first();
 
