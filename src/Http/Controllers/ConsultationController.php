@@ -21,7 +21,7 @@ class ConsultationController extends EscolaLmsBaseController implements Consulta
     {
         $search = $listConsultationsRequest->except(['limit', 'skip', 'order', 'order_by']);
         $consultations = $this->consultationServiceContract
-            ->getConsultationsListWithOrdering($search)
+            ->getConsultationsList($search)
             ->paginate($listConsultationsRequest->get('per_page') ?? 15);
         return $this->sendResponseForResource(
             ConsultationSimpleResource::collection($consultations), __('Consultations retrieved successfully')

@@ -17,7 +17,7 @@ class ConsultationService implements ConsultationServiceContract
         $this->consultationRepositoryContract = $consultationRepositoryContract;
     }
 
-    public function getConsultationsListWithOrdering(array $search = []): Builder
+    public function getConsultationsList(array $search = []): Builder
     {
         $criteria = FilterListDto::prepareFilters($search);
         return $this->consultationRepositoryContract->allQueryBuilder(
