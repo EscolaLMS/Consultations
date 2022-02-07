@@ -9,9 +9,4 @@ class ConsultationStatusEnum extends BasicEnum
     public const DRAFT     = 'draft';
     public const PUBLISHED = 'published';
     public const ARCHIVED  = 'archived';
-    public const STATUSES = [
-        self::DRAFT,
-        self::PUBLISHED,
-        self::ARCHIVED,
-    ];
 }
