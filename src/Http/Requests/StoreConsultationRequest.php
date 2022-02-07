@@ -21,7 +21,7 @@ class StoreConsultationRequest extends FormRequest
         return [
             'base_price' => 'integer',
             'name' => 'required|string|max:255|min:3',
-            'status' => ['required', 'string', Rule::in(ConsultationStatusEnum::STATUSES)],
+            'status' => ['required', 'string', Rule::in(ConsultationStatusEnum::getValues())],
             'description' => 'required|string|min:3',
             'calendar_url' => 'string',
             'started_at' => 'datetime',

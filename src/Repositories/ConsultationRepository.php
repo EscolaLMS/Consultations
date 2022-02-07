@@ -9,11 +9,7 @@ use Illuminate\Database\Eloquent\Builder;
 
 class ConsultationRepository extends BaseRepository implements ConsultationRepositoryContract
 {
-    protected $fieldSearchable = [
-        'author_id',
-        'name',
-        'base_price',
-    ];
+    protected $fieldSearchable = [];
 
     public function getFieldsSearchable(): array
     {

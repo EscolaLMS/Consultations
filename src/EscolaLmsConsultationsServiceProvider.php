@@ -2,6 +2,10 @@
 
 namespace EscolaLms\Consultations;
 
+use EscolaLms\Consultations\Repositories\ConsultationRepository;
+use EscolaLms\Consultations\Repositories\Contracts\ConsultationRepositoryContract;
+use EscolaLms\Consultations\Services\ConsultationService;
+use EscolaLms\Consultations\Services\Contracts\ConsultationServiceContract;
 use Illuminate\Support\ServiceProvider;
 
 /**
@@ -9,7 +13,14 @@ use Illuminate\Support\ServiceProvider;
  */
 class EscolaLmsConsultationsServiceProvider extends ServiceProvider
 {
-    public $singletons = [];
+    public const SERVICES = [
+        ConsultationServiceContract::class => ConsultationService::class
+    ];
+    public const REPOSITORIES = [
+        ConsultationRepositoryContract::class => ConsultationRepository::class
+    ];
+
+    public $singletons = self::SERVICES + self::REPOSITORIES;
 
     public function boot()
     {

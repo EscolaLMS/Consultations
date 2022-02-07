@@ -29,10 +29,10 @@ class FilterListDto
             $dto->addToCriteria(new ConsultationSearch($dto->getName()));
         }
         if ($dto->getBasePrice()) {
-            $dto->addToCriteria(new EqualCriterion('base_price', $dto->getBasePrice()));
+            $dto->addToCriteria(new EqualCriterion('consultations.base_price', $dto->getBasePrice()));
         }
         if ($dto->getStatus()) {
-            $dto->addToCriteria(new InCriterion('status', $dto->getStatus()));
+            $dto->addToCriteria(new InCriterion('consultations.status', $dto->getStatus()));
         }
         return $dto->criteria;
     }

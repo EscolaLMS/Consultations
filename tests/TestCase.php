@@ -3,6 +3,7 @@
 namespace EscolaLms\Consultations\Tests;
 
 use EscolaLms\Auth\EscolaLmsAuthServiceProvider;
+use EscolaLms\Auth\Models\User;
 use EscolaLms\Auth\Tests\Models\Client;
 use EscolaLms\Consultations\AuthServiceProvider;
 use EscolaLms\Consultations\EscolaLmsConsultationsServiceProvider;
@@ -35,7 +36,7 @@ class TestCase extends \EscolaLms\Core\Tests\TestCase
 
     protected function getEnvironmentSetUp($app)
     {
-        $app['config']->set('auth.providers.users.model', UserTest::class);
+        $app['config']->set('auth.providers.users.model', User::class);
         $app['config']->set('passport.client_uuids', true);
         $app['config']->set('database.connections.mysql.strict', false);
         $app['config']->set('app.debug', (bool) env('APP_DEBUG', true));

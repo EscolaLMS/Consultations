@@ -16,6 +16,10 @@ class ListConsultationsRequest extends FormRequest
 
     public function rules(): array
     {
-        return [];
+        return [
+            'name' => 'string',
+            'base_price' => 'integer',
+            'status' => 'array',
+        ];
     }
 }
