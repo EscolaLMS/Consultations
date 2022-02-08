@@ -11,7 +11,7 @@ class ShowConsultationRequest extends FormRequest
     public function authorize(): bool
     {
         $user = auth()->user();
-        return isset($user) ? $user->can(ConsultationsPermissionsEnum::CONSULTATION_CREATE, Consultation::class) : true;
+        return isset($user) ? $user->can(ConsultationsPermissionsEnum::CONSULTATION_READ, Consultation::class) : true;
     }
 
     public function rules(): array

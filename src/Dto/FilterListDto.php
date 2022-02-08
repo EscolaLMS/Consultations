@@ -7,20 +7,13 @@ use EscolaLms\Consultations\Repositories\Criteria\ConsultationSearch;
 use EscolaLms\Core\Repositories\Criteria\Primitives\EqualCriterion;
 use EscolaLms\Core\Repositories\Criteria\Primitives\InCriterion;
 
-class FilterListDto
+class FilterListDto extends BaseDto
 {
-    use DtoHelper;
-
     private string $name;
     private int $basePrice;
     private array $status;
 
     private array $criteria = [];
-
-    public function __construct(array $data = [])
-    {
-        $this->setterByData($data);
-    }
 
     public static function prepareFilters(array $search)
     {

@@ -19,7 +19,7 @@ class ConsultationFactory extends Factory
         $now = now();
         return [
             'base_price' => $this->faker->numberBetween(1, 200),
-            'name' => $this->faker->word,
+            'name' => $this->faker->sentence(10),
             'status' => $this->faker->randomElement(ConsultationStatusEnum::getValues()),
             'duration' => random_int(2, 10) . " hours",
             'description' => $this->faker->sentence,

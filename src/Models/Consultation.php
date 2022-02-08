@@ -13,6 +13,17 @@ class Consultation extends Model
 {
     use HasFactory;
 
+    protected $fillable = [
+        'base_price',
+        'name',
+        'status',
+        'description',
+        'author_id',
+        'duration',
+        'started_at',
+        'finished_at'
+    ];
+
     public function author(): BelongsTo
     {
         return $this->belongsTo(User::class, 'author_id');

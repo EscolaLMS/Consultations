@@ -29,4 +29,11 @@ class ConsultationRepository extends BaseRepository implements ConsultationRepos
         }
         return $query;
     }
+
+    public function updateModel(Consultation $consultation, array $data): Consultation
+    {
+        $consultation->setRawAttributes($data);
+        $consultation->save();
+        return $consultation;
+    }
 }
