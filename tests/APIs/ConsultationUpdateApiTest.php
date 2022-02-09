@@ -46,7 +46,6 @@ class ConsultationUpdateApiTest extends TestCase
             'name' => $consultationUpdate['name'],
             'status' => $consultationUpdate['status'],
             'author_id' => $consultationUpdate['author_id'],
-            'duration' => $consultationUpdate['duration'],
         ]);
         $response->assertJsonFragment(['success' => true]);
     }
@@ -62,7 +61,7 @@ class ConsultationUpdateApiTest extends TestCase
             '/api/admin/consultations/' . $id,
             $consultationUpdate->toArray()
         );
-        $response->assertStatus(JsonResponse::HTTP_UNPROCESSABLE_ENTITY);
+        $response->assertNotFound();
     }
 
     public function testConsultationUpdateRequiredValidation(): void

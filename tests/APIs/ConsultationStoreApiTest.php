@@ -40,7 +40,6 @@ class ConsultationStoreApiTest extends TestCase
             'name' => $consultation['name'],
             'status' => $consultation['status'],
             'author_id' => $consultation['author_id'],
-            'duration' => $consultation['duration'],
         ]);
         $response->assertJsonFragment(['success' => true]);
     }

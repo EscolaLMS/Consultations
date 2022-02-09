@@ -32,11 +32,7 @@ class ConsultationRepository extends BaseRepository implements ConsultationRepos
 
     public function updateModel(Consultation $consultation, array $data): Consultation
     {
-        foreach ($data as $k => $v) {
-            if (isset($consultation->$k)) {
-                $consultation->$k = $v;
-            }
-        }
+        $consultation->fill($data);
         $consultation->save();
         return $consultation;
     }

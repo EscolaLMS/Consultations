@@ -6,6 +6,7 @@ use EscolaLms\Consultations\Database\Seeders\ConsultationsPermissionSeeder;
 use EscolaLms\Consultations\Models\Consultation;
 use EscolaLms\Consultations\Tests\TestCase;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Support\Str;
 use Illuminate\Testing\Fluent\AssertableJson;
 
 class ConsultationApiTest extends TestCase
@@ -45,7 +46,6 @@ class ConsultationApiTest extends TestCase
             'name' => $this->consultation->name,
             'status' => $this->consultation->status,
             'author_id' => $this->consultation->author_id,
-            'duration' => $this->consultation->duration,
             'created_at' => $this->consultation->created_at,
         ]);
     }

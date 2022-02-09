@@ -57,6 +57,6 @@ class ConsultationDestroyApiTest extends TestCase
             'DELETE',
             '/api/admin/consultations/' . $id
         );
-        $response->assertStatus(JsonResponse::HTTP_UNPROCESSABLE_ENTITY);
+        $response->assertNotFound();
     }
 }
