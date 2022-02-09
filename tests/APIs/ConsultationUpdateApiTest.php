@@ -34,20 +34,19 @@ class ConsultationUpdateApiTest extends TestCase
 
     public function testConsultationUpdate(): void
     {
-        $consultationUpdate = Consultation::factory()->make();
+        $consultationUpdate = Consultation::factory()->make()->toArray();
         $response = $this->actingAs($this->user, 'api')->json(
             'PUT',
             $this->apiUrl,
-            $consultationUpdate->toArray()
+            $consultationUpdate
         );
         $response->assertOk();
         $response->assertJsonFragment([
-            'id' => $consultationUpdate->getKey(),
-            'name' => $consultationUpdate->name,
-            'status' => $consultationUpdate->status,
-            'author_id' => $consultationUpdate->author_id,
-            'duration' => $consultationUpdate->duration,
-            'created_at' => $consultationUpdate->created_at,
+            'id' => $this->consultation->getKey(),
+            'name' => $consultationUpdate['name'],
+            'status' => $consultationUpdate['status'],
+            'author_id' => $consultationUpdate['author_id'],
+            'duration' => $consultationUpdate['duration'],
         ]);
         $response->assertJsonFragment(['success' => true]);
     }

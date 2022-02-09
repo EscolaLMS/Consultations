@@ -65,6 +65,6 @@ class ConsultationController extends EscolaLmsBaseController implements Consulta
     public function destroy(int $id): JsonResponse
     {
         $this->consultationServiceContract->delete($id);
-        return $this->sendSuccess(__('Course deleted successfully'));
+        return $this->sendSuccess(__('Consultation deleted successfully'));
     }
 }

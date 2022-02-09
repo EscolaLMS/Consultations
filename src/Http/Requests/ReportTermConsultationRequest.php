@@ -15,7 +15,7 @@ class ReportTermConsultationRequest extends FormRequest
     public function rules(): array
     {
         return [
-            ''
+            'term' => 'required|date|after_or_equal:now'
         ];
     }
 }

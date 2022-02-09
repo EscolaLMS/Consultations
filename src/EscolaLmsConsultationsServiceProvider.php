@@ -6,6 +6,8 @@ use EscolaLms\Consultations\Repositories\ConsultationRepository;
 use EscolaLms\Consultations\Repositories\Contracts\ConsultationRepositoryContract;
 use EscolaLms\Consultations\Services\ConsultationService;
 use EscolaLms\Consultations\Services\Contracts\ConsultationServiceContract;
+use EscolaLms\Consultations\Services\Contracts\OrderServiceContract;
+use EscolaLms\Consultations\Services\OrderService;
 use Illuminate\Support\ServiceProvider;
 
 /**
@@ -14,7 +16,8 @@ use Illuminate\Support\ServiceProvider;
 class EscolaLmsConsultationsServiceProvider extends ServiceProvider
 {
     public const SERVICES = [
-        ConsultationServiceContract::class => ConsultationService::class
+        ConsultationServiceContract::class => ConsultationService::class,
+        OrderServiceContract::class => OrderService::class
     ];
     public const REPOSITORIES = [
         ConsultationRepositoryContract::class => ConsultationRepository::class

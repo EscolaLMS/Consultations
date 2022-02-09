@@ -8,6 +8,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Treestoneit\ShoppingCart\Buyable;
+use Treestoneit\ShoppingCart\BuyableTrait;
 
 
 /**
@@ -77,8 +79,9 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * )
  *
  */
-class Consultation extends Model
+class Consultation extends Model implements Buyable
 {
+    use BuyableTrait;
     use HasFactory;
 
     protected $fillable = [

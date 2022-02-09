@@ -10,6 +10,7 @@ use Illuminate\Foundation\Testing\DatabaseTransactions;
 class ConsultationStoreApiTest extends TestCase
 {
     use DatabaseTransactions;
+    private string $apiUrl;
 
     protected function setUp(): void
     {
@@ -19,31 +20,36 @@ class ConsultationStoreApiTest extends TestCase
         $this->user = config('auth.providers.users.model')::factory()->create();
         $this->user->guard_name = 'api';
         $this->user->assignRole('tutor');
+        $this->apiUrl = '/api/admin/consultations';
     }
 
     public function testConsultationStoreUnauthorized(): void
     {
-        $response = $this->json('POST','/api/admin/consultations');
+        $response = $this->json('POST',$this->apiUrl);
         $response->assertUnauthorized();
     }
 
     public function testConsultationStore(): void
     {
-        $consultation = Consultation::factory()->make();
+        $consultation = Consultation::factory()->make()->toArray();
         $response = $this->actingAs($this->user, 'api')->json(
             'POST',
-            '/api/admin/consultations',
-            $consultation->toArray()
+            $this->apiUrl,
+            $consultation
         );
         $response->assertCreated();
-        $response->assertJsonFragment($consultation->toArray());
+        $response->assertJsonFragment([
+            'name' => $consultation['name'],
+            'status' => $consultation['status'],
+            'author_id' => $consultation['author_id'],
+            'duration' => $consultation['duration'],
+        ]);
         $response->assertJsonFragment(['success' => true]);
     }
 
     public function testConsultationStoreRequiredValidation(): void
     {
-        $response = $this->actingAs($this->user, 'api')->json('POST',
-            '/api/admin/consultations');
+        $response = $this->actingAs($this->user, 'api')->json('POST', $this->apiUrl);
         $response->assertJsonValidationErrors(['name', 'status', 'description', 'author_id']);
     }
 }
