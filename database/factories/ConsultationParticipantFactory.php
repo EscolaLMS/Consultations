@@ -14,8 +14,8 @@ class ConsultationParticipantFactory extends Factory
 
     public function definition()
     {
-        $consultation = (new Consultation())->inRandomOrder()->first();
-        $user = (new User())->where('id', '<>', $consultation->author_id)->inRandomOrder()->first();
+        $consultation = Consultation::inRandomOrder()->first();
+        $user = User::where('id', '<>', $consultation->author_id)->inRandomOrder()->first();
 
         return [
             'consultation_id' => $consultation->getKey(),

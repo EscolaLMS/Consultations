@@ -3,7 +3,7 @@
 namespace EscolaLms\Consultations\Http\Controllers;
 
 use EscolaLms\Consultations\Dto\ConsultationDto;
-use EscolaLms\Consultations\Http\Controllers\Swagger\ConsultationAPISwagger;
+use EscolaLms\Consultations\Http\Controllers\Swagger\ConsultationSwagger;
 use EscolaLms\Consultations\Http\Requests\ListConsultationsRequest;
 use EscolaLms\Consultations\Http\Requests\StoreConsultationRequest;
 use EscolaLms\Consultations\Http\Requests\UpdateConsultationRequest;
@@ -12,7 +12,7 @@ use EscolaLms\Consultations\Services\Contracts\ConsultationServiceContract;
 use EscolaLms\Core\Http\Controllers\EscolaLmsBaseController;
 use Illuminate\Http\JsonResponse;
 
-class ConsultationController extends EscolaLmsBaseController implements ConsultationAPISwagger
+class ConsultationController extends EscolaLmsBaseController implements ConsultationSwagger
 {
     private ConsultationServiceContract $consultationServiceContract;
 

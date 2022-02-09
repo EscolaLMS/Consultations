@@ -1,5 +1,6 @@
 <?php
 
+use EscolaLms\Consultations\Http\Controllers\ConsultationAPIController;
 use EscolaLms\Consultations\Http\Controllers\ConsultationController;
 use Illuminate\Support\Facades\Route;
 
@@ -10,6 +11,9 @@ Route::group(['middleware' => ['auth:api'], 'prefix' => 'api/admin'], function (
 
 // user endpoints
 Route::group(['middleware' => ['auth:api'], 'prefix' => 'api'], function () {
+    Route::get('consultations/{id}', ConsultationController::class);
+    Route::get('consultations', ConsultationController::class);
+    Route::post('consultations/report-term/{id}', [ConsultationAPIController::class, 'reportTerm']);
 });
 
 // public routes
