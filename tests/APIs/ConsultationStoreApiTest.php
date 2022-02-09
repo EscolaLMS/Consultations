@@ -29,14 +29,19 @@ class ConsultationStoreApiTest extends TestCase
 
     public function testConsultationStore(): void
     {
-        $consultation = Consultation::factory()->make();
+        $consultation = Consultation::factory()->make()->toArray();
         $response = $this->actingAs($this->user, 'api')->json(
             'POST',
             '/api/admin/consultations',
-            $consultation->toArray()
+            $consultation
         );
         $response->assertCreated();
-        $response->assertJsonFragment($consultation->toArray());
+        $response->assertJsonFragment([
+            'name' => $consultation['name'],
+            'status' => $consultation['status'],
+            'author_id' => $consultation['author_id'],
+            'duration' => $consultation['duration'],
+        ]);
         $response->assertJsonFragment(['success' => true]);
     }
 
