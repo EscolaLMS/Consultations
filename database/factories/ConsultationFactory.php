@@ -6,7 +6,6 @@ use EscolaLms\Auth\Models\User;
 use EscolaLms\Consultations\Enum\ConsultationStatusEnum;
 use EscolaLms\Consultations\Models\Consultation;
 use EscolaLms\Core\Enums\UserRole;
-use EscolaLms\Courses\Database\Factories\FakerMarkdownProvider\FakerProvider;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class ConsultationFactory extends Factory
@@ -19,11 +18,10 @@ class ConsultationFactory extends Factory
         $now = now();
         return [
             'base_price' => $this->faker->numberBetween(1, 200),
-            'name' => $this->faker->word,
+            'name' => $this->faker->sentence(10),
             'status' => $this->faker->randomElement(ConsultationStatusEnum::getValues()),
             'description' => $this->faker->sentence,
-            'author_id' => empty($tutor) ? null : $tutor->id,
-            'calendar_url' => $this->faker->url,
+            'author_id' => empty($tutor) ? null : $tutor->getKey(),
             'started_at' => $now,
             'finished_at' => (clone $now)->modify('+1 hour'),
         ];

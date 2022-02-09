@@ -2,6 +2,8 @@
 
 namespace EscolaLms\Consultations\Dto\Traits;
 
+use Illuminate\Support\Str;
+
 trait DtoHelper
 {
     protected function setterByData(array $data): void
@@ -12,8 +14,29 @@ trait DtoHelper
             }, $k);
             if (method_exists($this, 'set' . $key)) {
                 $this->{'set' . $key}($v);
+            } else {
+                $key = lcfirst($key);
+                $this->$key = $v;
             }
         }
+    }
+
+    protected function getterByAttribute(string $attribute)
+    {
+        $key = Str::studly($attribute);
+        if (method_exists($this, 'set' . $key)) {
+            return $this->{'get' . $key}();
+        }
+        return $this->{lcfirst($key)} ?? null;
+    }
+
+    protected function fillInArray(array $fillables): array
+    {
+        $result = [];
+        foreach ($fillables as $fill) {
+            $result[$fill] = $this->getterByAttribute($fill);
+        }
+        return $result;
     }
 
 }

@@ -21,28 +21,21 @@ class ConsultationsPermissionSeeder extends Seeder
         Permission::findOrCreate(ConsultationsPermissionsEnum::CONSULTATION_UPDATE, 'api');
         Permission::findOrCreate(ConsultationsPermissionsEnum::CONSULTATION_DELETE, 'api');
         Permission::findOrCreate(ConsultationsPermissionsEnum::CONSULTATION_CREATE, 'api');
-        Permission::findOrCreate(ConsultationsPermissionsEnum::CONSULTATION_ATTEND, 'api');
-
-        Permission::findOrCreate(ConsultationsPermissionsEnum::CONSULTATION_UPDATE_OWNED, 'api');
-        Permission::findOrCreate(ConsultationsPermissionsEnum::CONSULTATION_DELETE_OWNED, 'api');
-        Permission::findOrCreate(ConsultationsPermissionsEnum::CONSULTATION_ATTEND_OWNED, 'api');
+        Permission::findOrCreate(ConsultationsPermissionsEnum::CONSULTATION_READ, 'api');
 
         $admin->givePermissionTo([
             ConsultationsPermissionsEnum::CONSULTATION_LIST,
             ConsultationsPermissionsEnum::CONSULTATION_UPDATE,
             ConsultationsPermissionsEnum::CONSULTATION_DELETE,
             ConsultationsPermissionsEnum::CONSULTATION_CREATE,
-            ConsultationsPermissionsEnum::CONSULTATION_ATTEND,
-            ConsultationsPermissionsEnum::CONSULTATION_UPDATE_OWNED,
-            ConsultationsPermissionsEnum::CONSULTATION_DELETE_OWNED,
-            ConsultationsPermissionsEnum::CONSULTATION_ATTEND_OWNED,
+            ConsultationsPermissionsEnum::CONSULTATION_READ,
         ]);
         $tutor->givePermissionTo([
             ConsultationsPermissionsEnum::CONSULTATION_LIST,
+            ConsultationsPermissionsEnum::CONSULTATION_UPDATE,
+            ConsultationsPermissionsEnum::CONSULTATION_DELETE,
             ConsultationsPermissionsEnum::CONSULTATION_CREATE,
-            ConsultationsPermissionsEnum::CONSULTATION_UPDATE_OWNED,
-            ConsultationsPermissionsEnum::CONSULTATION_DELETE_OWNED,
-            ConsultationsPermissionsEnum::CONSULTATION_ATTEND_OWNED,
+            ConsultationsPermissionsEnum::CONSULTATION_READ,
         ]);
     }
 }

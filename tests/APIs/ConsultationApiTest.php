@@ -1,0 +1,58 @@
+<?php
+
+namespace EscolaLms\Consultations\Tests\APIs;
+
+use EscolaLms\Consultations\Database\Seeders\ConsultationsPermissionSeeder;
+use EscolaLms\Consultations\Models\Consultation;
+use EscolaLms\Consultations\Tests\TestCase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Support\Str;
+use Illuminate\Testing\Fluent\AssertableJson;
+
+class ConsultationApiTest extends TestCase
+{
+    use DatabaseTransactions;
+    private Consultation $consultation;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->seed(ConsultationsPermissionSeeder::class);
+
+        $this->user = config('auth.providers.users.model')::factory()->create();
+        $this->user->guard_name = 'api';
+        $this->user->assignRole('tutor');
+        $this->consultation = Consultation::factory()->create();
+        $this->consultation->author()->associate($this->user);
+    }
+
+    public function testConsultationsList()
+    {
+        $this->response = $this->actingAs($this->user, 'api')->get('/api/admin/consultations');
+        $this->response->assertOk();
+    }
+
+    public function testConsultationsListWithFilter()
+    {
+        $filterData = [
+            'base_price=' . $this->consultation->base_price,
+            'name=' . $this->consultation->name,
+            'status[]=' . $this->consultation->status,
+        ];
+        $this->response = $this->actingAs($this->user, 'api')->get('/api/admin/consultations?' . implode('&', $filterData));
+        $this->response->assertOk();
+        $this->response->assertJsonFragment([
+            'id' => $this->consultation->getKey(),
+            'name' => $this->consultation->name,
+            'status' => $this->consultation->status,
+            'author_id' => $this->consultation->author_id,
+            'created_at' => $this->consultation->created_at,
+        ]);
+    }
+
+    public function testConsultationsListUnauthorized()
+    {
+        $this->response = $this->json('GET','/api/admin/consultations');
+        $this->response->assertUnauthorized();
+    }
+}

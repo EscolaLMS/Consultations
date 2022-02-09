@@ -3,6 +3,7 @@
 namespace EscolaLms\Consultations\Models;
 
 use EscolaLms\Auth\Models\User;
+use EscolaLms\Consultations\Database\Factories\ConsultationParticipantFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -19,5 +20,10 @@ class ConsultationParticipant extends Model
     public function consultation(): BelongsTo
     {
         return $this->belongsTo(Consultation::class);
+    }
+
+    protected static function newFactory(): ConsultationParticipantFactory
+    {
+        return ConsultationParticipantFactory::new();
     }
 }
