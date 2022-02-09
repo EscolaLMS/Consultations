@@ -65,4 +65,17 @@ class ConsultationService implements ConsultationServiceContract
         }
         return $consultation;
     }
+
+    public function delete(int $id): bool
+    {
+        DB::beginTransaction();
+        try {
+            $this->consultationRepositoryContract->delete($id);
+            DB::commit();
+            return true;
+        } catch (Exception $exception) {
+            DB::rollBack();
+            throw new UnprocessableEntityHttpException(__('Consultation deleted failed'));
+        }
+    }
 }

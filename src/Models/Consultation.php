@@ -9,6 +9,74 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+
+/**
+ * @OA\Schema(
+ *      schema="Consultation",
+ *      required={"name", "status", "description", "author_id"},
+ *      @OA\Property(
+ *          property="id",
+ *          description="id",
+ *          type="integer",
+ *      ),
+ *      @OA\Property(
+ *          property="name",
+ *          description="name",
+ *          type="string"
+ *      ),
+ *      @OA\Property(
+ *          property="status",
+ *          description="status",
+ *          type="string"
+ *      ),
+ *      @OA\Property(
+ *          property="description",
+ *          description="description",
+ *          type="string"
+ *      ),
+ *      @OA\Property(
+ *          property="author_id",
+ *          description="author_id",
+ *          type="integer"
+ *      ),
+ *      @OA\Property(
+ *          property="base_price",
+ *          description="base_price",
+ *          type="integer"
+ *      ),
+ *      @OA\Property(
+ *          property="duration",
+ *          description="duration",
+ *          type="string"
+ *      ),
+ *     @OA\Property(
+ *          property="description",
+ *          description="description",
+ *          type="string",
+ *      ),
+ *      @OA\Property(
+ *          property="finished_at",
+ *          description="finished_at",
+ *          type="datetime",
+ *      ),
+ *      @OA\Property(
+ *          property="started_at",
+ *          description="started_at",
+ *          type="datetime"
+ *      ),
+ *      @OA\Property(
+ *          property="created_at",
+ *          description="created_at",
+ *          type="datetime",
+ *      ),
+ *      @OA\Property(
+ *          property="updated_at",
+ *          description="updated_at",
+ *          type="datetime",
+ *      ),
+ * )
+ *
+ */
 class Consultation extends Model
 {
     use HasFactory;

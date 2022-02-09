@@ -2,6 +2,8 @@
 namespace EscolaLms\Consultations\Http\Controllers\Swagger;
 
 use EscolaLms\Consultations\Http\Requests\ListConsultationsRequest;
+use EscolaLms\Consultations\Http\Requests\StoreConsultationRequest;
+use EscolaLms\Consultations\Http\Requests\UpdateConsultationRequest;
 use Illuminate\Http\JsonResponse;
 
 interface ConsultationAPISwagger
@@ -198,4 +200,225 @@ interface ConsultationAPISwagger
      * )
      */
     public function index(ListConsultationsRequest $listConsultationsRequest): JsonResponse;
+
+    /**
+     * @OA\Post(
+     *      path="/api/admin/consultations",
+     *      summary="Store a newly created Consultation in storage",
+     *      tags={"Admin Consultations"},
+     *      description="Store Consultation",
+     *      security={
+     *          {"passport": {}},
+     *      },
+     *      @OA\RequestBody(
+     *          required=true,
+     *          @OA\MediaType(
+     *              mediaType="application/json",
+     *              @OA\Schema(ref="#/components/schemas/Consultation")
+     *          ),
+     *      ),
+     *      @OA\Response(
+     *          response=201,
+     *          description="successful operation",
+     *          @OA\MediaType(
+     *              mediaType="application/json"
+     *          ),
+     *          @OA\Schema(
+     *              type="object",
+     *              @OA\Property(
+     *                  property="success",
+     *                  type="boolean"
+     *              ),
+     *              @OA\Property(
+     *                  property="data",
+     *                  ref="#/components/schemas/Consultation"
+     *              ),
+     *              @OA\Property(
+     *                  property="message",
+     *                  type="string"
+     *              )
+     *          )
+     *      )
+     * )
+     */
+    public function store(StoreConsultationRequest $storeConsultationRequest): JsonResponse;
+
+    /**
+     * @OA\Get(
+     *      path="/api/admin/consultations/{id}",
+     *      summary="Display the specified Consultation",
+     *      tags={"Admin Consultations"},
+     *      description="Get Consultation",
+     *      security={
+     *         {"passport": {}},
+     *      },
+     *      @OA\Parameter(
+     *          name="id",
+     *          description="id of Consultation",
+     *          @OA\Schema(
+     *             type="integer",
+     *         ),
+     *          required=true,
+     *          in="path"
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="successful operation",
+     *          @OA\MediaType(
+     *              mediaType="application/json"
+     *          ),
+     *          @OA\Schema(
+     *              type="object",
+     *              @OA\Property(
+     *                  property="success",
+     *                  type="boolean"
+     *              ),
+     *              @OA\Property(
+     *                  property="data",
+     *                  ref="#/components/schemas/Consultation"
+     *              ),
+     *              @OA\Property(
+     *                  property="message",
+     *                  type="string"
+     *              )
+     *          )
+     *      )
+     * )
+     */
+
+    /**
+     * @OA\Get(
+     *      path="/api/consultations/{id}",
+     *      summary="Display the specified Consultation",
+     *      tags={"Consultations"},
+     *      description="Get Consultation",
+     *      @OA\Parameter(
+     *          name="id",
+     *          description="id of Consultation",
+     *          @OA\Schema(
+     *             type="integer",
+     *         ),
+     *          required=true,
+     *          in="path"
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="successful operation",
+     *          @OA\MediaType(
+     *              mediaType="application/json"
+     *          ),
+     *          @OA\Schema(
+     *              type="object",
+     *              @OA\Property(
+     *                  property="success",
+     *                  type="boolean"
+     *              ),
+     *              @OA\Property(
+     *                  property="data",
+     *                  ref="#/components/schemas/Consultation"
+     *              ),
+     *              @OA\Property(
+     *                  property="message",
+     *                  type="string"
+     *              )
+     *          )
+     *      )
+     * )
+     */
+    public function show(int $id): JsonResponse;
+
+    /**
+     * @OA\Put(
+     *      path="/api/admin/consultations/{id}",
+     *      summary="Update the specified Consultation in storage",
+     *      tags={"Admin Consultations"},
+     *      description="Update Consultation",
+     *      security={
+     *          {"passport": {}},
+     *      },
+     *      @OA\Parameter(
+     *          name="id",
+     *          description="id of Consultation",
+     *          @OA\Schema(
+     *             type="integer",
+     *         ),
+     *          required=true,
+     *          in="path"
+     *      ),
+     *      @OA\RequestBody(
+     *          required=true,
+     *          @OA\MediaType(
+     *              mediaType="application/json",
+     *              @OA\Schema(ref="#/components/schemas/Consultation")
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="successful operation",
+     *          @OA\MediaType(
+     *              mediaType="application/json"
+     *          ),
+     *          @OA\Schema(
+     *              type="object",
+     *              @OA\Property(
+     *                  property="success",
+     *                  type="boolean"
+     *              ),
+     *              @OA\Property(
+     *                  property="data",
+     *                  ref="#/components/schemas/Consultation"
+     *              ),
+     *              @OA\Property(
+     *                  property="message",
+     *                  type="string"
+     *              )
+     *          )
+     *      )
+     * )
+     */
+    public function update(int $id, UpdateConsultationRequest $updateConsultationRequest): JsonResponse;
+
+    /**
+     * @OA\Delete(
+     *      path="/api/admin/consultations/{id}",
+     *      summary="Remove the specified Consultation from storage",
+     *      tags={"Admin Consultations"},
+     *      description="Delete Consultation",
+     *      security={
+     *          {"passport": {}},
+     *      },
+     *      @OA\Parameter(
+     *          name="id",
+     *          description="id of Consultation",
+     *          @OA\Schema(
+     *             type="integer",
+     *         ),
+     *          required=true,
+     *          in="path"
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="successful operation",
+     *          @OA\MediaType(
+     *              mediaType="application/json"
+     *          ),
+     *          @OA\Schema(
+     *              type="object",
+     *              @OA\Property(
+     *                  property="success",
+     *                  type="boolean"
+     *              ),
+     *              @OA\Property(
+     *                  property="data",
+     *                  type="string"
+     *              ),
+     *              @OA\Property(
+     *                  property="message",
+     *                  type="string"
+     *              )
+     *          )
+     *      )
+     * )
+     */
+    public function destroy(int $id): JsonResponse;
 }

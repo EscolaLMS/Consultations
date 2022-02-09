@@ -6,7 +6,6 @@ use EscolaLms\Auth\Models\User;
 use EscolaLms\Consultations\Enum\ConsultationStatusEnum;
 use EscolaLms\Consultations\Models\Consultation;
 use EscolaLms\Core\Enums\UserRole;
-use EscolaLms\Courses\Database\Factories\FakerMarkdownProvider\FakerProvider;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class ConsultationFactory extends Factory

@@ -6,7 +6,6 @@ use EscolaLms\Auth\Models\User;
 use EscolaLms\Consultations\Enum\ConsultationParticipantStatusEnum;
 use EscolaLms\Consultations\Models\Consultation;
 use EscolaLms\Consultations\Models\ConsultationParticipant;
-use EscolaLms\Courses\Database\Factories\FakerMarkdownProvider\FakerProvider;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class ConsultationParticipantFactory extends Factory
@@ -15,8 +14,8 @@ class ConsultationParticipantFactory extends Factory
 
     public function definition()
     {
-        $consultation = Consultation::inRandomOrder()->first();
-        $user = User::where('id', '<>', $consultation->author_id)->inRandomOrder()->first();
+        $consultation = (new Consultation())->inRandomOrder()->first();
+        $user = (new User())->where('id', '<>', $consultation->author_id)->inRandomOrder()->first();
 
         return [
             'consultation_id' => $consultation->getKey(),
