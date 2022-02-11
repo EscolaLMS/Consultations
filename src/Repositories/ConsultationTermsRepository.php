@@ -20,4 +20,16 @@ class ConsultationTermsRepository extends BaseRepository implements Consultation
         return ConsultationTerm::class;
     }
 
+    public function findByOrderItem(int $orderItemId): ConsultationTerm
+    {
+        return $this->model->newQuery()->where('order_item_id', '=', $orderItemId)->firstOrFail();
+    }
+
+    public function updateModel(ConsultationTerm $consultationTerm, array $data): ConsultationTerm
+    {
+        $consultationTerm->fill($data);
+        $consultationTerm->save();
+        return $consultationTerm;
+    }
+
 }

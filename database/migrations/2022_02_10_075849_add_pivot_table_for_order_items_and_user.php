@@ -21,15 +21,15 @@ class AddPivotTableForOrderItemsAndUser extends Migration
                 $table->dropColumn(['executed_at', 'executed_status']);
             });
         }
-        Schema::create('consultations_terms', function (Blueprint $table) {
+        Schema::create('consultation_terms', function (Blueprint $table) {
             $table->id();
             $table->bigInteger('user_id')->unsigned();
             $table->bigInteger('order_item_id')->unsigned();
             $table->dateTime('executed_at')->nullable();
             $table->string('executed_status')->nullable();
-
+            $table->timestamps();
             if (Schema::hasTable('orders')) {
-                $table->foreign('order_item_id')->on('orders')->references('id')->cascadeOnDelete();
+                $table->foreign('order_item_id')->on('order_items')->references('id')->cascadeOnDelete();
             }
             $table->foreign('user_id')->on('users')->references('id');
         });
@@ -52,6 +52,6 @@ class AddPivotTableForOrderItemsAndUser extends Migration
             });
         }
 
-        Schema::dropIfExists('consultations_terms');
+        Schema::dropIfExists('consultation_terms');
     }
 }

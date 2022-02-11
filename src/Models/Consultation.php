@@ -44,11 +44,6 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  *          description="base_price",
  *          type="integer"
  *      ),
- *      @OA\Property(
- *          property="duration",
- *          description="duration",
- *          type="string"
- *      ),
  *     @OA\Property(
  *          property="description",
  *          description="description",
@@ -87,7 +82,6 @@ class Consultation extends Model
         'status',
         'description',
         'author_id',
-        'duration',
         'started_at',
         'finished_at'
     ];

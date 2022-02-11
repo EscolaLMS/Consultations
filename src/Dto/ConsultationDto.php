@@ -12,7 +12,6 @@ class ConsultationDto extends BaseDto implements ModelDtoContract
     protected string $description;
     protected ?string $startedAt;
     protected ?string $finishedAt;
-    protected ?string $duration;
     protected ?int $basePrice;
     protected ?int $authorId;
 

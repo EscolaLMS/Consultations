@@ -14,11 +14,9 @@ Route::group(['middleware' => ['auth:api'], 'prefix' => 'api/admin'], function (
 Route::group(['middleware' => ['auth:api'], 'prefix' => 'api/consultations'], function () {
     Route::get('/', [ConsultationController::class, 'index']);
     Route::get('/{id}', [ConsultationController::class, 'show']);
+    Route::post('/report-term/{orderItemId}', [ConsultationController::class, 'reportTerm']);
 });
 
-Route::group(['prefix' => 'api/orders', 'middleware' => ['auth:api']], function () {
-    Route::get('report-term/{id}', [OrderApiController::class, 'reportTerm']);
-});
 
 // public routes
 Route::group(['prefix' => 'api'], function () {

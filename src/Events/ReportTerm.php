@@ -3,20 +3,22 @@
 namespace EscolaLms\Consultations\Events;
 
 use EscolaLms\Auth\Models\User;
+use EscolaLms\Consultations\Models\ConsultationTerm;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
+use EscolaLms\Consultations\Models\Consultation as ConsultationModel;
 
 class ReportTerm
 {
     use Dispatchable, SerializesModels;
 
     private User $user;
-    private ConsultationModel $consultation;
+    private ConsultationTerm $consultationTerm;
 
-    public function __construct(User $user, ConsultationModel $consultation)
+    public function __construct(User $user, ConsultationTerm $consultationTerm)
     {
         $this->user = $user;
-        $this->consultation = $consultation;
+        $this->consultationTerm = $consultationTerm;
     }
 
     public function getUser(): User
@@ -24,8 +26,8 @@ class ReportTerm
         return $this->user;
     }
 
-    public function getCourse(): ConsultationModel
+    public function getConsultationTerm(): ConsultationTerm
     {
-        return $this->consultation;
+        return $this->consultationTerm;
     }
 }

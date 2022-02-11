@@ -2,6 +2,8 @@
 
 namespace EscolaLms\Consultations\Dto\Traits;
 
+use Illuminate\Support\Str;
+
 trait DtoHelper
 {
     protected function setterByData(array $data): void
@@ -21,9 +23,7 @@ trait DtoHelper
 
     protected function getterByAttribute(string $attribute)
     {
-        $key = preg_replace_callback('/_([a-zA-Z])/', function ($match) {
-            return strtoupper($match[1]);
-        }, $attribute);
+        $key = Str::studly($attribute);
         if (method_exists($this, 'set' . $key)) {
             return $this->{'get' . $key}();
         }

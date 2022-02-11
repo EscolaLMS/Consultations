@@ -11,6 +11,7 @@ use EscolaLms\Consultations\Http\Resources\ConsultationSimpleResource;
 use EscolaLms\Consultations\Services\Contracts\ConsultationServiceContract;
 use EscolaLms\Core\Http\Controllers\EscolaLmsBaseController;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class ConsultationController extends EscolaLmsBaseController implements ConsultationSwagger
 {
@@ -66,5 +67,11 @@ class ConsultationController extends EscolaLmsBaseController implements Consulta
     {
         $this->consultationServiceContract->delete($id);
         return $this->sendSuccess(__('Consultation deleted successfully'));
+    }
+
+    public function reportTerm(int $orderItemId, Request $request)
+    {
+        $this->consultationServiceContract->reportTerm($orderItemId, $request->input('executed_at'));
+        return $this->sendSuccess(__('Consultation reserved term successfully'));
     }
 }
