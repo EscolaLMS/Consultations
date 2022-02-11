@@ -3,8 +3,12 @@
 namespace EscolaLms\Consultations\Services;
 
 use EscolaLms\Consultations\Dto\FilterListDto;
+use EscolaLms\Consultations\Enum\ConsultationTermStatusEnum;
 use EscolaLms\Consultations\Models\Consultation;
+use EscolaLms\Consultations\Models\ConsultationTerm;
+use EscolaLms\Consultations\Models\Contracts\ConsultationContract;
 use EscolaLms\Consultations\Repositories\Contracts\ConsultationRepositoryContract;
+use EscolaLms\Consultations\Repositories\Contracts\ConsultationTermsRepositoryContract;
 use EscolaLms\Consultations\Services\Contracts\ConsultationServiceContract;
 use Exception;
 use Illuminate\Database\Eloquent\Builder;
@@ -14,11 +18,14 @@ use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 class ConsultationService implements ConsultationServiceContract
 {
     private ConsultationRepositoryContract $consultationRepositoryContract;
+    private ConsultationTermsRepositoryContract $consultationTermsRepositoryContract;
 
     public function __construct(
-        ConsultationRepositoryContract $consultationRepositoryContract
+        ConsultationRepositoryContract $consultationRepositoryContract,
+        ConsultationTermsRepositoryContract $consultationTermsRepositoryContract
     ) {
         $this->consultationRepositoryContract = $consultationRepositoryContract;
+        $this->consultationTermsRepositoryContract = $consultationTermsRepositoryContract;
     }
 
     public function getConsultationsList(array $search = []): Builder
@@ -76,6 +83,20 @@ class ConsultationService implements ConsultationServiceContract
         } catch (Exception $exception) {
             DB::rollBack();
             throw new UnprocessableEntityHttpException(__('Consultation deleted failed'));
+        }
+    }
+
+    public function setPivotOrderConsultation($order, $user)
+    {
+        foreach ($order->items as $item) {
+            if ($item->buyable instanceof Consultation) {
+                $data = [
+                    'order_item_id' => $item->getKey(),
+                    'user_id' => $user->getKey(),
+                    'executed_status' => ConsultationTermStatusEnum::NOT_REPORTED
+                ];
+                $this->consultationTermsRepositoryContract->create($data);
+            }
         }
     }
 }

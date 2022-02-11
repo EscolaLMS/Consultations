@@ -2,6 +2,30 @@
 
 namespace EscolaLms\Consultations\Events;
 
-class ReportTerm extends Consultation
+use EscolaLms\Auth\Models\User;
+use Illuminate\Foundation\Events\Dispatchable;
+use Illuminate\Queue\SerializesModels;
+
+class ReportTerm
 {
+    use Dispatchable, SerializesModels;
+
+    private User $user;
+    private ConsultationModel $consultation;
+
+    public function __construct(User $user, ConsultationModel $consultation)
+    {
+        $this->user = $user;
+        $this->consultation = $consultation;
+    }
+
+    public function getUser(): User
+    {
+        return $this->user;
+    }
+
+    public function getCourse(): ConsultationModel
+    {
+        return $this->consultation;
+    }
 }

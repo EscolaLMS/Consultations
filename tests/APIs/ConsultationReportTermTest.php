@@ -2,46 +2,43 @@
 
 namespace EscolaLms\Consultations\Tests\APIs;
 
-use EscolaLms\Auth\Models\User;
+use EscolaLms\Cart\Events\CartOrderPaid;
 use EscolaLms\Cart\Models\Order;
 use EscolaLms\Cart\Models\OrderItem;
-use EscolaLms\Consultations\Models\Consultation;
+use EscolaLms\Cart\Models\User;
+use EscolaLms\Consultations\Listeners\ReportTermListener;
+use EscolaLms\Consultations\Tests\Models\ConsultationTest;
 use EscolaLms\Consultations\Tests\TestCase;
-use EscolaLms\Payments\Models\Payment;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Support\Facades\Event;
 
 class ConsultationReportTermTest extends TestCase
 {
     use DatabaseTransactions;
     private string $apiUrl;
     private Order $order;
+    private ConsultationTest $consultation;
 
     protected function setUp(): void
     {
         parent::setUp();
-        $this->user = config('auth.providers.users.model')::factory()->create();
+        $this->user = User::factory()->create();
         $this->user->guard_name = 'api';
         $this->user->assignRole('tutor');
     }
 
     private function initVariable(): void
     {
-        $consultationsForOrder = Consultation::factory(3)->create();
-        $price = $consultationsForOrder->reduce(fn ($acc, Consultation $consultation) => $acc + $consultation->getBuyablePrice(), 0);
-
-        $order = Order::factory()->has(Payment::factory()->state([
-            'amount' => $price,
-            'billable_id' => $this->user->getKey(),
-            'billable_type' => User::class,
-        ]))
-            ->afterCreating(
+        $consultationsForOrder = ConsultationTest::factory(3)->create();
+        $price = $consultationsForOrder->reduce(fn ($acc, ConsultationTest $consultation) => $acc + $consultation->getBuyablePrice(), 0);
+        $this->order = Order::factory()->afterCreating(
                 fn (Order $order) => $order->items()->saveMany(
                     $consultationsForOrder->map(
-                        function (Consultation $consultation) {
+                        function (ConsultationTest $consultation) {
                             return OrderItem::query()->make([
                                 'quantity' => 1,
                                 'buyable_id' => $consultation->getKey(),
-                                'buyable_type' => Consultation::class,
+                                'buyable_type' => ConsultationTest::class,
                             ]);
                         }
                     )
@@ -55,6 +52,10 @@ class ConsultationReportTermTest extends TestCase
 
     public function testConsultationReportTerm()
     {
+        Event::fake(CartOrderPaid::class);
         $this->initVariable();
+        $event = new CartOrderPaid($this->user, $this->order);
+        $listener = app(ReportTermListener::class);
+        $listener->handle($event);
     }
 }

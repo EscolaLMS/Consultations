@@ -3,11 +3,11 @@
 namespace EscolaLms\Consultations;
 
 use EscolaLms\Consultations\Repositories\ConsultationRepository;
+use EscolaLms\Consultations\Repositories\ConsultationTermsRepository;
 use EscolaLms\Consultations\Repositories\Contracts\ConsultationRepositoryContract;
+use EscolaLms\Consultations\Repositories\Contracts\ConsultationTermsRepositoryContract;
 use EscolaLms\Consultations\Services\ConsultationService;
 use EscolaLms\Consultations\Services\Contracts\ConsultationServiceContract;
-use EscolaLms\Consultations\Services\Contracts\OrderServiceContract;
-use EscolaLms\Consultations\Services\OrderService;
 use Illuminate\Support\ServiceProvider;
 
 /**
@@ -16,11 +16,11 @@ use Illuminate\Support\ServiceProvider;
 class EscolaLmsConsultationsServiceProvider extends ServiceProvider
 {
     public const SERVICES = [
-        ConsultationServiceContract::class => ConsultationService::class,
-        OrderServiceContract::class => OrderService::class
+        ConsultationServiceContract::class => ConsultationService::class
     ];
     public const REPOSITORIES = [
-        ConsultationRepositoryContract::class => ConsultationRepository::class
+        ConsultationRepositoryContract::class => ConsultationRepository::class,
+        ConsultationTermsRepositoryContract::class => ConsultationTermsRepository::class
     ];
 
     public $singletons = self::SERVICES + self::REPOSITORIES;

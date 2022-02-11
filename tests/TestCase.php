@@ -7,6 +7,7 @@ use EscolaLms\Auth\Models\User;
 use EscolaLms\Auth\Tests\Models\Client;
 use EscolaLms\Consultations\AuthServiceProvider;
 use EscolaLms\Consultations\EscolaLmsConsultationsServiceProvider;
+use EscolaLms\Consultations\Tests\Providers\EventsServiceProvider;
 use Illuminate\Testing\TestResponse;
 use Laravel\Passport\Passport;
 use Laravel\Passport\PassportServiceProvider;
@@ -31,6 +32,7 @@ class TestCase extends \EscolaLms\Core\Tests\TestCase
             PermissionServiceProvider::class,
             PassportServiceProvider::class,
             AuthServiceProvider::class,
+            EventsServiceProvider::class,
         ];
     }
 
