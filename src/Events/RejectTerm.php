@@ -2,6 +2,6 @@
 
 namespace EscolaLms\Consultations\Events;
 
-class ReportTerm extends ConsultationTerm
+class RejectTerm extends ConsultationTerm
 {
 }

@@ -9,7 +9,7 @@ class ReportTermConsultationRequest extends FormRequest
     public function authorize(): bool
     {
         $user = auth()->user();
-        return isset($user) ? true : false;
+        return isset($user);
     }
 
     public function rules(): array

@@ -22,7 +22,7 @@ class ConsultationTermsRepository extends BaseRepository implements Consultation
 
     public function findByOrderItem(int $orderItemId): ConsultationTerm
     {
-        return $this->model->newQuery()->where('order_item_id', '=', $orderItemId)->firstOrFail();
+        return $this->model->newQuery()->whereOrderItemId($orderItemId)->firstOrFail();
     }
 
     public function updateModel(ConsultationTerm $consultationTerm, array $data): ConsultationTerm

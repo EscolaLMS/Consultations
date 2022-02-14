@@ -6,7 +6,6 @@ use EscolaLms\Consultations\Database\Seeders\ConsultationsPermissionSeeder;
 use EscolaLms\Consultations\Models\Consultation;
 use EscolaLms\Consultations\Tests\TestCase;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
-use Illuminate\Support\Str;
 use Illuminate\Testing\Fluent\AssertableJson;
 
 class ConsultationApiTest extends TestCase
@@ -26,13 +25,13 @@ class ConsultationApiTest extends TestCase
         $this->consultation->author()->associate($this->user);
     }
 
-    public function testConsultationsList()
+    public function testConsultationsList(): void
     {
         $this->response = $this->actingAs($this->user, 'api')->get('/api/admin/consultations');
         $this->response->assertOk();
     }
 
-    public function testConsultationsListWithFilter()
+    public function testConsultationsListWithFilter(): void
     {
         $filterData = [
             'base_price=' . $this->consultation->base_price,
@@ -45,12 +44,11 @@ class ConsultationApiTest extends TestCase
             'id' => $this->consultation->getKey(),
             'name' => $this->consultation->name,
             'status' => $this->consultation->status,
-            'author_id' => $this->consultation->author_id,
             'created_at' => $this->consultation->created_at,
         ]);
     }
 
-    public function testConsultationsListUnauthorized()
+    public function testConsultationsListUnauthorized(): void
     {
         $this->response = $this->json('GET','/api/admin/consultations');
         $this->response->assertUnauthorized();

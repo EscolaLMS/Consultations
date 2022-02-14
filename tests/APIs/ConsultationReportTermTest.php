@@ -7,6 +7,8 @@ use EscolaLms\Cart\Models\Order;
 use EscolaLms\Cart\Models\OrderItem;
 use EscolaLms\Cart\Models\User;
 use EscolaLms\Consultations\Enum\ConsultationTermStatusEnum;
+use EscolaLms\Consultations\Events\ApprovedTerm;
+use EscolaLms\Consultations\Events\RejectTerm;
 use EscolaLms\Consultations\Events\ReportTerm;
 use EscolaLms\Consultations\Listeners\ReportTermListener;
 use EscolaLms\Consultations\Models\ConsultationTerm;
@@ -58,16 +60,16 @@ class ConsultationReportTermTest extends TestCase
         $listener->handle($event);
     }
 
-    public function testConsultationReportTerm()
+    public function testConsultationReportTerm(): void
     {
         $this->initVariable();
-        $item = Order::where('user_id', '=', $this->user->getKey())->first()->items()->first();
+        $item = Order::whereUserId($this->user->getKey())->first()->items()->first();
         $now = now()->modify('+1 day');
         $this->response = $this->actingAs($this->user, 'api')
             ->json('POST',
                 '/api/consultations/report-term/' . $item->getKey(),
                 [
-                    'executed_at' => $now->format('Y-m-d H:i:s')
+                    'term' => $now->format('Y-m-d H:i:s')
                 ]
             );
         $consultationTermsRepositoryContract = app(ConsultationTermsRepositoryContract::class);
@@ -78,17 +80,81 @@ class ConsultationReportTermTest extends TestCase
         Event::assertDispatched(ReportTerm::class);
     }
 
-    public function testConsultationReportTermUnauthorized()
+    public function testConsultationReportTermUnauthorized(): void
     {
         $this->initVariable();
-        $item = Order::where('user_id', '=', $this->user->getKey())->first()->items()->first();
+        $item = Order::whereUserId($this->user->getKey())->first()->items()->first();
         $now = now()->modify('+1 day');
         $this->response = $this->json('POST',
                 '/api/consultations/report-term/' . $item->getKey(),
                 [
-                    'executed_at' => $now->format('Y-m-d H:i:s')
+                    'term' => $now->format('Y-m-d H:i:s')
                 ]
             );
+        $this->response->assertUnauthorized();
+    }
+
+    public function testConsultationTermApproved(): void
+    {
+        $this->initVariable();
+        $orderItem = Order::whereUserId($this->user->getKey())->first()->items()->first();
+        $now = now()->modify('+1 day');
+        $this->response = $this->actingAs($this->user, 'api')->json('POST',
+            '/api/consultations/report-term/' . $orderItem->getKey(),
+            [
+                'term' => $now->format('Y-m-d H:i:s')
+            ]
+        );
+        $consultationTermsRepositoryContract = app(ConsultationTermsRepositoryContract::class);
+        $consultationTerm = $consultationTermsRepositoryContract->findByOrderItem($orderItem->getKey());
+        $this->response = $this->actingAs($this->user, 'api')->json(
+            'GET',
+            '/api/consultations/approve-term/' . $consultationTerm->getKey()
+        );
+        Event::assertDispatched(ApprovedTerm::class);
+        $consultationTerm->refresh();
+        $this->response->assertOk();
+        $this->assertTrue($consultationTerm->executed_status === ConsultationTermStatusEnum::APPROVED);
+    }
+
+    public function testConsultationTermApprovedUnauthorized()
+    {
+        $this->response = $this->json(
+            'GET',
+            '/api/consultations/approve-term/1'
+        );
+        $this->response->assertUnauthorized();
+    }
+
+    public function testConsultationTermReject(): void
+    {
+        $this->initVariable();
+        $orderItem = Order::whereUserId($this->user->getKey())->first()->items()->first();
+        $now = now()->modify('+1 day');
+        $this->response = $this->actingAs($this->user, 'api')->json('POST',
+            '/api/consultations/report-term/' . $orderItem->getKey(),
+            [
+                'term' => $now->format('Y-m-d H:i:s')
+            ]
+        );
+        $consultationTermsRepositoryContract = app(ConsultationTermsRepositoryContract::class);
+        $consultationTerm = $consultationTermsRepositoryContract->findByOrderItem($orderItem->getKey());
+        $this->response = $this->actingAs($this->user, 'api')->json(
+            'GET',
+            '/api/consultations/reject-term/' . $consultationTerm->getKey()
+        );
+        Event::assertDispatched(RejectTerm::class);
+        $consultationTerm->refresh();
+        $this->response->assertOk();
+        $this->assertTrue($consultationTerm->executed_status === ConsultationTermStatusEnum::REJECT);
+    }
+
+    public function testConsultationTermRejectUnauthorized()
+    {
+        $this->response = $this->json(
+            'GET',
+            '/api/consultations/reject-term/1'
+        );
         $this->response->assertUnauthorized();
     }
 }

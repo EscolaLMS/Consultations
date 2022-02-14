@@ -8,6 +8,7 @@ use EscolaLms\Consultations\Repositories\Contracts\ConsultationRepositoryContrac
 use EscolaLms\Consultations\Repositories\Contracts\ConsultationTermsRepositoryContract;
 use EscolaLms\Consultations\Services\ConsultationService;
 use EscolaLms\Consultations\Services\Contracts\ConsultationServiceContract;
+use EscolaLms\Jitsi\EscolaLmsJitsiServiceProvider;
 use Illuminate\Support\ServiceProvider;
 
 /**
@@ -46,5 +47,6 @@ class EscolaLmsConsultationsServiceProvider extends ServiceProvider
     {
         $this->mergeConfigFrom(__DIR__ . '/config.php', 'escolalms_consultations');
         $this->app->register(AuthServiceProvider::class);
+        $this->app->register(EscolaLmsJitsiServiceProvider::class);
     }
 }
