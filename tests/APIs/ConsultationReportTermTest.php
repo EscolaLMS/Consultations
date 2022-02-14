@@ -117,7 +117,7 @@ class ConsultationReportTermTest extends TestCase
         $this->assertTrue($consultationTerm->executed_status === ConsultationTermStatusEnum::APPROVED);
     }
 
-    public function testConsultationTermApprovedUnauthorized()
+    public function testConsultationTermApprovedUnauthorized(): void
     {
         $this->response = $this->json(
             'GET',
@@ -149,7 +149,7 @@ class ConsultationReportTermTest extends TestCase
         $this->assertTrue($consultationTerm->executed_status === ConsultationTermStatusEnum::REJECT);
     }
 
-    public function testConsultationTermRejectUnauthorized()
+    public function testConsultationTermRejectUnauthorized(): void
     {
         $this->response = $this->json(
             'GET',

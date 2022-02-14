@@ -2,6 +2,7 @@
 
 use EscolaLms\Consultations\Http\Controllers\ConsultationAPIController;
 use EscolaLms\Consultations\Http\Controllers\ConsultationController;
+use EscolaLms\Consultations\Http\Controllers\OrderApiController;
 use Illuminate\Support\Facades\Route;
 
 // admin endpoints
