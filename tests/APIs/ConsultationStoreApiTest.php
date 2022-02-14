@@ -10,6 +10,7 @@ use Illuminate\Foundation\Testing\DatabaseTransactions;
 class ConsultationStoreApiTest extends TestCase
 {
     use DatabaseTransactions;
+    private string $apiUrl;
 
     protected function setUp(): void
     {
@@ -19,11 +20,12 @@ class ConsultationStoreApiTest extends TestCase
         $this->user = config('auth.providers.users.model')::factory()->create();
         $this->user->guard_name = 'api';
         $this->user->assignRole('tutor');
+        $this->apiUrl = '/api/admin/consultations';
     }
 
     public function testConsultationStoreUnauthorized(): void
     {
-        $response = $this->json('POST','/api/admin/consultations');
+        $response = $this->json('POST',$this->apiUrl);
         $response->assertUnauthorized();
     }
 
@@ -32,7 +34,7 @@ class ConsultationStoreApiTest extends TestCase
         $consultation = Consultation::factory()->make()->toArray();
         $response = $this->actingAs($this->user, 'api')->json(
             'POST',
-            '/api/admin/consultations',
+            $this->apiUrl,
             $consultation
         );
         $response->assertCreated();
@@ -46,8 +48,7 @@ class ConsultationStoreApiTest extends TestCase
 
     public function testConsultationStoreRequiredValidation(): void
     {
-        $response = $this->actingAs($this->user, 'api')->json('POST',
-            '/api/admin/consultations');
+        $response = $this->actingAs($this->user, 'api')->json('POST', $this->apiUrl);
         $response->assertJsonValidationErrors(['name', 'status', 'description', 'author_id']);
     }
 }

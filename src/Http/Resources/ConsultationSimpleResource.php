@@ -22,7 +22,6 @@ class ConsultationSimpleResource extends JsonResource
             'author_id' => $this->author_id,
             'status' => $this->status,
             'description' => $this->description,
-            'duration' => $this->duration,
         ];
         return self::apply($fields, $this);
     }

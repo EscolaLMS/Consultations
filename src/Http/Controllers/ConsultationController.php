@@ -3,7 +3,7 @@
 namespace EscolaLms\Consultations\Http\Controllers;
 
 use EscolaLms\Consultations\Dto\ConsultationDto;
-use EscolaLms\Consultations\Http\Controllers\Swagger\ConsultationAPISwagger;
+use EscolaLms\Consultations\Http\Controllers\Swagger\ConsultationSwagger;
 use EscolaLms\Consultations\Http\Requests\ListConsultationsRequest;
 use EscolaLms\Consultations\Http\Requests\StoreConsultationRequest;
 use EscolaLms\Consultations\Http\Requests\UpdateConsultationRequest;
@@ -11,8 +11,9 @@ use EscolaLms\Consultations\Http\Resources\ConsultationSimpleResource;
 use EscolaLms\Consultations\Services\Contracts\ConsultationServiceContract;
 use EscolaLms\Core\Http\Controllers\EscolaLmsBaseController;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
-class ConsultationController extends EscolaLmsBaseController implements ConsultationAPISwagger
+class ConsultationController extends EscolaLmsBaseController implements ConsultationSwagger
 {
     private ConsultationServiceContract $consultationServiceContract;
 
@@ -65,6 +66,12 @@ class ConsultationController extends EscolaLmsBaseController implements Consulta
     public function destroy(int $id): JsonResponse
     {
         $this->consultationServiceContract->delete($id);
-        return $this->sendSuccess(__('Course deleted successfully'));
+        return $this->sendSuccess(__('Consultation deleted successfully'));
+    }
+
+    public function reportTerm(int $orderItemId, Request $request)
+    {
+        $this->consultationServiceContract->reportTerm($orderItemId, $request->input('executed_at'));
+        return $this->sendSuccess(__('Consultation reserved term successfully'));
     }
 }

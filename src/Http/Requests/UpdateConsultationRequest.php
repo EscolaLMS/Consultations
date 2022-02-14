@@ -24,7 +24,6 @@ class UpdateConsultationRequest extends FormRequest
             'status' => ['required', 'string', Rule::in(ConsultationStatusEnum::getValues())],
             'description' => ['required', 'string', 'min:3'],
             'author_id' => ['required', 'integer', 'exists:users,id'],
-            'duration' => ['string'],
             'started_at' => ['date'],
             'finished_at' => ['date', 'after_or_equal:started_at'],
         ];

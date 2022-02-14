@@ -3,7 +3,9 @@
 namespace EscolaLms\Consultations;
 
 use EscolaLms\Consultations\Repositories\ConsultationRepository;
+use EscolaLms\Consultations\Repositories\ConsultationTermsRepository;
 use EscolaLms\Consultations\Repositories\Contracts\ConsultationRepositoryContract;
+use EscolaLms\Consultations\Repositories\Contracts\ConsultationTermsRepositoryContract;
 use EscolaLms\Consultations\Services\ConsultationService;
 use EscolaLms\Consultations\Services\Contracts\ConsultationServiceContract;
 use Illuminate\Support\ServiceProvider;
@@ -17,7 +19,8 @@ class EscolaLmsConsultationsServiceProvider extends ServiceProvider
         ConsultationServiceContract::class => ConsultationService::class
     ];
     public const REPOSITORIES = [
-        ConsultationRepositoryContract::class => ConsultationRepository::class
+        ConsultationRepositoryContract::class => ConsultationRepository::class,
+        ConsultationTermsRepositoryContract::class => ConsultationTermsRepository::class
     ];
 
     public $singletons = self::SERVICES + self::REPOSITORIES;
