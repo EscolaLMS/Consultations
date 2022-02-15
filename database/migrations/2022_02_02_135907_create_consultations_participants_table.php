@@ -1,6 +1,5 @@
 <?php
 
-use EscolaLms\Consultations\Enum\ConsultationParticipantStatusEnum;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -18,7 +17,7 @@ class CreateConsultationsParticipantsTable extends Migration
             $table->id();
             $table->bigInteger('consultation_id')->unsigned()->index();
             $table->bigInteger('user_id')->unsigned()->nullable();
-            $table->string('status')->default(ConsultationParticipantStatusEnum::DISCONNECTED);
+            $table->string('status')->default(null)->nullable();
             $table->timestamps();
 
             $table->foreign('user_id')->references('id')->on('users')->onDelete('SET NULL');
