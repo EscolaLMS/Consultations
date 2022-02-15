@@ -68,10 +68,4 @@ class ConsultationController extends EscolaLmsBaseController implements Consulta
         $this->consultationServiceContract->delete($id);
         return $this->sendSuccess(__('Consultation deleted successfully'));
     }
-
-    public function reportTerm(int $orderItemId, Request $request)
-    {
-        $this->consultationServiceContract->reportTerm($orderItemId, $request->input('executed_at'));
-        return $this->sendSuccess(__('Consultation reserved term successfully'));
-    }
 }

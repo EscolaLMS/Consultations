@@ -9,13 +9,13 @@ class ReportTermConsultationRequest extends FormRequest
     public function authorize(): bool
     {
         $user = auth()->user();
-        return isset($user) ? true : false;
+        return isset($user);
     }
 
     public function rules(): array
     {
         return [
-            'term' => 'required|date|after_or_equal:now'
+            'term' => ['required', 'date', 'after_or_equal:now']
         ];
     }
 }
