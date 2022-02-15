@@ -16,6 +16,5 @@ class ConsultationsSeeder extends Seeder
     public function run()
     {
         Consultation::factory(10);
-        ConsultationParticipant::factory(10);
     }
 }
