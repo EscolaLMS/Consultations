@@ -10,7 +10,7 @@ class ConsultationTermFactory extends Factory
 {
     protected $model = ConsultationTerm::class;
 
-    public function definition()
+    public function definition(): array
     {
         $now = now()->modify('+2 hours');
         return [

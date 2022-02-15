@@ -12,7 +12,7 @@ abstract class ConsultationTerm
     use Dispatchable, SerializesModels;
 
     private User $user;
-    private ConsultationTermModel $consultation;
+    private ConsultationTermModel $consultationTerm;
 
     public function __construct(User $user, ConsultationTermModel $consultationTerm)
     {

@@ -77,7 +77,9 @@ class ConsultationReportTermTest extends TestCase
         $this->assertTrue($consultationTerm->executed_at === $now->format('Y-m-d H:i:s'));
         $this->assertTrue($consultationTerm->executed_status === ConsultationTermStatusEnum::REPORTED);
         $this->response->assertOk();
-        Event::assertDispatched(ReportTerm::class);
+        Event::assertDispatched(ReportTerm::class, function (ReportTerm $event) use($item) {
+            return $event->getUser()->getKey() === $item->buyable->author->getKey();
+        });
     }
 
     public function testConsultationReportTermUnauthorized(): void
@@ -111,7 +113,9 @@ class ConsultationReportTermTest extends TestCase
             'GET',
             '/api/consultations/approve-term/' . $consultationTerm->getKey()
         );
-        Event::assertDispatched(ApprovedTerm::class);
+        Event::assertDispatched(ApprovedTerm::class, function (ApprovedTerm $event) {
+            return $event->getUser()->getKey() === $this->user->getKey();
+        });
         $consultationTerm->refresh();
         $this->response->assertOk();
         $this->assertTrue($consultationTerm->executed_status === ConsultationTermStatusEnum::APPROVED);
@@ -143,7 +147,9 @@ class ConsultationReportTermTest extends TestCase
             'GET',
             '/api/consultations/reject-term/' . $consultationTerm->getKey()
         );
-        Event::assertDispatched(RejectTerm::class);
+        Event::assertDispatched(RejectTerm::class, function (RejectTerm $event) {
+            return $event->getUser()->getKey() === $this->user->getKey();
+        });
         $consultationTerm->refresh();
         $this->response->assertOk();
         $this->assertTrue($consultationTerm->executed_status === ConsultationTermStatusEnum::REJECT);
