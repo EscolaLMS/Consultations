@@ -44,11 +44,6 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  *          description="base_price",
  *          type="integer"
  *      ),
- *     @OA\Property(
- *          property="description",
- *          description="description",
- *          type="string",
- *      ),
  *      @OA\Property(
  *          property="finished_at",
  *          description="finished_at",
