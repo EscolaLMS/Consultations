@@ -50,13 +50,13 @@ class ConsultationGenerateJitsiTest extends TestCase
         ]);
     }
 
-    public function testGenerateJitsiUnAuthorized()
+    public function testGenerateJitsiUnAuthorized(): void
     {
         $response = $this->json('GET', 'api/consultations/generate-jitsi/1');
         $response->assertUnauthorized();
     }
 
-    public function testGenerateJitsiWithApprovedTerm()
+    public function testGenerateJitsiWithApprovedTerm(): void
     {
         $this->initVariable();
         $orderItem = $this->order->items()->first();
@@ -85,7 +85,7 @@ class ConsultationGenerateJitsiTest extends TestCase
         );
     }
 
-    public function testGenerateJitsiWithRejectedTerm()
+    public function testGenerateJitsiWithRejectedTerm(): void
     {
         $this->initVariable();
         $orderItem = $this->order->items()->first();

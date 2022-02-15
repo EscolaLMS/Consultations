@@ -11,7 +11,6 @@ use EscolaLms\Consultations\Events\ApprovedTerm;
 use EscolaLms\Consultations\Events\RejectTerm;
 use EscolaLms\Consultations\Events\ReportTerm;
 use EscolaLms\Consultations\Listeners\ReportTermListener;
-use EscolaLms\Consultations\Models\ConsultationTerm;
 use EscolaLms\Consultations\Repositories\Contracts\ConsultationTermsRepositoryContract;
 use EscolaLms\Consultations\Tests\Models\ConsultationTest;
 use EscolaLms\Consultations\Tests\TestCase;
@@ -77,9 +76,11 @@ class ConsultationReportTermTest extends TestCase
         $this->assertTrue($consultationTerm->executed_at === $now->format('Y-m-d H:i:s'));
         $this->assertTrue($consultationTerm->executed_status === ConsultationTermStatusEnum::REPORTED);
         $this->response->assertOk();
-        Event::assertDispatched(ReportTerm::class, function (ReportTerm $event) use($item) {
-            return $event->getUser()->getKey() === $item->buyable->author->getKey();
-        });
+        $authorId = $item->buyable->author->getKey();
+        Event::assertDispatched(ReportTerm::class, fn (ReportTerm $event) =>
+            $event->getUser()->getKey() === $authorId &&
+            $event->getConsultationTerm()->getKey() === $consultationTerm->getKey()
+        );
     }
 
     public function testConsultationReportTermUnauthorized(): void
@@ -113,9 +114,11 @@ class ConsultationReportTermTest extends TestCase
             'GET',
             '/api/consultations/approve-term/' . $consultationTerm->getKey()
         );
-        Event::assertDispatched(ApprovedTerm::class, function (ApprovedTerm $event) {
-            return $event->getUser()->getKey() === $this->user->getKey();
-        });
+        $userId = $this->user->getKey();
+        Event::assertDispatched(ApprovedTerm::class, fn (ApprovedTerm $event) =>
+            $event->getUser()->getKey() === $userId &&
+            $event->getConsultationTerm()->getKey() === $consultationTerm->getKey()
+        );
         $consultationTerm->refresh();
         $this->response->assertOk();
         $this->assertTrue($consultationTerm->executed_status === ConsultationTermStatusEnum::APPROVED);
@@ -147,9 +150,11 @@ class ConsultationReportTermTest extends TestCase
             'GET',
             '/api/consultations/reject-term/' . $consultationTerm->getKey()
         );
-        Event::assertDispatched(RejectTerm::class, function (RejectTerm $event) {
-            return $event->getUser()->getKey() === $this->user->getKey();
-        });
+        $userId = $this->user->getKey();
+        Event::assertDispatched(RejectTerm::class, fn (RejectTerm $event) =>
+            $event->getUser()->getKey() === $userId &&
+            $event->getConsultationTerm()->getKey() === $consultationTerm->getKey()
+        );
         $consultationTerm->refresh();
         $this->response->assertOk();
         $this->assertTrue($consultationTerm->executed_status === ConsultationTermStatusEnum::REJECT);

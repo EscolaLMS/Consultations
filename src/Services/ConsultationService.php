@@ -92,12 +92,12 @@ class ConsultationService implements ConsultationServiceContract
     {
         return DB::transaction(function () use ($orderItemId, $executedAt) {
             $consultationTerm = $this->consultationTermsRepositoryContract->findByOrderItem($orderItemId);
-            $author = $consultationTerm->orderItem->buyable->author;
             $data = [
                 'executed_status' => ConsultationTermStatusEnum::REPORTED,
                 'executed_at' => $executedAt
             ];
             $this->consultationTermsRepositoryContract->updateModel($consultationTerm, $data);
+            $author = $consultationTerm->orderItem->buyable->author;
             event(new ReportTerm($author, $consultationTerm));
             return true;
         });
