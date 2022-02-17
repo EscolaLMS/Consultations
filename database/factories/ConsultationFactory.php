@@ -21,9 +21,10 @@ class ConsultationFactory extends Factory
             'name' => $this->faker->sentence(10),
             'status' => $this->faker->randomElement(ConsultationStatusEnum::getValues()),
             'description' => $this->faker->sentence,
+            'duration' => rand(2, 10) . " hours",
             'author_id' => empty($tutor) ? null : $tutor->getKey(),
-            'started_at' => $now,
-            'finished_at' => (clone $now)->modify('+1 hour'),
+            'active_from' => $now,
+            'active_to' => (clone $now)->modify('+1 hour'),
         ];
     }
 }

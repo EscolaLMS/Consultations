@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Builder;
 
 interface ConsultationServiceContract
 {
-    public function getConsultationsList(array $search = []): Builder;
+    public function getConsultationsList(array $search = [], bool $onlyActive = false): Builder;
     public function store(array $data = []): Consultation;
     public function update(int $id, array $data = []): Consultation;
     public function show(int $id): Consultation;
@@ -19,4 +19,5 @@ interface ConsultationServiceContract
     public function rejectTerm(int $consultationTermId): bool;
     public function setStatus(ConsultationTerm $consultationTerm, string $status): ConsultationTerm;
     public function generateJitsi(int $consultationTermId): array;
+    public function canGenerateJitsi(ConsultationTerm $consultationTerm): bool;
 }

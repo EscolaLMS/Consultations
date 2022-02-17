@@ -29,6 +29,7 @@ class ConsultationController extends EscolaLmsBaseController implements Consulta
         $consultations = $this->consultationServiceContract
             ->getConsultationsList($search)
             ->paginate($listConsultationsRequest->get('per_page') ?? 15);
+
         return $this->sendResponseForResource(
             ConsultationSimpleResource::collection($consultations), __('Consultations retrieved successfully')
         );

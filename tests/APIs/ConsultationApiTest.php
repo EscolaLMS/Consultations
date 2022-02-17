@@ -31,6 +31,18 @@ class ConsultationApiTest extends TestCase
         $this->response->assertOk();
     }
 
+    public function testConsultationsListByDate(): void
+    {
+        $now = now()->modify('+1 days');
+        $cons = Consultation::factory([
+            'active_from' => $now,
+            'active_to' => (clone $now)->modify('+1 days')
+        ])->create();
+        $this->response = $this->actingAs($this->user, 'api')->get('/api/consultations');
+        $this->response->assertOk();
+        $this->response->assertJsonMissing(['id' => $cons->getKey()]);
+    }
+
     public function testConsultationsListWithFilter(): void
     {
         $filterData = [

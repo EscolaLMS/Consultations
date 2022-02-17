@@ -63,7 +63,8 @@ class ConsultationGenerateJitsiTest extends TestCase
         $consultationTerm = ConsultationTerm::factory([
             'user_id' => $this->user->getKey(),
             'order_item_id' => $orderItem->getKey(),
-            'executed_status' => ConsultationTermStatusEnum::APPROVED
+            'executed_status' => ConsultationTermStatusEnum::APPROVED,
+            'executed_at' => now()
         ])->create();
 
         $response = $this->actingAs($this->user, 'api')->json('GET', 'api/consultations/generate-jitsi/' . $consultationTerm->getKey());
@@ -97,6 +98,22 @@ class ConsultationGenerateJitsiTest extends TestCase
 
         $response = $this->actingAs($this->user, 'api')->json('GET', 'api/consultations/generate-jitsi/' . $consultationTerm->getKey());
         $response->assertNotFound();
-        $response->assertJson(fn (AssertableJson $json) => $json->where('message', __('Consultation term is not approved'))->etc());
+        $response->assertJson(fn (AssertableJson $json) => $json->where('message', __('Consultation term is not available'))->etc());
+    }
+
+    public function testGenerateJitsiBeforeExecutedAt(): void
+    {
+        $this->initVariable();
+        $orderItem = $this->order->items()->first();
+        $consultationTerm = ConsultationTerm::factory([
+            'user_id' => $this->user->getKey(),
+            'order_item_id' => $orderItem->getKey(),
+            'executed_status' => ConsultationTermStatusEnum::APPROVED,
+            'executed_at' => now()->modify('+1 hour')
+        ])->create();
+
+        $response = $this->actingAs($this->user, 'api')->json('GET', 'api/consultations/generate-jitsi/' . $consultationTerm->getKey());
+        $response->assertNotFound();
+        $response->assertJson(fn (AssertableJson $json) => $json->where('message', __('Consultation term is not available'))->etc());
     }
 }

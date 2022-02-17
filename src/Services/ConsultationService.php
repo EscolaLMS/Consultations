@@ -14,6 +14,7 @@ use EscolaLms\Consultations\Repositories\Contracts\ConsultationTermsRepositoryCo
 use EscolaLms\Consultations\Services\Contracts\ConsultationServiceContract;
 use EscolaLms\Jitsi\Services\Contracts\JitsiServiceContract;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -34,8 +35,13 @@ class ConsultationService implements ConsultationServiceContract
         $this->jitsiServiceContract = $jitsiServiceContract;
     }
 
-    public function getConsultationsList(array $search = []): Builder
+    public function getConsultationsList(array $search = [], bool $onlyActive = false): Builder
     {
+        if ($onlyActive) {
+            $now = now()->format('Y-m-d');
+            $search['active_to'] = $search['active_to'] ?? $now;
+            $search['active_from'] = $search['active_from'] ?? $now;
+        }
         $criteria = FilterListDto::prepareFilters($search);
         return $this->consultationRepositoryContract->allQueryBuilder(
             $search,
@@ -132,12 +138,29 @@ class ConsultationService implements ConsultationServiceContract
     public function generateJitsi(int $consultationTermId): array
     {
         $consultationTerm = $this->consultationTermsRepositoryContract->find($consultationTermId);
-        if (!$consultationTerm->isApproved()) {
-            throw new NotFoundHttpException(__('Consultation term is not approved'));
+        if ($this->canGenerateJitsi($consultationTerm)) {
+            throw new NotFoundHttpException(__('Consultation term is not available'));
         }
+
         return $this->jitsiServiceContract->getChannelData(
             auth()->user(),
             Str::studly($consultationTerm->orderItem->buyable->name)
         );
+    }
+
+    public function canGenerateJitsi(ConsultationTerm $consultationTerm): bool
+    {
+        $modifyTimeStrings = [
+            'seconds', 'minutes', 'hours', 'weeks', 'years'
+        ];
+        $now = now();
+        $explode = explode(' ', $consultationTerm->orderItem->buyable->duration);
+        $count = $explode[0];
+        $string = in_array($explode[1], $modifyTimeStrings) ? $explode[1] : 'hours';
+        $dateTo = Carbon::make($consultationTerm->executed_at)->modify('+' . $count . ' ' . $string);
+
+        return !$consultationTerm->isApproved() ||
+            $now < $consultationTerm->executed_at ||
+            $now > $dateTo;
     }
 }
