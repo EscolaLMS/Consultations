@@ -2,8 +2,11 @@
 
 namespace EscolaLms\Consultations\Http\Controllers;
 
+use EscolaLms\Consultations\Enum\ConstantEnum;
 use EscolaLms\Consultations\Http\Controllers\Swagger\ConsultationAPISwagger;
+use EscolaLms\Consultations\Http\Requests\ListConsultationsRequest;
 use EscolaLms\Consultations\Http\Requests\ReportTermConsultationRequest;
+use EscolaLms\Consultations\Http\Resources\ConsultationSimpleResource;
 use EscolaLms\Consultations\Services\Contracts\ConsultationServiceContract;
 use EscolaLms\Core\Http\Controllers\EscolaLmsBaseController;
 use Illuminate\Http\JsonResponse;
@@ -16,6 +19,21 @@ class ConsultationAPIController extends EscolaLmsBaseController implements Consu
         ConsultationServiceContract $consultationServiceContract
     ) {
         $this->consultationServiceContract = $consultationServiceContract;
+    }
+
+    public function index(ListConsultationsRequest $listConsultationsRequest): JsonResponse
+    {
+        $search = $listConsultationsRequest->except(['limit', 'skip', 'order', 'order_by']);
+        $consultations = $this->consultationServiceContract
+            ->getConsultationsList($search, true)
+            ->paginate(
+                $listConsultationsRequest->get('per_page') ??
+                config('escolalms_consultations.perPage', ConstantEnum::PER_PAGE)
+            );
+
+        return $this->sendResponseForResource(
+            ConsultationSimpleResource::collection($consultations), __('Consultations retrieved successfully')
+        );
     }
 
     public function reportTerm(int $orderItemId, ReportTermConsultationRequest $request): JsonResponse

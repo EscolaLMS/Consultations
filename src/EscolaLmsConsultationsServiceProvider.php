@@ -8,8 +8,8 @@ use EscolaLms\Consultations\Repositories\Contracts\ConsultationRepositoryContrac
 use EscolaLms\Consultations\Repositories\Contracts\ConsultationTermsRepositoryContract;
 use EscolaLms\Consultations\Services\ConsultationService;
 use EscolaLms\Consultations\Services\Contracts\ConsultationServiceContract;
-use EscolaLms\Courses\Providers\SettingsServiceProvider;
 use EscolaLms\Jitsi\EscolaLmsJitsiServiceProvider;
+use EscolaLms\Settings\EscolaLmsSettingsServiceProvider;
 use Illuminate\Support\ServiceProvider;
 
 /**
@@ -40,8 +40,8 @@ class EscolaLmsConsultationsServiceProvider extends ServiceProvider
     protected function bootForConsole(): void
     {
         $this->publishes([
-            __DIR__ . '/config.php' => config_path('escolalms_consultations.php'),
-        ], 'escolalms_consultations.config');
+            __DIR__ . '/config.php' => config_path('config.php'),
+        ], 'escolalms_consultations');
     }
 
     public function register()
@@ -49,6 +49,6 @@ class EscolaLmsConsultationsServiceProvider extends ServiceProvider
         $this->mergeConfigFrom(__DIR__ . '/config.php', 'escolalms_consultations');
         $this->app->register(AuthServiceProvider::class);
         $this->app->register(EscolaLmsJitsiServiceProvider::class);
-        $this->app->register(SettingsServiceProvider::class);
+        $this->app->register(EscolaLmsSettingsServiceProvider::class);
     }
 }

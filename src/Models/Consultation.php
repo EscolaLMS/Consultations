@@ -34,6 +34,11 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  *          type="string"
  *      ),
  *      @OA\Property(
+ *          property="duration",
+ *          description="duration",
+ *          type="string"
+ *      ),
+ *      @OA\Property(
  *          property="author_id",
  *          description="author_id",
  *          type="integer"
@@ -44,13 +49,13 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  *          type="integer"
  *      ),
  *      @OA\Property(
- *          property="finished_at",
- *          description="finished_at",
+ *          property="active_to",
+ *          description="active_to",
  *          type="datetime",
  *      ),
  *      @OA\Property(
- *          property="started_at",
- *          description="started_at",
+ *          property="active_from",
+ *          description="active_from",
  *          type="datetime"
  *      ),
  *      @OA\Property(
@@ -74,10 +79,11 @@ class Consultation extends Model
         'base_price',
         'name',
         'status',
+        'duration',
         'description',
         'author_id',
-        'started_at',
-        'finished_at'
+        'active_from',
+        'active_to'
     ];
 
     public function author(): BelongsTo
