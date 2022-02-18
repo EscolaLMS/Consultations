@@ -2,6 +2,7 @@
 
 namespace EscolaLms\Consultations\Http\Controllers;
 
+use EscolaLms\Consultations\Enum\ConstantEnum;
 use EscolaLms\Consultations\Http\Controllers\Swagger\ConsultationAPISwagger;
 use EscolaLms\Consultations\Http\Requests\ListConsultationsRequest;
 use EscolaLms\Consultations\Http\Requests\ReportTermConsultationRequest;
@@ -25,7 +26,10 @@ class ConsultationAPIController extends EscolaLmsBaseController implements Consu
         $search = $listConsultationsRequest->except(['limit', 'skip', 'order', 'order_by']);
         $consultations = $this->consultationServiceContract
             ->getConsultationsList($search, true)
-            ->paginate($listConsultationsRequest->get('per_page') ?? 15);
+            ->paginate(
+                $listConsultationsRequest->get('per_page') ??
+                config('escolalms_consultations.perPage', ConstantEnum::PER_PAGE)
+            );
 
         return $this->sendResponseForResource(
             ConsultationSimpleResource::collection($consultations), __('Consultations retrieved successfully')

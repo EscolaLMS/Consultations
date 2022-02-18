@@ -6,22 +6,12 @@ use Illuminate\Support\Facades\Schema;
 
 class RemoveParticipantTable extends Migration
 {
-    /**
-     * Run the migrations.
-     *
-     * @return void
-     */
-    public function up()
+    public function up(): void
     {
         Schema::dropIfExists('consultations_participants');
     }
 
-    /**
-     * Reverse the migrations.
-     *
-     * @return void
-     */
-    public function down()
+    public function down(): void
     {
         Schema::create('consultations_participants', function (Blueprint $table) {
             $table->id();

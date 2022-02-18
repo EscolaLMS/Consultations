@@ -6,24 +6,15 @@ use Illuminate\Support\Facades\Schema;
 
 class AddMissingsColumnToConsultationsTable extends Migration
 {
-    /**
-     * Run the migrations.
-     *
-     * @return void
-     */
-    public function up()
+
+    public function up(): void
     {
         Schema::table('consultations', function (Blueprint $table) {
             $table->string('duration')->nullable();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     *
-     * @return void
-     */
-    public function down()
+    public function down(): void
     {
         Schema::table('consultations', function (Blueprint $table) {
             $table->dropColumn('duration');

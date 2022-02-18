@@ -40,8 +40,8 @@ class EscolaLmsConsultationsServiceProvider extends ServiceProvider
     protected function bootForConsole(): void
     {
         $this->publishes([
-            __DIR__ . '/config.php' => config_path('escolalms_consultations.php'),
-        ], 'escolalms_consultations.config');
+            __DIR__ . '/config.php' => config_path('config.php'),
+        ], 'escolalms_consultations');
     }
 
     public function register()

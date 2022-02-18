@@ -6,12 +6,7 @@ use Illuminate\Support\Facades\Schema;
 
 class ChangeNameColumnsForConsultationsTable extends Migration
 {
-    /**
-     * Run the migrations.
-     *
-     * @return void
-     */
-    public function up()
+    public function up(): void
     {
         Schema::table('consultations', function (Blueprint $table) {
             $table->renameColumn('started_at', 'active_from');
@@ -20,12 +15,7 @@ class ChangeNameColumnsForConsultationsTable extends Migration
         });
     }
 
-    /**
-     * Reverse the migrations.
-     *
-     * @return void
-     */
-    public function down()
+    public function down(): void
     {
         Schema::table('consultations', function (Blueprint $table) {
             $table->renameColumn('active_from', 'started_at');
