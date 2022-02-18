@@ -2,14 +2,14 @@
 
 namespace EscolaLms\Consultations\Tests\Providers;
 
-use EscolaLms\Cart\Events\CartOrderPaid;
+use EscolaLms\Cart\Events\OrderPaid;
 use EscolaLms\Consultations\Listeners\ReportTermListener;
 use Illuminate\Support\ServiceProvider;
 
 class EventsServiceProvider extends ServiceProvider
 {
     protected $listen = [
-        CartOrderPaid::class => [
+        OrderPaid::class => [
             ReportTermListener::class,
         ],
     ];
