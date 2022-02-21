@@ -6,6 +6,7 @@ use EscolaLms\Consultations\Enum\ConstantEnum;
 use EscolaLms\Consultations\Http\Controllers\Swagger\ConsultationAPISwagger;
 use EscolaLms\Consultations\Http\Requests\ListConsultationsRequest;
 use EscolaLms\Consultations\Http\Requests\ReportTermConsultationRequest;
+use EscolaLms\Consultations\Http\Resources\ConsultationProposedTermResource;
 use EscolaLms\Consultations\Http\Resources\ConsultationSimpleResource;
 use EscolaLms\Consultations\Services\Contracts\ConsultationServiceContract;
 use EscolaLms\Core\Http\Controllers\EscolaLmsBaseController;
@@ -52,6 +53,15 @@ class ConsultationAPIController extends EscolaLmsBaseController implements Consu
     {
         $this->consultationServiceContract->rejectTerm($consultationTermId);
         return $this->sendSuccess(__('Consultation term reject successfully'));
+    }
+
+    public function proposedTerms(int $orderItemId): JsonResponse
+    {
+        $proposedTerms = $this->consultationServiceContract->proposedTerms($orderItemId);
+        return $this->sendResponseForResource(
+            ConsultationProposedTermResource::collection($proposedTerms),
+            __('Consultations propsed terms retrieved successfully')
+        );
     }
 
     public function generateJitsi(int $consultationTermId): JsonResponse

@@ -6,6 +6,8 @@ use EscolaLms\Consultations\Database\Seeders\ConsultationsPermissionSeeder;
 use EscolaLms\Consultations\Models\Consultation;
 use EscolaLms\Consultations\Tests\TestCase;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Testing\Fluent\AssertableJson;
 
 class ConsultationStoreApiTest extends TestCase
 {
@@ -32,16 +34,37 @@ class ConsultationStoreApiTest extends TestCase
     public function testConsultationStore(): void
     {
         $consultation = Consultation::factory()->make()->toArray();
+        $this->assertTrue(!isset($consultation['image_path']));
+        $proposedTerms = [
+            now()->format('Y-m-d H:i:s'),
+            now()->modify('+1 day')->format('Y-m-d H:i:s')
+        ];
+        $requestArray = array_merge(
+            $consultation,
+            ['proposed_terms' => $proposedTerms],
+            ['image' => UploadedFile::fake()->image('image.jpg')]
+        );
         $response = $this->actingAs($this->user, 'api')->json(
             'POST',
             $this->apiUrl,
-            $consultation
+            $requestArray
         );
         $response->assertCreated();
         $response->assertJsonFragment([
             'name' => $consultation['name'],
             'status' => $consultation['status'],
-            'author_id' => $consultation['author_id'],
+            'author_id' => $consultation['author_id']
+        ]);
+        $response->assertJson(fn (AssertableJson $json) => $json->has(
+            'data',
+            fn ($json) => $json
+                ->has('image_path')
+                ->etc()
+            )
+            ->etc()
+        );
+        $response->assertJsonFragment([
+            'proposed_terms' => $proposedTerms
         ]);
         $response->assertJsonFragment(['success' => true]);
     }

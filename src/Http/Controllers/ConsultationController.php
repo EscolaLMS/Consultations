@@ -42,7 +42,7 @@ class ConsultationController extends EscolaLmsBaseController implements Consulta
     public function store(StoreConsultationRequest $storeConsultationRequest): JsonResponse
     {
         $dto = new ConsultationDto($storeConsultationRequest->all());
-        $consultation = $this->consultationServiceContract->store($dto->toArray());
+        $consultation = $this->consultationServiceContract->store($dto);
         return $this->sendResponseForResource(
             ConsultationSimpleResource::make($consultation),
             __('Consultation saved successfully')
@@ -52,7 +52,7 @@ class ConsultationController extends EscolaLmsBaseController implements Consulta
     public function update(int $id, UpdateConsultationRequest $updateConsultationRequest): JsonResponse
     {
         $dto = new ConsultationDto($updateConsultationRequest->all());
-        $consultation = $this->consultationServiceContract->update($id, $dto->toArray());
+        $consultation = $this->consultationServiceContract->update($id, $dto);
         return $this->sendResponseForResource(
             ConsultationSimpleResource::make($consultation),
             __('Consultation updated successfully')
