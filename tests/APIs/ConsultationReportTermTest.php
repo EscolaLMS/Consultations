@@ -11,8 +11,8 @@ use EscolaLms\Consultations\Events\ApprovedTerm;
 use EscolaLms\Consultations\Events\RejectTerm;
 use EscolaLms\Consultations\Events\ReportTerm;
 use EscolaLms\Consultations\Listeners\ReportTermListener;
+use EscolaLms\Consultations\Models\Consultation;
 use EscolaLms\Consultations\Repositories\Contracts\ConsultationTermsRepositoryContract;
-use EscolaLms\Consultations\Tests\Models\ConsultationTest;
 use EscolaLms\Consultations\Tests\TestCase;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\Event;
@@ -22,7 +22,7 @@ class ConsultationReportTermTest extends TestCase
     use DatabaseTransactions;
     private string $apiUrl;
     private Order $order;
-    private ConsultationTest $consultation;
+    private Consultation $consultation;
 
     protected function setUp(): void
     {
@@ -34,16 +34,16 @@ class ConsultationReportTermTest extends TestCase
 
     private function initVariable(): void
     {
-        $consultationsForOrder = ConsultationTest::factory(3)->create();
-        $price = $consultationsForOrder->reduce(fn ($acc, ConsultationTest $consultation) => $acc + $consultation->getBuyablePrice(), 0);
+        $consultationsForOrder = Consultation::factory(3)->create();
+        $price = $consultationsForOrder->reduce(fn ($acc, Consultation $consultation) => $acc + $consultation->getBuyablePrice(), 0);
         $this->order = Order::factory()->afterCreating(
                 fn (Order $order) => $order->items()->saveMany(
                     $consultationsForOrder->map(
-                        function (ConsultationTest $consultation) {
+                        function (Consultation $consultation) {
                             return OrderItem::query()->make([
                                 'quantity' => 1,
                                 'buyable_id' => $consultation->getKey(),
-                                'buyable_type' => ConsultationTest::class,
+                                'buyable_type' => Consultation::class,
                             ]);
                         }
                     )

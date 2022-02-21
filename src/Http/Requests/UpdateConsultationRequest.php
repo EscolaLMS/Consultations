@@ -24,9 +24,12 @@ class UpdateConsultationRequest extends FormRequest
             'status' => ['required', 'string', Rule::in(ConsultationStatusEnum::getValues())],
             'description' => ['required', 'string', 'min:3'],
             'duration' => ['nullable', 'string', 'max:80'],
+            'image' => ['nullable', 'file', 'image'],
             'author_id' => ['required', 'integer', 'exists:users,id'],
             'active_from' => ['date'],
             'active_to' => ['date', 'after_or_equal:active_from'],
+            'proposed_dates' => ['array'],
+            'proposed_dates.*' => ['date', 'after_or_equal:active_from'],
         ];
     }
 }
