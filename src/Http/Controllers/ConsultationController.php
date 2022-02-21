@@ -3,7 +3,8 @@
 namespace EscolaLms\Consultations\Http\Controllers;
 
 use EscolaLms\Consultations\Dto\ConsultationDto;
-use EscolaLms\Consultations\Http\Controllers\Swagger\ConsultationAPISwagger;
+use EscolaLms\Consultations\Enum\ConstantEnum;
+use EscolaLms\Consultations\Http\Controllers\Swagger\ConsultationSwagger;
 use EscolaLms\Consultations\Http\Requests\ListConsultationsRequest;
 use EscolaLms\Consultations\Http\Requests\StoreConsultationRequest;
 use EscolaLms\Consultations\Http\Requests\UpdateConsultationRequest;
@@ -11,8 +12,9 @@ use EscolaLms\Consultations\Http\Resources\ConsultationSimpleResource;
 use EscolaLms\Consultations\Services\Contracts\ConsultationServiceContract;
 use EscolaLms\Core\Http\Controllers\EscolaLmsBaseController;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
-class ConsultationController extends EscolaLmsBaseController implements ConsultationAPISwagger
+class ConsultationController extends EscolaLmsBaseController implements ConsultationSwagger
 {
     private ConsultationServiceContract $consultationServiceContract;
 
@@ -27,7 +29,11 @@ class ConsultationController extends EscolaLmsBaseController implements Consulta
         $search = $listConsultationsRequest->except(['limit', 'skip', 'order', 'order_by']);
         $consultations = $this->consultationServiceContract
             ->getConsultationsList($search)
-            ->paginate($listConsultationsRequest->get('per_page') ?? 15);
+            ->paginate(
+                $listConsultationsRequest->get('per_page') ??
+                config('escolalms_consultations.perPage', ConstantEnum::PER_PAGE)
+            );
+
         return $this->sendResponseForResource(
             ConsultationSimpleResource::collection($consultations), __('Consultations retrieved successfully')
         );
@@ -65,6 +71,6 @@ class ConsultationController extends EscolaLmsBaseController implements Consulta
     public function destroy(int $id): JsonResponse
     {
         $this->consultationServiceContract->delete($id);
-        return $this->sendSuccess(__('Course deleted successfully'));
+        return $this->sendSuccess(__('Consultation deleted successfully'));
     }
 }

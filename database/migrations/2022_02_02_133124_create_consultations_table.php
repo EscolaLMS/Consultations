@@ -7,12 +7,8 @@ use Illuminate\Support\Facades\Schema;
 
 class CreateConsultationsTable extends Migration
 {
-    /**
-     * Run the migrations.
-     *
-     * @return void
-     */
-    public function up()
+
+    public function up(): void
     {
         Schema::create('consultations', function (Blueprint $table) {
             $table->id();
@@ -30,12 +26,7 @@ class CreateConsultationsTable extends Migration
         });
     }
 
-    /**
-     * Reverse the migrations.
-     *
-     * @return void
-     */
-    public function down()
+    public function down(): void
     {
         Schema::dropIfExists('consultations');
     }
