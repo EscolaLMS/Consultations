@@ -2,6 +2,7 @@
 
 namespace EscolaLms\Consultations\Tests\APIs;
 
+use EscolaLms\Categories\Models\Category;
 use EscolaLms\Consultations\Database\Seeders\ConsultationsPermissionSeeder;
 use EscolaLms\Consultations\Models\Consultation;
 use EscolaLms\Consultations\Tests\TestCase;
@@ -39,10 +40,12 @@ class ConsultationStoreApiTest extends TestCase
             now()->format('Y-m-d H:i:s'),
             now()->modify('+1 day')->format('Y-m-d H:i:s')
         ];
+        $categories = Category::factory(2)->create()->pluck('id')->toArray();
         $requestArray = array_merge(
             $consultation,
             ['proposed_terms' => $proposedTerms],
-            ['image' => UploadedFile::fake()->image('image.jpg')]
+            ['image' => UploadedFile::fake()->image('image.jpg')],
+            ['categories' => $categories]
         );
         $response = $this->actingAs($this->user, 'api')->json(
             'POST',
@@ -55,18 +58,27 @@ class ConsultationStoreApiTest extends TestCase
             'status' => $consultation['status'],
             'author_id' => $consultation['author_id']
         ]);
-        $response->assertJson(fn (AssertableJson $json) => $json->has(
-            'data',
-            fn ($json) => $json
-                ->has('image_path')
-                ->etc()
-            )
-            ->etc()
-        );
         $response->assertJsonFragment([
             'proposed_terms' => $proposedTerms
         ]);
         $response->assertJsonFragment(['success' => true]);
+        $response->assertJson(fn (AssertableJson $json) => $json->has(
+            'data',
+            fn ($json) => $json
+                ->has('image_path')
+                ->has('categories', fn (AssertableJson $json) =>
+                    $json->each(fn (AssertableJson $json) =>
+                        $json->where('id', fn ($json) =>
+                            in_array($json, $categories)
+                        )
+                        ->etc()
+                    )
+                    ->etc()
+                )
+                ->etc()
+            )
+            ->etc()
+        );
     }
 
     public function testConsultationStoreRequiredValidation(): void

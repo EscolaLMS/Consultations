@@ -2,6 +2,7 @@
 
 namespace EscolaLms\Consultations\Tests\APIs;
 
+use EscolaLms\Categories\Models\Category;
 use EscolaLms\Consultations\Database\Seeders\ConsultationsPermissionSeeder;
 use EscolaLms\Consultations\Models\Consultation;
 use EscolaLms\Consultations\Tests\TestCase;
@@ -42,10 +43,12 @@ class ConsultationUpdateApiTest extends TestCase
         ];
         $consultationUpdate = Consultation::factory()->make()->toArray();
         $this->assertTrue(!isset($consultation['image_path']));
+        $categories = Category::factory(2)->create()->pluck('id')->toArray();
         $requestArray = array_merge(
             $consultationUpdate,
             ['proposed_terms' => $proposedTerms],
-            ['image' => UploadedFile::fake()->image('image.jpg')]
+            ['image' => UploadedFile::fake()->image('image.jpg')],
+            ['categories' => $categories]
         );
         $response = $this->actingAs($this->user, 'api')->json(
             'PUT',
@@ -59,12 +62,20 @@ class ConsultationUpdateApiTest extends TestCase
             'status' => $consultationUpdate['status'],
             'author_id' => $consultationUpdate['author_id'],
         ]);
-        $response->assertJson(
-            fn (AssertableJson $json) => $json->has(
+        $response->assertJson(fn (AssertableJson $json) => $json->has(
             'data',
-                fn ($json) => $json
-                    ->has('image_path')
+            fn ($json) => $json
+                ->has('image_path')
+                ->has('categories', fn (AssertableJson $json) =>
+                    $json->each(fn (AssertableJson $json) =>
+                        $json->where('id', fn ($json) =>
+                            in_array($json, $categories)
+                            )
+                        ->etc()
+                    )
                     ->etc()
+                )
+                ->etc()
             )
             ->etc()
         );

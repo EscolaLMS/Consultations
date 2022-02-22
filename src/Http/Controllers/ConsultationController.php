@@ -6,9 +6,11 @@ use EscolaLms\Consultations\Dto\ConsultationDto;
 use EscolaLms\Consultations\Enum\ConstantEnum;
 use EscolaLms\Consultations\Http\Controllers\Swagger\ConsultationSwagger;
 use EscolaLms\Consultations\Http\Requests\ListConsultationsRequest;
+use EscolaLms\Consultations\Http\Requests\ScheduleConsultationRequest;
 use EscolaLms\Consultations\Http\Requests\StoreConsultationRequest;
 use EscolaLms\Consultations\Http\Requests\UpdateConsultationRequest;
 use EscolaLms\Consultations\Http\Resources\ConsultationSimpleResource;
+use EscolaLms\Consultations\Http\Resources\ConsultationTermsResource;
 use EscolaLms\Consultations\Services\Contracts\ConsultationServiceContract;
 use EscolaLms\Core\Http\Controllers\EscolaLmsBaseController;
 use Illuminate\Http\JsonResponse;
@@ -36,6 +38,17 @@ class ConsultationController extends EscolaLmsBaseController implements Consulta
 
         return $this->sendResponseForResource(
             ConsultationSimpleResource::collection($consultations), __('Consultations retrieved successfully')
+        );
+    }
+
+    public function schedule(int $id, ScheduleConsultationRequest $scheduleConsultationRequest): JsonResponse
+    {
+        $search = $scheduleConsultationRequest->except(['limit', 'skip', 'order', 'order_by']);
+        $consultationTerms = $this->consultationServiceContract
+            ->getConsultationTermsByConsultationId($id, $search);
+        return $this->sendResponseForResource(
+            ConsultationTermsResource::collection($consultationTerms),
+            __('Consultation schedules retrieved successfully')
         );
     }
 

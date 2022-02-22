@@ -3,6 +3,7 @@
 namespace EscolaLms\Consultations\Services;
 
 use EscolaLms\Consultations\Dto\ConsultationDto;
+use EscolaLms\Consultations\Dto\FilterConsultationTermsListDto;
 use EscolaLms\Consultations\Dto\FilterListDto;
 use EscolaLms\Consultations\Enum\ConsultationTermStatusEnum;
 use EscolaLms\Consultations\Events\ApprovedTerm;
@@ -194,10 +195,21 @@ class ConsultationService implements ConsultationServiceContract
         return $consultation->proposedTerms ?? null;
     }
 
-    public function setFiles(Consultation $consultation, array $files = [])
+    public function setFiles(Consultation $consultation, array $files = []): void
     {
         foreach ($files as $key => $file) {
             $consultation->$key = $file->storePublicly("consultation/{$consultation->getKey()}/images");
         }
+    }
+
+    public function getConsultationTermsByConsultationId(int $consultationId, array $search = []): Collection
+    {
+        $filterConsultationTermsDto = FilterConsultationTermsListDto::prepareFilters(
+            array_merge($search, ['consultation_id' => $consultationId])
+        );
+        return $this->consultationTermsRepositoryContract->allQueryBuilder(
+            $search,
+            $filterConsultationTermsDto
+        )->get();
     }
 }

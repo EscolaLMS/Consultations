@@ -5,10 +5,12 @@ namespace EscolaLms\Consultations\Models;
 use EscolaLms\Auth\Models\User;
 use EscolaLms\Cart\Contracts\Base\BuyableTrait;
 use EscolaLms\Cart\Models\OrderItem;
+use EscolaLms\Categories\Models\Category;
 use EscolaLms\Consultations\Database\Factories\ConsultationFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 
@@ -72,6 +74,40 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
  *          description="updated_at",
  *          type="datetime",
  *      ),
+ *      @OA\Property(
+ *          property="categories",
+ *          description="categories",
+ *          type="array",
+ *          @OA\Items(
+ *             @OA\JsonContent(
+ *                  @OA\Property(
+ *                     property="name",
+ *                     type="string",
+ *                     example="Dokumentacja",
+ *                  ),
+ *                  @OA\Property(
+ *                     property="icon_class",
+ *                     type="string",
+ *                     example="fa-business-time",
+ *                  ),
+ *                  @OA\Property(
+ *                    property="is_active",
+ *                    type="bool",
+ *                    example="true",
+ *                  ),
+ *                  @OA\Property(
+ *                      property="parent_id",
+ *                      type="?integer",
+ *                      example="null",
+ *                 ),
+ *              )
+ *          )
+ *      ),
+ *      @OA\Property(
+ *          property="proposed_terms",
+ *          description="proposed_terms",
+ *          type="array"
+ *      ),
  * )
  *
  */
@@ -111,9 +147,14 @@ class Consultation extends Model
         return ConsultationFactory::new();
     }
 
+    public function categories(): BelongsToMany
+    {
+        return $this->belongsToMany(Category::class);
+    }
+
     public function getBuyableDescription(): string
     {
-        // TODO: Implement getBuyableDescription() method.
+        return '';
     }
 
     public function getBuyablePrice(?array $options = null): int
