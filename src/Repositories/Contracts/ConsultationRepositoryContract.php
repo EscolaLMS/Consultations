@@ -9,4 +9,5 @@ interface ConsultationRepositoryContract
 {
     public function allQueryBuilder(array $search = [], array $criteria = []): Builder;
     public function updateModel(Consultation $consultation, array $data): Consultation;
+    public function getByOrderId(int $orderItemId): ?Consultation;
 }

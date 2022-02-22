@@ -15,13 +15,16 @@ class ConsultationSimpleResource extends JsonResource
             'id' => $this->id,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
-            'started_at' => $this->started_at,
-            'finished_at' => $this->finished_at,
+            'active_from' => $this->active_from,
+            'active_to' => $this->active_to,
             'name' => $this->name,
             'base_price' => $this->base_price,
             'author_id' => $this->author_id,
             'status' => $this->status,
             'description' => $this->description,
+            'duration' => $this->duration,
+            'image_path' => $this->image_path,
+            'proposed_terms' => ConsultationProposedTermResource::collection($this->proposedTerms)
         ];
         return self::apply($fields, $this);
     }

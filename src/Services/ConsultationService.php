@@ -2,11 +2,13 @@
 
 namespace EscolaLms\Consultations\Services;
 
+use EscolaLms\Consultations\Dto\ConsultationDto;
 use EscolaLms\Consultations\Dto\FilterListDto;
 use EscolaLms\Consultations\Enum\ConsultationTermStatusEnum;
 use EscolaLms\Consultations\Events\ApprovedTerm;
 use EscolaLms\Consultations\Events\RejectTerm;
 use EscolaLms\Consultations\Events\ReportTerm;
+use EscolaLms\Consultations\Helpers\StrategyHelper;
 use EscolaLms\Consultations\Models\Consultation;
 use EscolaLms\Consultations\Models\ConsultationTerm;
 use EscolaLms\Consultations\Repositories\Contracts\ConsultationRepositoryContract;
@@ -15,6 +17,7 @@ use EscolaLms\Consultations\Services\Contracts\ConsultationServiceContract;
 use EscolaLms\Jitsi\Services\Contracts\JitsiServiceContract;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -49,18 +52,25 @@ class ConsultationService implements ConsultationServiceContract
         );
     }
 
-    public function store(array $data = []): Consultation
+    public function store(ConsultationDto $consultationDto): Consultation
     {
-        return DB::transaction(function () use($data) {
-            return $this->consultationRepositoryContract->create($data);
+        return DB::transaction(function () use($consultationDto) {
+            $consultation = $this->consultationRepositoryContract->create($consultationDto->toArray());
+            $this->setRelations($consultation, $consultationDto->getRelations());
+            $this->setFiles($consultation, $consultationDto->getFiles());
+            $consultation->save();
+            return $consultation;
         });
     }
 
-    public function update(int $id, array $data = []): Consultation
+    public function update(int $id, ConsultationDto $consultationDto): Consultation
     {
         $consultation = $this->show($id);
-        return DB::transaction(function () use($consultation, $data) {
-            return $this->consultationRepositoryContract->updateModel($consultation, $data);
+        return DB::transaction(function () use($consultation, $consultationDto) {
+            $this->setFiles($consultation, $consultationDto->getFiles());
+            $consultation = $this->consultationRepositoryContract->updateModel($consultation, $consultationDto->toArray());
+            $this->setRelations($consultation, $consultationDto->getRelations());
+            return $consultation;
         });
     }
 
@@ -162,5 +172,32 @@ class ConsultationService implements ConsultationServiceContract
         return !$consultationTerm->isApproved() ||
             $now < $consultationTerm->executed_at ||
             $now > $dateTo;
+    }
+
+    public function setRelations(Consultation $consultation, array $relations = []): void
+    {
+        foreach ($relations as $key => $value) {
+            $className = 'ConsultationWith' . ucfirst($key) . 'Strategy';
+            StrategyHelper::useStrategyPattern(
+                $className,
+                'RelationsStrategy',
+                'setRelation',
+                $consultation,
+                $relations
+            );
+        }
+    }
+
+    public function proposedTerms(int $orderItemId): ?Collection
+    {
+        $consultation = $this->consultationRepositoryContract->getByOrderId($orderItemId);
+        return $consultation->proposedTerms ?? null;
+    }
+
+    public function setFiles(Consultation $consultation, array $files = [])
+    {
+        foreach ($files as $key => $file) {
+            $consultation->$key = $file->storePublicly("consultation/{$consultation->getKey()}/images");
+        }
     }
 }
