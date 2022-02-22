@@ -11,6 +11,7 @@ use EscolaLms\Consultations\Database\Seeders\ConsultationsPermissionSeeder;
 use EscolaLms\Consultations\Listeners\ReportTermListener;
 use EscolaLms\Consultations\Models\Consultation;
 use EscolaLms\Consultations\Models\ConsultationProposedTerm;
+use EscolaLms\Consultations\Models\ConsultationTerm;
 use EscolaLms\Consultations\Tests\TestCase;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\Event;
