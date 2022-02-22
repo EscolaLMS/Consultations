@@ -2,6 +2,7 @@
 namespace EscolaLms\Consultations\Http\Controllers\Swagger;
 
 use EscolaLms\Consultations\Http\Requests\ListConsultationsRequest;
+use EscolaLms\Consultations\Http\Requests\ScheduleConsultationRequest;
 use EscolaLms\Consultations\Http\Requests\StoreConsultationRequest;
 use EscolaLms\Consultations\Http\Requests\UpdateConsultationRequest;
 use Illuminate\Http\JsonResponse;
@@ -421,4 +422,72 @@ interface ConsultationSwagger
      * )
      */
     public function destroy(int $id): JsonResponse;
+
+    /**
+     * @OA\Get(
+     *      path="/api/admin/consultations/{id}/schedule",
+     *      tags={"Consultations"},
+     *      description="Get Consultation schedule",
+     *      @OA\Parameter(
+     *          name="id",
+     *          description="id of Consultation",
+     *          @OA\Schema(
+     *             type="integer",
+     *         ),
+     *          required=true,
+     *          in="path"
+     *      ),
+     *      @OA\Parameter(
+     *          name="date_from",
+     *          description="Course term date from"
+     *          required=false,
+     *          in="query",
+     *          @OA\Schema(
+     *              type="string",
+     *          ),
+     *      ),
+     *      @OA\Parameter(
+     *          name="date_to",
+     *          description="Course term date to"
+     *          required=false,
+     *          in="query",
+     *          @OA\Schema(
+     *              type="string",
+     *          ),
+     *      ),
+     *      @OA\Parameter(
+     *          name="status",
+     *          description="Course term status: not_reported, reported, reject, approved"
+     *          required=false,
+     *          in="query",
+     *          @OA\Schema(
+     *              type="string",
+     *          ),
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="successful operation",
+     *          @OA\MediaType(
+     *              mediaType="application/json"
+     *          ),
+     *          @OA\Schema(
+     *              type="object",
+     *              @OA\Property(
+     *                  property="success",
+     *                  type="boolean"
+     *              ),
+     *              @OA\Property(
+     *                  property="data",
+     *                  type="array",
+     *                  @OA\Items(ref="#/components/schemas/ConsultationTerm")
+     *              ),
+     *              @OA\Property(
+     *                  property="message",
+     *                  type="string"
+     *              )
+     *          )
+     *      )
+     * )
+     */
+    public function schedule(int $id, ScheduleConsultationRequest $scheduleConsultationRequest): JsonResponse;
 }

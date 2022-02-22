@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Route;
 // admin endpoints
 Route::group(['middleware' => ['auth:api'], 'prefix' => 'api/admin'], function () {
     Route::resource('consultations', ConsultationController::class);
+    Route::get('/consultations/{id}/schedule', [ConsultationController::class, 'schedule']);
 });
 
 // user endpoints

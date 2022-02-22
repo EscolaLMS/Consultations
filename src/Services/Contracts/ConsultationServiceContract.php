@@ -23,4 +23,7 @@ interface ConsultationServiceContract
     public function generateJitsi(int $consultationTermId): array;
     public function canGenerateJitsi(ConsultationTerm $consultationTerm): bool;
     public function proposedTerms(int $orderItemId): ?Collection;
+    public function setRelations(Consultation $consultation, array $relations = []): void;
+    public function setFiles(Consultation $consultation, array $files = []): void;
+    public function getConsultationTermsByConsultationId(int $consultationId, array $search = []): Collection;
 }

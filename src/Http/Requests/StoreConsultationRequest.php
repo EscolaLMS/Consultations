@@ -30,6 +30,8 @@ class StoreConsultationRequest extends FormRequest
             'active_to' => ['date', 'after_or_equal:active_from'],
             'proposed_dates' => ['array'],
             'proposed_dates.*' => ['date', 'after_or_equal:active_from'],
+            'categories' => ['array'],
+            'categories.*' => ['integer', 'exists:categories,id'],
         ];
     }
 }

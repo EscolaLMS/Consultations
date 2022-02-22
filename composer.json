@@ -8,6 +8,7 @@
     "escolalms/core": "^1",
     "escolalms/auth": "^0",
     "escolalms/settings": "^0",
+    "escolalms/categories": "^0",
     "escolalms/jitsi": "^0",
     "laravel/framework": ">=8.0",
     "escolalms/cart": "^0"
