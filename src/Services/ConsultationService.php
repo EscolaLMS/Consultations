@@ -53,6 +53,18 @@ class ConsultationService implements ConsultationServiceContract
         );
     }
 
+    public function getConsultationsListForUser(array $search = []): Builder
+    {
+        $now = now()->format('Y-m-d');
+        $search['active_to'] = $search['active_to'] ?? $now;
+        $search['active_from'] = $search['active_from'] ?? $now;
+        $criteria = FilterListDto::prepareFilters($search);
+        return $this->consultationRepositoryContract->forUser(
+            $search,
+            $criteria
+        );
+    }
+
     public function store(ConsultationDto $consultationDto): Consultation
     {
         return DB::transaction(function () use($consultationDto) {

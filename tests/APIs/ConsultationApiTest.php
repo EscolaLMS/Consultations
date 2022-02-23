@@ -65,4 +65,5 @@ class ConsultationApiTest extends TestCase
         $this->response = $this->json('GET','/api/admin/consultations');
         $this->response->assertUnauthorized();
     }
+
 }

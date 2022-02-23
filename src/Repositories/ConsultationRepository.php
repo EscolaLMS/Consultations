@@ -6,6 +6,7 @@ use EscolaLms\Consultations\Models\Consultation;
 use EscolaLms\Consultations\Repositories\Contracts\ConsultationRepositoryContract;
 use EscolaLms\Core\Repositories\BaseRepository;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Query\JoinClause;
 
 class ConsultationRepository extends BaseRepository implements ConsultationRepositoryContract
 {
@@ -28,6 +29,17 @@ class ConsultationRepository extends BaseRepository implements ConsultationRepos
             $query = $this->applyCriteria($query, $criteria);
         }
         return $query;
+    }
+
+    public function forUser(array $search = [], array $criteria = []): Builder
+    {
+        $q = $this->allQueryBuilder($search, $criteria);
+        $q->whereHas('orderItems', function ($query) {
+            return $query
+                ->leftJoin('orders', 'orders.id', '=', 'order_items.order_id')
+                ->where('orders.user_id', '=', auth()->user()->getKey());
+        });
+        return $q;
     }
 
     public function updateModel(Consultation $consultation, array $data): Consultation
