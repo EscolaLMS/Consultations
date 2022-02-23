@@ -3,7 +3,6 @@
 namespace EscolaLms\Consultations\Models;
 
 use EscolaLms\Auth\Models\User;
-use EscolaLms\Cart\Contracts\Base\BuyableTrait;
 use EscolaLms\Cart\Models\OrderItem;
 use EscolaLms\Categories\Models\Category;
 use EscolaLms\Consultations\Database\Factories\ConsultationFactory;
@@ -114,7 +113,6 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
 class Consultation extends Model
 {
     use HasFactory;
-    use BuyableTrait;
 
     protected $fillable = [
         'base_price',

@@ -37,6 +37,21 @@ class ConsultationAPIController extends EscolaLmsBaseController implements Consu
         );
     }
 
+    public function forUser(ListConsultationsRequest $listConsultationsRequest): JsonResponse
+    {
+        $search = $listConsultationsRequest->except(['limit', 'skip', 'order', 'order_by']);
+        $consultations = $this->consultationServiceContract
+            ->getConsultationsListForUser($search)
+            ->paginate(
+                $listConsultationsRequest->get('per_page') ??
+                config('escolalms_consultations.perPage', ConstantEnum::PER_PAGE)
+            );
+
+        return $this->sendResponseForResource(
+            ConsultationSimpleResource::collection($consultations), __('Consultations retrieved successfully')
+        );
+    }
+
     public function reportTerm(int $orderItemId, ReportTermConsultationRequest $request): JsonResponse
     {
         $this->consultationServiceContract->reportTerm($orderItemId, $request->input('term'));
