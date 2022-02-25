@@ -107,7 +107,13 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
  *          description="proposed_terms",
  *          type="array",
  *          @OA\Items(
- *              type="string"
+ *             @OA\JsonContent(
+ *                  @OA\Property(
+ *                      property="",
+ *                      type="string",
+ *                      example="12-12-2022 11:30",
+ *                  ),
+ *             )
  *          )
  *      ),
  * )
