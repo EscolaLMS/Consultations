@@ -105,7 +105,10 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
  *      @OA\Property(
  *          property="proposed_terms",
  *          description="proposed_terms",
- *          type="array"
+ *          type="array",
+ *          @OA\Items(
+ *              type="string"
+ *          )
  *      ),
  * )
  *
