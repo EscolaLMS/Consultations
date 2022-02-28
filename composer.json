@@ -4,6 +4,7 @@
   "type": "package",
   "require": {
     "php": ">=7.4",
+    "darkaonline/l5-swagger": "^8.3",
     "davidbadura/faker-markdown-generator": "^1.1",
     "escolalms/auth": "^0",
     "escolalms/cart": "0.1.19",
