@@ -37,7 +37,7 @@ interface ConsultationAPISwagger
      *          response=200,
      *          description="successful operation",
      *          @OA\MediaType(
-     *              mediaType="application/json"
+     *              mediaType="application/json",
      *          ),
      *          @OA\Schema(
      *              type="object",
