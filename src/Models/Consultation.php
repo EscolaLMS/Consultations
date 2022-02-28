@@ -78,28 +78,26 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
  *          description="categories",
  *          type="array",
  *          @OA\Items(
- *             @OA\JsonContent(
- *                  @OA\Property(
- *                     property="name",
- *                     type="string",
- *                     example="Dokumentacja",
- *                  ),
- *                  @OA\Property(
- *                     property="icon_class",
- *                     type="string",
- *                     example="fa-business-time",
- *                  ),
- *                  @OA\Property(
- *                    property="is_active",
- *                    type="bool",
- *                    example="true",
- *                  ),
- *                  @OA\Property(
- *                      property="parent_id",
- *                      type="?integer",
- *                      example="null",
- *                 ),
- *              ),
+ *             @OA\Property(
+ *                 property="name",
+ *                 type="string",
+ *                 example="Dokumentacja",
+ *             ),
+ *             @OA\Property(
+ *                 property="icon_class",
+ *                 type="string",
+ *                 example="fa-business-time",
+ *             ),
+ *             @OA\Property(
+ *                 property="is_active",
+ *                 type="bool",
+ *                 example="true",
+ *             ),
+ *             @OA\Property(
+ *                 property="parent_id",
+ *                 type="?integer",
+ *                 example="null",
+ *             ),
  *          ),
  *      ),
  *      @OA\Property(
@@ -107,12 +105,10 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
  *          description="proposed_terms",
  *          type="array",
  *          @OA\Items(
- *             @OA\JsonContent(
- *                  @OA\Property(
- *                      property="",
- *                      type="string",
- *                      example="12-12-2022 11:30",
- *                  ),
+ *             @OA\Property(
+ *                  property="",
+ *                  type="string",
+ *                  example="12-12-2022 11:30",
  *             ),
  *          ),
  *      ),
