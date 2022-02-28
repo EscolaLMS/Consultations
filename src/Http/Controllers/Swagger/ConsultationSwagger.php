@@ -431,15 +431,16 @@ interface ConsultationSwagger
      *      @OA\Parameter(
      *          name="id",
      *          description="id of Consultation",
-     *          @OA\Schema(
-     *             type="integer",
-     *         ),
      *          required=true,
-     *          in="path"
+     *          in="path",
+     *          @OA\Schema(
+     *              type="integer",
+     *          ),
+     *          name="id",
      *      ),
      *      @OA\Parameter(
      *          name="date_from",
-     *          description="Course term date from"
+     *          description="Course term date from",
      *          required=false,
      *          in="query",
      *          @OA\Schema(
@@ -448,7 +449,7 @@ interface ConsultationSwagger
      *      ),
      *      @OA\Parameter(
      *          name="date_to",
-     *          description="Course term date to"
+     *          description="Course term date to",
      *          required=false,
      *          in="query",
      *          @OA\Schema(
@@ -457,7 +458,7 @@ interface ConsultationSwagger
      *      ),
      *      @OA\Parameter(
      *          name="status",
-     *          description="Course term status: not_reported, reported, reject, approved"
+     *          description="Course term status: not_reported, reported, reject, approved",
      *          required=false,
      *          in="query",
      *          @OA\Schema(

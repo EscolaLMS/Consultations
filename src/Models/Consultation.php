@@ -26,32 +26,32 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
  *      @OA\Property(
  *          property="name",
  *          description="name",
- *          type="string"
+ *          type="string",
  *      ),
  *      @OA\Property(
  *          property="status",
  *          description="status",
- *          type="string"
+ *          type="string",
  *      ),
  *      @OA\Property(
  *          property="description",
  *          description="description",
- *          type="string"
+ *          type="string",
  *      ),
  *      @OA\Property(
  *          property="duration",
  *          description="duration",
- *          type="string"
+ *          type="string",
  *      ),
  *      @OA\Property(
  *          property="author_id",
  *          description="author_id",
- *          type="integer"
+ *          type="integer",
  *      ),
  *      @OA\Property(
  *          property="base_price",
  *          description="base_price",
- *          type="integer"
+ *          type="integer",
  *      ),
  *      @OA\Property(
  *          property="active_to",
@@ -61,7 +61,7 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
  *      @OA\Property(
  *          property="active_from",
  *          description="active_from",
- *          type="datetime"
+ *          type="datetime",
  *      ),
  *      @OA\Property(
  *          property="created_at",
@@ -99,8 +99,8 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
  *                      type="?integer",
  *                      example="null",
  *                 ),
- *              )
- *          )
+ *              ),
+ *          ),
  *      ),
  *      @OA\Property(
  *          property="proposed_terms",
@@ -113,8 +113,8 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
  *                      type="string",
  *                      example="12-12-2022 11:30",
  *                  ),
- *             )
- *          )
+ *             ),
+ *          ),
  *      ),
  * )
  *
