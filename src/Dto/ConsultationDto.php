@@ -34,7 +34,7 @@ class ConsultationDto extends BaseDto implements ModelDtoContract
     {
         $result = [];
         foreach ($proposedTerms as $term) {
-            $result[] = new ConsultationProposedTerm(['proposed_at' => Carbon::make($term)]);
+            $result[] = new ConsultationProposedTerm(['proposed_at' => Carbon::parse($term)]);
         }
         $this->relations['proposedTerms'] = $result;
     }
