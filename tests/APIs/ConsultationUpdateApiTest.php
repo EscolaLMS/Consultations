@@ -130,12 +130,4 @@ class ConsultationUpdateApiTest extends TestCase
         $response->assertNotFound();
     }
 
-    public function testConsultationUpdateRequiredValidation(): void
-    {
-        $response = $this->actingAs($this->user, 'api')->json(
-            'PUT',
-            $this->apiUrl
-        );
-        $response->assertJsonValidationErrors(['name', 'status', 'description', 'author_id']);
-    }
 }

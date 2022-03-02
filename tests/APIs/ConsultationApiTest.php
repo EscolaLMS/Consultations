@@ -38,7 +38,7 @@ class ConsultationApiTest extends TestCase
 
     public function testConsultationsListByDate(): void
     {
-        $now = now()->modify('+1 days');
+        $now = now();
         $cons = Consultation::factory([
             'active_from' => $now,
             'active_to' => (clone $now)->modify('+1 days')
