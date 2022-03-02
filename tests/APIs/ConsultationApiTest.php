@@ -2,16 +2,19 @@
 
 namespace EscolaLms\Consultations\Tests\APIs;
 
+use EscolaLms\Categories\Models\Category;
 use EscolaLms\Consultations\Database\Seeders\ConsultationsPermissionSeeder;
 use EscolaLms\Consultations\Models\Consultation;
 use EscolaLms\Consultations\Tests\TestCase;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Support\Collection;
 use Illuminate\Testing\Fluent\AssertableJson;
 
 class ConsultationApiTest extends TestCase
 {
     use DatabaseTransactions;
     private Consultation $consultation;
+    private Collection $categories;
 
     protected function setUp(): void
     {
@@ -23,6 +26,8 @@ class ConsultationApiTest extends TestCase
         $this->user->assignRole('tutor');
         $this->consultation = Consultation::factory()->create();
         $this->consultation->author()->associate($this->user);
+        $this->categories = Category::factory(2)->create();
+        $this->consultation->categories()->sync($this->categories->pluck('id')->toArray());
     }
 
     public function testConsultationsList(): void
@@ -33,22 +38,24 @@ class ConsultationApiTest extends TestCase
 
     public function testConsultationsListByDate(): void
     {
-        $now = now()->modify('+1 days');
+        $now = now();
         $cons = Consultation::factory([
-            'active_from' => $now,
+            'active_from' => $now->modify('+1 days'),
             'active_to' => (clone $now)->modify('+1 days')
         ])->create();
         $this->response = $this->actingAs($this->user, 'api')->get('/api/consultations');
         $this->response->assertOk();
-        $this->response->assertJsonMissing(['id' => $cons->getKey()]);
+        $this->response->assertJsonMissing([$cons->toArray()]);
     }
 
     public function testConsultationsListWithFilter(): void
     {
+        $categories = $this->categories->pluck('id')->toArray();
         $filterData = [
             'base_price=' . $this->consultation->base_price,
             'name=' . $this->consultation->name,
             'status[]=' . $this->consultation->status,
+            'categories[]=' . $categories[0]
         ];
         $this->response = $this->actingAs($this->user, 'api')->get('/api/admin/consultations?' . implode('&', $filterData));
         $this->response->assertOk();
@@ -57,6 +64,7 @@ class ConsultationApiTest extends TestCase
             'name' => $this->consultation->name,
             'status' => $this->consultation->status,
             'created_at' => $this->consultation->created_at,
+            'categories' => $this->consultation->categories->toArray()
         ]);
     }
 

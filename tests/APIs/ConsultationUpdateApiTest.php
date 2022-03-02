@@ -85,6 +85,37 @@ class ConsultationUpdateApiTest extends TestCase
         $response->assertJsonFragment(['success' => true]);
     }
 
+    public function testConsultationUpdateSingleField(): void
+    {
+        $categories = Category::factory(2)->create()->pluck('id')->toArray();
+        $requestArray = array_merge(
+            ['categories' => $categories]
+        );
+        $response = $this->actingAs($this->user, 'api')->json(
+            'PUT',
+            $this->apiUrl,
+            $requestArray
+        );
+        $response->assertOk();
+        $response->assertJson(fn (AssertableJson $json) => $json->has(
+            'data',
+            fn ($json) => $json
+                ->has('categories', fn (AssertableJson $json) =>
+                $json->each(fn (AssertableJson $json) =>
+                $json->where('id', fn ($json) =>
+                in_array($json, $categories)
+                )
+                    ->etc()
+                )
+                    ->etc()
+                )
+                ->etc()
+        )
+            ->etc()
+        );
+        $response->assertJsonFragment(['success' => true]);
+    }
+
     public function testConsultationUpdateFailed(): void
     {
         $consultation = Consultation::factory()->create();
@@ -99,12 +130,4 @@ class ConsultationUpdateApiTest extends TestCase
         $response->assertNotFound();
     }
 
-    public function testConsultationUpdateRequiredValidation(): void
-    {
-        $response = $this->actingAs($this->user, 'api')->json(
-            'PUT',
-            $this->apiUrl
-        );
-        $response->assertJsonValidationErrors(['name', 'status', 'description', 'author_id']);
-    }
 }
