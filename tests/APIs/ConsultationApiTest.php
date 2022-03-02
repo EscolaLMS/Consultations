@@ -45,7 +45,7 @@ class ConsultationApiTest extends TestCase
         ])->create();
         $this->response = $this->actingAs($this->user, 'api')->get('/api/consultations');
         $this->response->assertOk();
-        $this->response->assertJsonMissing(['id' => $cons->getKey()]);
+        $this->response->assertJsonMissing([$cons->toArray()]);
     }
 
     public function testConsultationsListWithFilter(): void
