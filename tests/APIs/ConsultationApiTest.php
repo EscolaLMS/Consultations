@@ -27,7 +27,7 @@ class ConsultationApiTest extends TestCase
         $this->consultation = Consultation::factory()->create();
         $this->consultation->author()->associate($this->user);
         $this->categories = Category::factory(2)->create();
-        $this->consultation->categories()->saveMany($this->categories);
+        $this->consultation->categories()->sync($this->categories->pluck('id')->toArray());
     }
 
     public function testConsultationsList(): void
@@ -40,7 +40,7 @@ class ConsultationApiTest extends TestCase
     {
         $now = now();
         $cons = Consultation::factory([
-            'active_from' => $now,
+            'active_from' => $now->modify('+1 days'),
             'active_to' => (clone $now)->modify('+1 days')
         ])->create();
         $this->response = $this->actingAs($this->user, 'api')->get('/api/consultations');
