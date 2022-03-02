@@ -13,8 +13,8 @@ class FilterListDto extends BaseDto
     private string $name;
     private int $basePrice;
     private array $status;
-    private string $activeTo;
-    private string $activeFrom;
+    private string $dateTo;
+    private string $dateFrom;
     private array $categories;
 
     private array $criteria = [];
@@ -31,11 +31,11 @@ class FilterListDto extends BaseDto
         if ($dto->getStatus()) {
             $dto->addToCriteria(new InCriterion('consultations.status', $dto->getStatus()));
         }
-        if ($dto->getActiveFrom()) {
-            $dto->addToCriteria(new DateCriterion('consultations.active_from', $dto->getActiveFrom(), '>='));
+        if ($dto->getDateFrom()) {
+            $dto->addToCriteria(new DateCriterion('consultations.active_from', $dto->getDateFrom(), '>='));
         }
-        if ($dto->getActiveTo()) {
-            $dto->addToCriteria(new DateCriterion('consultations.active_to', $dto->getActiveTo(), '<='));
+        if ($dto->getDateTo()) {
+            $dto->addToCriteria(new DateCriterion('consultations.active_to', $dto->getDateTo(), '<='));
         }
         if ($dto->getCategories()) {
             $dto->addToCriteria(new CategoriesCriterion($dto->getCategories()));
@@ -59,14 +59,14 @@ class FilterListDto extends BaseDto
         return $this->status ?? null;
     }
 
-    public function getActiveFrom(): ?string
+    public function getDateFrom(): ?string
     {
-        return $this->activeFrom ?? null;
+        return $this->dateFrom ?? null;
     }
 
-    public function getActiveTo(): ?string
+    public function getDateTo(): ?string
     {
-        return $this->activeTo ?? null;
+        return $this->dateTo ?? null;
     }
 
     public function getCategories(): ?array
@@ -89,14 +89,14 @@ class FilterListDto extends BaseDto
         $this->status = $status;
     }
 
-    protected function setActiveFrom(string $activeFrom): void
+    protected function setDateFrom(string $dateFrom): void
     {
-        $this->activeFrom = $activeFrom;
+        $this->dateFrom = $dateFrom;
     }
 
-    protected function setActiveTo(string $activeTo): void
+    protected function setDateTo(string $dateTo): void
     {
-        $this->activeTo = $activeTo;
+        $this->dateTo = $dateTo;
     }
 
     protected function setCategories(array $categories): void
