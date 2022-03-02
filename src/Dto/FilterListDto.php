@@ -2,7 +2,7 @@
 
 namespace EscolaLms\Consultations\Dto;
 
-use EscolaLms\Consultations\Dto\Traits\DtoHelper;
+use EscolaLms\Consultations\Repositories\Criteria\CategoriesCriterion;
 use EscolaLms\Consultations\Repositories\Criteria\ConsultationSearch;
 use EscolaLms\Core\Repositories\Criteria\Primitives\DateCriterion;
 use EscolaLms\Core\Repositories\Criteria\Primitives\EqualCriterion;
@@ -15,6 +15,7 @@ class FilterListDto extends BaseDto
     private array $status;
     private string $activeTo;
     private string $activeFrom;
+    private array $categories;
 
     private array $criteria = [];
 
@@ -36,6 +37,10 @@ class FilterListDto extends BaseDto
         if ($dto->getActiveTo()) {
             $dto->addToCriteria(new DateCriterion('consultations.active_to', $dto->getActiveTo(), '<='));
         }
+        if ($dto->getCategories()) {
+            $dto->addToCriteria(new CategoriesCriterion($dto->getCategories()));
+        }
+
         return $dto->criteria;
     }
 
@@ -64,6 +69,11 @@ class FilterListDto extends BaseDto
         return $this->activeTo ?? null;
     }
 
+    public function getCategories(): ?array
+    {
+        return $this->categories ?? null;
+    }
+
     protected function setName(string $name): void
     {
         $this->name = $name;
@@ -87,6 +97,11 @@ class FilterListDto extends BaseDto
     protected function setActiveTo(string $activeTo): void
     {
         $this->activeTo = $activeTo;
+    }
+
+    protected function setCategories(array $categories): void
+    {
+        $this->categories = $categories;
     }
 
     private function addToCriteria($value): void
