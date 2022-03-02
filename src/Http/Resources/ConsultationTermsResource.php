@@ -29,8 +29,9 @@ class ConsultationTermsResource extends JsonResource
     public function toArray($request)
     {
         return [
-            'date' => Carbon::make($this->executed_at)->format('Y-m-d H:i:s'),
-            'status' => $this->executed_status,
+            'date' => Carbon::make($this->executed_at)->format('Y-m-d H:i:s') ?? '',
+            'status' => $this->executed_status ?? '',
+            'author' => $this->orderItem->buyable->author ?? null
         ];
     }
 }

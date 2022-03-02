@@ -12,6 +12,7 @@ interface ConsultationSwagger
     /**
      * @OA\Get(
      *      path="/api/admin/consultations",
+     *      tags={"Admin Consultations"}
      *      @OA\Parameter(
      *          name="order_by",
      *          required=false,

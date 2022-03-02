@@ -78,8 +78,9 @@ class ConsultationScheduleTermsTest extends TestCase
         $this->response->assertOk();
         $consultationTerms = $this->consultationTerms->map(function (ConsultationTerm $element) {
             return [
-                'date' => Carbon::make($element->executed_at)->format('Y-m-d H:i:s'),
-                'status' => $element->executed_status,
+                'date' => Carbon::make($element->executed_at)->format('Y-m-d H:i:s') ?? '',
+                'status' => $element->executed_status ?? '',
+                'author' => $element->orderItem->buyable->author->toArray() ?? ''
             ];
         })->toArray();
         $this->response->assertJsonFragment($consultationTerms);
