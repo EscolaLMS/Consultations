@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Support\Facades\Storage;
 
 
 /**
@@ -163,5 +164,13 @@ class Consultation extends Model
     public function getBuyablePrice(?array $options = null): int
     {
         return $this->base_price ?? 0;
+    }
+
+    public function getImageUrlAttribute(): ?string
+    {
+        if (isset($this->attributes['image_path'])) {
+            return url(Storage::disk('public')->url($this->attributes['image_path']));
+        }
+        return null;
     }
 }
