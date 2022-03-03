@@ -31,7 +31,7 @@ class ConsultationUpdateApiTest extends TestCase
 
     public function testConsultationUpdateUnauthorized(): void
     {
-        $response = $this->json('PUT',$this->apiUrl);
+        $response = $this->json('POST',$this->apiUrl);
         $response->assertUnauthorized();
     }
 
@@ -51,7 +51,7 @@ class ConsultationUpdateApiTest extends TestCase
             ['categories' => $categories]
         );
         $response = $this->actingAs($this->user, 'api')->json(
-            'PUT',
+            'POST',
             $this->apiUrl,
             $requestArray
         );
@@ -92,7 +92,7 @@ class ConsultationUpdateApiTest extends TestCase
             ['categories' => $categories]
         );
         $response = $this->actingAs($this->user, 'api')->json(
-            'PUT',
+            'POST',
             $this->apiUrl,
             $requestArray
         );
@@ -123,7 +123,7 @@ class ConsultationUpdateApiTest extends TestCase
         $consultation->delete();
         $consultationUpdate = Consultation::factory()->make();
         $response = $this->actingAs($this->user, 'api')->json(
-            'PUT',
+            'POST',
             '/api/admin/consultations/' . $id,
             $consultationUpdate->toArray()
         );
