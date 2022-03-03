@@ -24,6 +24,7 @@ class ConsultationSimpleResource extends JsonResource
             'description' => $this->description,
             'duration' => $this->duration,
             'image_path' => $this->image_path,
+            'image_url' => $this->image_url,
             'proposed_terms' => ConsultationProposedTermResource::collection($this->proposedTerms),
             'categories' => $this->categories,
         ];
