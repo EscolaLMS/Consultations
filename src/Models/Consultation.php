@@ -126,6 +126,7 @@ class Consultation extends Model
         'status',
         'duration',
         'description',
+        'image_path',
         'author_id',
         'active_from',
         'active_to'

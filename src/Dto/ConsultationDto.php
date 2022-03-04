@@ -18,6 +18,7 @@ class ConsultationDto extends BaseDto implements ModelDtoContract
     protected ?string $duration;
     protected ?int $basePrice;
     protected ?int $authorId;
+    protected ?string $imagePath;
 
     public function model(): Consultation
     {
@@ -28,6 +29,11 @@ class ConsultationDto extends BaseDto implements ModelDtoContract
     {
         $result = $this->fillInArray($this->model()->getFillable());
         return $filters ? array_filter($result) : $result;
+    }
+
+    public function getImagePath(): string
+    {
+        return $this->imagePath ?? '';
     }
 
     protected function setProposedTerms(array $proposedTerms): void
