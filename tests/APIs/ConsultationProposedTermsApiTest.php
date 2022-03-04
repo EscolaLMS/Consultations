@@ -3,7 +3,7 @@
 namespace EscolaLms\Consultations\Tests\APIs;
 
 use Carbon\Carbon;
-use EscolaLms\Cart\Events\CartOrderPaid;
+use EscolaLms\Cart\Events\OrderPaid;
 use EscolaLms\Cart\Models\Order;
 use EscolaLms\Cart\Models\OrderItem;
 use EscolaLms\Cart\Models\User;
@@ -58,7 +58,7 @@ class ConsultationProposedTermsApiTest extends TestCase
             'subtotal' => $price,
         ]);
         Event::fake();
-        $event = new CartOrderPaid($this->user, $this->order);
+        $event = new OrderPaid($this->order, $this->user);
         $listener = app(ReportTermListener::class);
         $listener->handle($event);
     }
