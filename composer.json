@@ -6,7 +6,7 @@
     "php": ">=7.4",
     "davidbadura/faker-markdown-generator": "^1.1",
     "escolalms/auth": "^0",
-    "escolalms/cart": "0.1.19",
+    "escolalms/cart": "^0",
     "escolalms/categories": "^0",
     "escolalms/core": "^1",
     "escolalms/jitsi": "^0",
