@@ -56,10 +56,19 @@ class ConsultationShowApiTest extends TestCase
         $consultation->delete();
         $consultationUpdate = Consultation::factory()->make();
         $response = $this->actingAs($this->user, 'api')->json(
-            'PUT',
+            'GET',
             '/api/admin/consultations/' . $id,
             $consultationUpdate->toArray()
         );
         $response->assertNotFound();
+    }
+
+    public function testConsultationShowAPI()
+    {
+        $response = $this->actingAs($this->user, 'api')->json(
+            'GET',
+            '/api/consultations/' . $this->consultation->getKey()
+        );
+        $response->assertOk();
     }
 }

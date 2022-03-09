@@ -3,6 +3,7 @@ namespace EscolaLms\Consultations\Http\Controllers\Swagger;
 
 use EscolaLms\Consultations\Http\Requests\ListConsultationsRequest;
 use EscolaLms\Consultations\Http\Requests\ScheduleConsultationRequest;
+use EscolaLms\Consultations\Http\Requests\ShowConsultationRequest;
 use EscolaLms\Consultations\Http\Requests\StoreConsultationRequest;
 use EscolaLms\Consultations\Http\Requests\UpdateConsultationRequest;
 use Illuminate\Http\JsonResponse;
@@ -189,47 +190,7 @@ interface ConsultationSwagger
      *      )
      * )
      */
-
-    /**
-     * @OA\Get(
-     *      path="/api/consultations/{id}",
-     *      summary="Display the specified Consultation",
-     *      tags={"Consultations"},
-     *      description="Get Consultation",
-     *      @OA\Parameter(
-     *          name="id",
-     *          description="id of Consultation",
-     *          @OA\Schema(
-     *             type="integer",
-     *         ),
-     *          required=true,
-     *          in="path"
-     *      ),
-     *      @OA\Response(
-     *          response=200,
-     *          description="successful operation",
-     *          @OA\MediaType(
-     *              mediaType="application/json"
-     *          ),
-     *          @OA\Schema(
-     *              type="object",
-     *              @OA\Property(
-     *                  property="success",
-     *                  type="boolean"
-     *              ),
-     *              @OA\Property(
-     *                  property="data",
-     *                  ref="#/components/schemas/Consultation"
-     *              ),
-     *              @OA\Property(
-     *                  property="message",
-     *                  type="string"
-     *              )
-     *          )
-     *      )
-     * )
-     */
-    public function show(int $id): JsonResponse;
+    public function show(ShowConsultationRequest $showConsultationRequest, int $id): JsonResponse;
 
     /**
      * @OA\Put(
