@@ -7,6 +7,8 @@ use EscolaLms\Consultations\Enum\ConstantEnum;
 use EscolaLms\Consultations\Http\Controllers\Swagger\ConsultationSwagger;
 use EscolaLms\Consultations\Http\Requests\ListConsultationsRequest;
 use EscolaLms\Consultations\Http\Requests\ScheduleConsultationRequest;
+use EscolaLms\Consultations\Http\Requests\ShowAPIConsultationRequest;
+use EscolaLms\Consultations\Http\Requests\ShowConsultationRequest;
 use EscolaLms\Consultations\Http\Requests\StoreConsultationRequest;
 use EscolaLms\Consultations\Http\Requests\UpdateConsultationRequest;
 use EscolaLms\Consultations\Http\Resources\ConsultationSimpleResource;
@@ -72,12 +74,12 @@ class ConsultationController extends EscolaLmsBaseController implements Consulta
         );
     }
 
-    public function show(int $id): JsonResponse
+    public function show(ShowConsultationRequest $showConsultationRequest, int $id): JsonResponse
     {
         $consultation = $this->consultationServiceContract->show($id);
         return $this->sendResponseForResource(
             ConsultationSimpleResource::make($consultation),
-            __('Consultation updated successfully')
+            __('Consultation show successfully')
         );
     }
 

@@ -36,6 +36,15 @@ class ConsultationApiTest extends TestCase
         $this->response->assertOk();
     }
 
+    public function testConsultationListAPI()
+    {
+        $response = $this->actingAs($this->user, 'api')->json(
+            'GET',
+            '/api/consultations/'
+        );
+        $response->assertOk();
+    }
+
     public function testConsultationsListByDate(): void
     {
         $now = now();

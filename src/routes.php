@@ -23,6 +23,6 @@ Route::group(['middleware' => ['auth:api'], 'prefix' => 'api/consultations'], fu
 
 Route::group(['prefix' => 'api/consultations'], function () {
     Route::get('/', [ConsultationAPIController::class, 'index']);
-    Route::get('/{id}', [ConsultationController::class, 'show']);
+    Route::get('/{id}', [ConsultationAPIController::class, 'show']);
 });
 

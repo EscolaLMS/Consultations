@@ -1,8 +1,10 @@
 <?php
 namespace EscolaLms\Consultations\Http\Controllers\Swagger;
 
+use EscolaLms\Consultations\Http\Requests\ListAPIConsultationsRequest;
 use EscolaLms\Consultations\Http\Requests\ListConsultationsRequest;
 use EscolaLms\Consultations\Http\Requests\ReportTermConsultationRequest;
+use EscolaLms\Consultations\Http\Requests\ShowAPIConsultationRequest;
 use Illuminate\Http\JsonResponse;
 
 interface ConsultationAPISwagger
@@ -267,7 +269,7 @@ interface ConsultationAPISwagger
      *      )
      * )
      */
-    public function index(ListConsultationsRequest $listConsultationsRequest): JsonResponse;
+    public function index(ListAPIConsultationsRequest $listConsultationsRequest): JsonResponse;
 
     /**
      * @OA\Get(
@@ -412,4 +414,45 @@ interface ConsultationAPISwagger
      *   )
      */
     public function proposedTerms(int $orderItemId): JsonResponse;
+
+    /**
+     * @OA\Get(
+     *      path="/api/consultations/{id}",
+     *      summary="Display the specified Consultation",
+     *      tags={"Consultations"},
+     *      description="Get Consultation",
+     *      @OA\Parameter(
+     *          name="id",
+     *          description="id of Consultation",
+     *          @OA\Schema(
+     *             type="integer",
+     *         ),
+     *          required=true,
+     *          in="path"
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="successful operation",
+     *          @OA\MediaType(
+     *              mediaType="application/json"
+     *          ),
+     *          @OA\Schema(
+     *              type="object",
+     *              @OA\Property(
+     *                  property="success",
+     *                  type="boolean"
+     *              ),
+     *              @OA\Property(
+     *                  property="data",
+     *                  ref="#/components/schemas/Consultation"
+     *              ),
+     *              @OA\Property(
+     *                  property="message",
+     *                  type="string"
+     *              )
+     *          )
+     *      )
+     * )
+     */
+    public function show(ShowAPIConsultationRequest $showAPIConsultationRequest, int $id): JsonResponse;
 }

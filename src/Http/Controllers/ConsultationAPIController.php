@@ -4,11 +4,14 @@ namespace EscolaLms\Consultations\Http\Controllers;
 
 use EscolaLms\Consultations\Enum\ConstantEnum;
 use EscolaLms\Consultations\Http\Controllers\Swagger\ConsultationAPISwagger;
+use EscolaLms\Consultations\Http\Requests\ListAPIConsultationsRequest;
 use EscolaLms\Consultations\Http\Requests\ListConsultationsRequest;
 use EscolaLms\Consultations\Http\Requests\ReportTermConsultationRequest;
+use EscolaLms\Consultations\Http\Requests\ShowAPIConsultationRequest;
 use EscolaLms\Consultations\Http\Resources\ConsultationProposedTermResource;
 use EscolaLms\Consultations\Http\Resources\ConsultationSimpleResource;
 use EscolaLms\Consultations\Services\Contracts\ConsultationServiceContract;
+use EscolaLms\Consultations\Tests\APIs\ConsultationShowApiTest;
 use EscolaLms\Core\Http\Controllers\EscolaLmsBaseController;
 use Illuminate\Http\JsonResponse;
 
@@ -22,7 +25,7 @@ class ConsultationAPIController extends EscolaLmsBaseController implements Consu
         $this->consultationServiceContract = $consultationServiceContract;
     }
 
-    public function index(ListConsultationsRequest $listConsultationsRequest): JsonResponse
+    public function index(ListAPIConsultationsRequest $listConsultationsRequest): JsonResponse
     {
         $search = $listConsultationsRequest->except(['limit', 'skip', 'order', 'order_by']);
         $consultations = $this->consultationServiceContract
@@ -34,6 +37,15 @@ class ConsultationAPIController extends EscolaLmsBaseController implements Consu
 
         return $this->sendResponseForResource(
             ConsultationSimpleResource::collection($consultations), __('Consultations retrieved successfully')
+        );
+    }
+
+    public function show(ShowAPIConsultationRequest $showAPIConsultationRequest, int $id): JsonResponse
+    {
+        $consultation = $this->consultationServiceContract->show($id);
+        return $this->sendResponseForResource(
+            ConsultationSimpleResource::make($consultation),
+            __('Consultation show successfully')
         );
     }
 
