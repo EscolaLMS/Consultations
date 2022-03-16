@@ -14,6 +14,9 @@ interface ConsultationSwagger
      * @OA\Get(
      *      path="/api/admin/consultations",
      *      tags={"Admin Consultations"},
+     *      security={
+     *          {"passport": {}},
+     *      },
      *      @OA\Parameter(
      *          name="order_by",
      *          required=false,
@@ -292,6 +295,9 @@ interface ConsultationSwagger
      *      path="/api/admin/consultations/{id}/schedule",
      *      tags={"Consultations"},
      *      description="Get Consultation schedule",
+     *      security={
+     *          {"passport": {}},
+     *      },
      *      @OA\Parameter(
      *          name="id",
      *          description="id of Consultation",

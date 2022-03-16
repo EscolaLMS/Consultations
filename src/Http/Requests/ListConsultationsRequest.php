@@ -11,7 +11,8 @@ class ListConsultationsRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return Gate::allows(ConsultationsPermissionsEnum::CONSULTATION_LIST, Consultation::class);
+        $user = auth()->user();
+        return isset($user);
     }
 
     public function rules(): array
