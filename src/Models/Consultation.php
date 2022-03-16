@@ -126,10 +126,11 @@ class Consultation extends Model
         'status',
         'duration',
         'description',
+        'short_desc',
         'image_path',
         'author_id',
         'active_from',
-        'active_to'
+        'active_to',
     ];
 
     public function author(): BelongsTo

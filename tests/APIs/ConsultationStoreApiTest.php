@@ -55,6 +55,7 @@ class ConsultationStoreApiTest extends TestCase
         $response->assertCreated();
         $response->assertJsonFragment([
             'name' => $consultation['name'],
+            'short_desc' => $consultation['short_desc'],
             'status' => $consultation['status'],
             'author_id' => $consultation['author_id']
         ]);
