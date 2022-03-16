@@ -22,6 +22,7 @@ class ConsultationSimpleResource extends JsonResource
             'author_id' => $this->author_id,
             'status' => $this->status,
             'description' => $this->description,
+            'short_desc' => $this->short_desc,
             'duration' => $this->duration,
             'image_path' => $this->image_path,
             'image_url' => $this->image_url,

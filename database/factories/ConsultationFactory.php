@@ -21,6 +21,7 @@ class ConsultationFactory extends Factory
             'name' => $this->faker->sentence(10),
             'status' => $this->faker->randomElement(ConsultationStatusEnum::getValues()),
             'description' => $this->faker->sentence,
+            'short_desc' => $this->faker->sentence,
             'duration' => rand(2, 10) . " hours",
             'author_id' => empty($tutor) ? null : $tutor->getKey(),
             'active_from' => $now,

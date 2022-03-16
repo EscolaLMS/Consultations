@@ -58,6 +58,7 @@ class ConsultationUpdateApiTest extends TestCase
         $response->assertOk();
         $response->assertJsonFragment([
             'id' => $this->consultation->getKey(),
+            'short_desc' => $consultationUpdate['short_desc'],
             'name' => $consultationUpdate['name'],
             'status' => $consultationUpdate['status'],
             'author_id' => $consultationUpdate['author_id'],
