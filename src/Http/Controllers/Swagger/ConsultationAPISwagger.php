@@ -12,6 +12,9 @@ interface ConsultationAPISwagger
     /**
      * @OA\Post(
      *      path="/api/consultations/report-term/{orderItemId}",
+     *      security={
+     *          {"passport": {}},
+     *      },
      *      summary="Report term with bought consultation",
      *      tags={"Consultations"},
      *      description="Report term consultation",
@@ -68,6 +71,9 @@ interface ConsultationAPISwagger
     /**
      * @OA\Get(
      *      tags={"Consultations"},
+     *      security={
+     *          {"passport": {}},
+     *      },
      *      path="/api/consultations/approve-term/{consultationTermId}",
      *      description="Approve reported term with consultation author",
      *      @OA\Parameter(
@@ -100,6 +106,9 @@ interface ConsultationAPISwagger
      * @OA\Get(
      *      tags={"Consultations"},
      *      path="/api/consultations/reject-term/{consultationTermId}",
+     *      security={
+     *          {"passport": {}},
+     *      },
      *      description="Reject reported term with consultation author",
      *      @OA\Parameter(
      *          name="consultationTermId",
@@ -131,6 +140,9 @@ interface ConsultationAPISwagger
      * @OA\Get(
      *      tags={"Consultations"},
      *      path="/api/consultations/generate-jitsi/{consultationTermId}",
+     *      security={
+     *          {"passport": {}},
+     *      },
      *      description="Generate jitsi object for approved consultation term",
      *      @OA\Parameter(
      *          name="consultationTermId",
@@ -274,6 +286,9 @@ interface ConsultationAPISwagger
     /**
      * @OA\Get(
      *      path="/api/consultations/me",
+     *      security={
+     *          {"passport": {}},
+     *      },
      *      summary="Get a listing of the Consultations bought by user.",
      *      tags={"Consultations"},
      *      description="Get a listing of the Consultations bought by user",
@@ -373,6 +388,9 @@ interface ConsultationAPISwagger
      * @OA\Get(
      *      tags={"Consultations"},
      *      path="/api/consultations/proposed-terms/{orderItemId}",
+     *      security={
+     *          {"passport": {}},
+     *      },
      *      description="Get proposedTerm For OrderItem",
      *      @OA\Parameter(
      *          name="orderItemId",
