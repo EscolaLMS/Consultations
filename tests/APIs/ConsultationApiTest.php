@@ -8,7 +8,6 @@ use EscolaLms\Consultations\Models\Consultation;
 use EscolaLms\Consultations\Tests\TestCase;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Collection;
-use Illuminate\Testing\Fluent\AssertableJson;
 
 class ConsultationApiTest extends TestCase
 {

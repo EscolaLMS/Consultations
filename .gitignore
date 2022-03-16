@@ -4,5 +4,6 @@ composer.lock
 .idea
 openapi.json
 .env
+.env.testing
 scorm
 .DS_Store

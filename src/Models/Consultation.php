@@ -167,11 +167,11 @@ class Consultation extends Model
         return $this->base_price ?? 0;
     }
 
-    public function getImageUrlAttribute(): ?string
+    public function getImageUrlAttribute(): string
     {
-        if (isset($this->attributes['image_path'])) {
+        if ($this->attributes['image_path'] ?? null) {
             return url(Storage::disk('public')->url($this->attributes['image_path']));
         }
-        return null;
+        return '';
     }
 }
