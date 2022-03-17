@@ -32,9 +32,9 @@ class ConsultationDto extends BaseDto implements ModelDtoContract
         return $filters ? array_filter($result) : $result;
     }
 
-    public function getImagePath(): string
+    public function getImagePath()
     {
-        return $this->imagePath ?? '';
+        return $this->imagePath ?? false;
     }
 
     protected function setProposedTerms(array $proposedTerms): void
