@@ -58,7 +58,6 @@ class ConsultationAPIController extends EscolaLmsBaseController implements Consu
                 $listConsultationsRequest->get('per_page') ??
                 config('escolalms_consultations.perPage', ConstantEnum::PER_PAGE)
             );
-
         return $this->sendResponseForResource(
             ConsultationSimpleResource::collection($consultations), __('Consultations retrieved successfully')
         );

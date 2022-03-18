@@ -34,11 +34,9 @@ class ConsultationRepository extends BaseRepository implements ConsultationRepos
     public function forUser(array $search = [], array $criteria = []): Builder
     {
         $q = $this->allQueryBuilder($search, $criteria);
-        $q->whereHas('orderItems', function ($query) {
-            return $query
-                ->leftJoin('orders', 'orders.id', '=', 'order_items.order_id')
-                ->where('orders.user_id', '=', auth()->user()->getKey());
-        });
+        $q->whereHas('users', fn ($query) =>
+            $query->where(['users.id' => auth()->user()->getKey()])
+        );
         return $q;
     }
 

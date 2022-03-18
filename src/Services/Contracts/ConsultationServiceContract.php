@@ -26,4 +26,5 @@ interface ConsultationServiceContract
     public function setRelations(Consultation $consultation, array $relations = []): void;
     public function setFiles(Consultation $consultation, array $files = []): void;
     public function getConsultationTermsByConsultationId(int $consultationId, array $search = []): Collection;
+    public function getConsultationsListForUser(array $search = []): Builder;
 }
