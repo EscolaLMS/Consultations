@@ -2,15 +2,13 @@
 
 namespace EscolaLms\Consultations\Tests\APIs;
 
-use EscolaLms\Cart\Models\Order;
-use EscolaLms\Cart\Models\OrderItem;
-use EscolaLms\Cart\Models\User;
 use EscolaLms\Consultations\Database\Seeders\ConsultationsPermissionSeeder;
 use EscolaLms\Consultations\Models\Consultation;
 use EscolaLms\Consultations\Tests\TestCase;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Collection;
 use Illuminate\Testing\Fluent\AssertableJson;
+use EscolaLms\Consultations\Models\User;
 
 class ConsultationListForUserTest extends TestCase
 {
@@ -32,24 +30,7 @@ class ConsultationListForUserTest extends TestCase
     private function initVariable(): void
     {
         $this->consultations = Consultation::factory(3)->create();
-        $price = $this->consultations->reduce(fn ($acc, Consultation $consultation) => $acc + $consultation->getBuyablePrice(), 0);
-        $this->order = Order::factory()->afterCreating(
-            fn (Order $order) => $order->items()->saveMany(
-                $this->consultations->map(
-                    function (Consultation $consultation) {
-                        return OrderItem::query()->make([
-                            'quantity' => 1,
-                            'buyable_id' => $consultation->getKey(),
-                            'buyable_type' => Consultation::class,
-                        ]);
-                    }
-                )
-            )
-        )->create([
-            'user_id' => $this->user->getKey(),
-            'total' => $price,
-            'subtotal' => $price,
-        ]);
+        $this->user->consultations()->sync($this->consultations->pluck('id')->toArray());
     }
 
     public function testConsultationListForUser(): void
