@@ -19,7 +19,7 @@ class ConsultationDto extends BaseDto implements ModelDtoContract
     protected ?string $duration;
     protected ?int $basePrice;
     protected ?int $authorId;
-    protected ?string $imagePath;
+    protected $imagePath = false;
 
     public function model(): Consultation
     {
@@ -34,7 +34,10 @@ class ConsultationDto extends BaseDto implements ModelDtoContract
 
     public function getImagePath()
     {
-        return $this->imagePath ?? false;
+        if ($this->imagePath !== false) {
+            return $this->imagePath === null ? '' : $this->imagePath;
+        }
+        return false;
     }
 
     protected function setProposedTerms(array $proposedTerms): void
