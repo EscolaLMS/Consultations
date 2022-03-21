@@ -43,7 +43,6 @@ class ConsultationShowApiTest extends TestCase
             'id' => $this->consultation->getKey(),
             'name' => $this->consultation->name,
             'status' => $this->consultation->status,
-            'author_id' => $this->consultation->author_id,
             'created_at' => $this->consultation->created_at,
         ]);
         $response->assertJsonFragment(['success' => true]);

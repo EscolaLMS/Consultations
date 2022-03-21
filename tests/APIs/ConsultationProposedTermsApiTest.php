@@ -6,6 +6,8 @@ use Carbon\Carbon;
 use EscolaLms\Cart\Events\OrderPaid;
 use EscolaLms\Cart\Models\Order;
 use EscolaLms\Cart\Models\OrderItem;
+use EscolaLms\Cart\Models\Product;
+use EscolaLms\Cart\Models\ProductProductable;
 use EscolaLms\Cart\Models\User;
 use EscolaLms\Consultations\Database\Seeders\ConsultationsPermissionSeeder;
 use EscolaLms\Consultations\Listeners\ReportTermListener;
@@ -44,10 +46,15 @@ class ConsultationProposedTermsApiTest extends TestCase
             fn (Order $order) => $order->items()->saveMany(
                 $consultationsForOrder->map(
                     function (Consultation $consultation) {
+                        $product = Product::factory()->create();
+                        $product->productables()->save(new ProductProductable([
+                            'productable_id' => $consultation->getKey(),
+                            'productable_type' => $consultation->getMorphClass(),
+                        ]));
                         return OrderItem::query()->make([
                             'quantity' => 1,
-                            'buyable_id' => $consultation->getKey(),
-                            'buyable_type' => Consultation::class,
+                            'buyable_id' => $product->getKey(),
+                            'buyable_type' => Product::class,
                         ]);
                     }
                 )
@@ -76,9 +83,12 @@ class ConsultationProposedTermsApiTest extends TestCase
     {
         $this->initVariable();
         $orderItem = $this->order->items()->first();
-        $consultationTerms = $orderItem->buyable->proposedTerms->map(
-            fn (ConsultationProposedTerm $consultationTerm) => Carbon::make($consultationTerm->proposed_at)->format('Y-m-d H:i:s')
-        )->toArray();
+        $consultationProposedTerms = [];
+        $orderItem->buyable->productables->each(function ($consultation) use(&$consultationProposedTerms) {
+            $consultationProposedTerms = $consultation->productable->proposedTerms->map(
+                fn (ConsultationProposedTerm $consultationTerm) => Carbon::make($consultationTerm->proposed_at)->format('Y-m-d H:i:s')
+            )->toArray();
+        });
         $this->response = $this->actingAs($this->user, 'api')->json(
             'GET',
             'api/consultations/proposed-terms/' . $orderItem->getKey()
@@ -86,7 +96,7 @@ class ConsultationProposedTermsApiTest extends TestCase
         $this->response->assertOk();
         $this->response->assertJson(fn (AssertableJson $json) => $json
             ->where('success', true)
-            ->where('data', $consultationTerms)
+            ->where('data', $consultationProposedTerms)
             ->etc()
         );
     }

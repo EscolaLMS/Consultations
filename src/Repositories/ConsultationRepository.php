@@ -31,7 +31,7 @@ class ConsultationRepository extends BaseRepository implements ConsultationRepos
         return $query;
     }
 
-    public function forUser(array $search = [], array $criteria = []): Builder
+    public function forCurrentUser(array $search = [], array $criteria = []): Builder
     {
         $q = $this->allQueryBuilder($search, $criteria);
         $q->whereHas('users', fn ($query) =>
@@ -49,6 +49,10 @@ class ConsultationRepository extends BaseRepository implements ConsultationRepos
 
     public function getByOrderId(int $orderItemId): ?Consultation
     {
+        dd($this->model->newQuery()
+            ->whereRelation('orderItems', fn (Builder $query) =>
+            $query->whereId($orderItemId)
+            )->toSql());
         return $this->model->newQuery()
             ->whereRelation('orderItems', fn (Builder $query) =>
                 $query->whereId($orderItemId)

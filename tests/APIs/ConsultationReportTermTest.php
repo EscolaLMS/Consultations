@@ -5,6 +5,8 @@ namespace EscolaLms\Consultations\Tests\APIs;
 use EscolaLms\Cart\Events\OrderPaid;
 use EscolaLms\Cart\Models\Order;
 use EscolaLms\Cart\Models\OrderItem;
+use EscolaLms\Cart\Models\Product;
+use EscolaLms\Cart\Models\ProductProductable;
 use EscolaLms\Cart\Models\User;
 use EscolaLms\Consultations\Enum\ConsultationTermStatusEnum;
 use EscolaLms\Consultations\Events\ApprovedTerm;
@@ -37,22 +39,27 @@ class ConsultationReportTermTest extends TestCase
         $consultationsForOrder = Consultation::factory(3)->create();
         $price = $consultationsForOrder->reduce(fn ($acc, Consultation $consultation) => $acc + $consultation->getBuyablePrice(), 0);
         $this->order = Order::factory()->afterCreating(
-                fn (Order $order) => $order->items()->saveMany(
-                    $consultationsForOrder->map(
-                        function (Consultation $consultation) {
-                            return OrderItem::query()->make([
-                                'quantity' => 1,
-                                'buyable_id' => $consultation->getKey(),
-                                'buyable_type' => Consultation::class,
-                            ]);
-                        }
-                    )
+            fn (Order $order) => $order->items()->saveMany(
+                $consultationsForOrder->map(
+                    function (Consultation $consultation) {
+                        $product = Product::factory()->create();
+                        $product->productables()->save(new ProductProductable([
+                            'productable_id' => $consultation->getKey(),
+                            'productable_type' => $consultation->getMorphClass(),
+                        ]));
+                        return OrderItem::query()->make([
+                            'quantity' => 1,
+                            'buyable_id' => $product->getKey(),
+                            'buyable_type' => Product::class,
+                        ]);
+                    }
                 )
-            )->create([
-                'user_id' => $this->user->getKey(),
-                'total' => $price,
-                'subtotal' => $price,
-            ]);
+            )
+        )->create([
+            'user_id' => $this->user->getKey(),
+            'total' => $price,
+            'subtotal' => $price,
+        ]);
         Event::fake();
         $event = new OrderPaid($this->order, $this->user);
         $listener = app(ReportTermListener::class);
@@ -63,16 +70,17 @@ class ConsultationReportTermTest extends TestCase
     {
         $this->initVariable();
         $item = Order::whereUserId($this->user->getKey())->first()->items()->first();
+        $orderItem = $item->getKey();
         $now = now()->modify('+1 day');
         $this->response = $this->actingAs($this->user, 'api')
             ->json('POST',
-                '/api/consultations/report-term/' . $item->getKey(),
+                '/api/consultations/report-term/' . $orderItem,
                 [
                     'term' => $now->format('Y-m-d H:i:s')
                 ]
             );
         $consultationTermsRepositoryContract = app(ConsultationTermsRepositoryContract::class);
-        $consultationTerm = $consultationTermsRepositoryContract->findByOrderItem($item->getKey());
+        $consultationTerm = $consultationTermsRepositoryContract->findByOrderItem($orderItem);
         $this->assertTrue($consultationTerm->executed_at === $now->format('Y-m-d H:i:s'));
         $this->assertTrue($consultationTerm->executed_status === ConsultationTermStatusEnum::REPORTED);
         $this->response->assertOk();

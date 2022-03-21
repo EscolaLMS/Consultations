@@ -41,11 +41,12 @@ class ConsultationUpdateApiTest extends TestCase
             now()->format('Y-m-d H:i:s'),
             now()->modify('+1 day')->format('Y-m-d H:i:s')
         ];
-        $consultationUpdate = Consultation::factory()->make()->toArray();
+        $consultationUpdate = Consultation::factory()->make();
+        $consultationUpdateArray = $consultationUpdate->toArray();
         $this->assertTrue(!isset($consultation['image_path']));
         $categories = Category::factory(2)->create()->pluck('id')->toArray();
         $requestArray = array_merge(
-            $consultationUpdate,
+            $consultationUpdateArray,
             ['proposed_terms' => $proposedTerms],
             ['image' => UploadedFile::fake()->image('image.jpg')],
             ['categories' => $categories]
@@ -58,10 +59,9 @@ class ConsultationUpdateApiTest extends TestCase
         $response->assertOk();
         $response->assertJsonFragment([
             'id' => $this->consultation->getKey(),
-            'short_desc' => $consultationUpdate['short_desc'],
-            'name' => $consultationUpdate['name'],
-            'status' => $consultationUpdate['status'],
-            'author_id' => $consultationUpdate['author_id'],
+            'short_desc' => $consultationUpdateArray['short_desc'],
+            'name' => $consultationUpdateArray['name'],
+            'status' => $consultationUpdateArray['status'],
         ]);
         $response->assertJson(fn (AssertableJson $json) => $json->has(
             'data',
