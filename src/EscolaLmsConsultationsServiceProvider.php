@@ -2,6 +2,7 @@
 
 namespace EscolaLms\Consultations;
 
+use EscolaLms\Consultations\Providers\EventServiceProvider;
 use EscolaLms\Consultations\Repositories\ConsultationRepository;
 use EscolaLms\Consultations\Repositories\ConsultationTermsRepository;
 use EscolaLms\Consultations\Repositories\Contracts\ConsultationRepositoryContract;
@@ -50,5 +51,6 @@ class EscolaLmsConsultationsServiceProvider extends ServiceProvider
         $this->app->register(AuthServiceProvider::class);
         $this->app->register(EscolaLmsJitsiServiceProvider::class);
         $this->app->register(EscolaLmsSettingsServiceProvider::class);
+        $this->app->register(EventServiceProvider::class);
     }
 }

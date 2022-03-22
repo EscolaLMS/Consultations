@@ -76,6 +76,21 @@ use Illuminate\Support\Facades\Storage;
  *          type="datetime",
  *      ),
  *      @OA\Property(
+ *          property="order_item_id",
+ *          description="order_item_id",
+ *          type="integer",
+ *      ),
+ *      @OA\Property(
+ *          property="executed_status",
+ *          description="executed_status",
+ *          type="string",
+ *      ),
+ *      @OA\Property(
+ *          property="executed_at",
+ *          description="executed_at",
+ *          type="datetime",
+ *      ),
+ *      @OA\Property(
  *          property="categories",
  *          description="categories",
  *          type="array",
