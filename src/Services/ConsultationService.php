@@ -4,7 +4,6 @@ namespace EscolaLms\Consultations\Services;
 
 use EscolaLms\Cart\Models\Order;
 use EscolaLms\Cart\Models\OrderItem;
-use EscolaLms\Cart\Models\Product;
 use EscolaLms\Cart\Models\ProductProductable;
 use EscolaLms\Cart\Models\User;
 use EscolaLms\Consultations\Dto\ConsultationDto;
@@ -25,9 +24,11 @@ use EscolaLms\Consultations\Repositories\Contracts\ConsultationTermsRepositoryCo
 use EscolaLms\Consultations\Services\Contracts\ConsultationServiceContract;
 use EscolaLms\Jitsi\Services\Contracts\JitsiServiceContract;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -113,9 +114,12 @@ class ConsultationService implements ConsultationServiceContract
 
     public function setPivotOrderConsultation(Order $order, User $user): void
     {
+        Log::info('orderId', ['orderKey' => $order->getKey()]);
         $order->items->each(function (OrderItem $item) use ($user) {
-            $item->buyable->productables->where('productable_type', Consultation::class)
-                ->each(function (ProductProductable $product) use ($item, $user) {
+            Log::info('order item', ['orderItemKey' => $item->getKey()]);
+            $item->buyable->productables->each(function (ProductProductable $product) use ($item, $user) {
+                Log::info('productable id', ['productableKey' => $product->productable->getKey()]);
+                if ($product->productable instanceof Consultation) {
                     $data = [
                         'order_item_id' => $item->getKey(),
                         'consultation_id' => $product->productable->getKey(),
@@ -123,6 +127,7 @@ class ConsultationService implements ConsultationServiceContract
                         'executed_status' => ConsultationTermStatusEnum::NOT_REPORTED
                     ];
                     $this->consultationTermsRepositoryContract->create($data);
+                }
             });
         });
     }
@@ -239,19 +244,28 @@ class ConsultationService implements ConsultationServiceContract
         )->get();
     }
 
-    public function forCurrentUserResponse(ListConsultationsRequest $listConsultationsRequest)
+    public function forCurrentUserResponse(ListConsultationsRequest $listConsultationsRequest): AnonymousResourceCollection
     {
         $search = $listConsultationsRequest->except(['limit', 'skip', 'order', 'order_by']);
         $consultations = $this->getConsultationsListForCurrentUser($search);
         $consultations
-            ->select('consultations.*', 'consultation_terms.order_item_id')
+            ->select(
+                'consultations.*',
+                'consultation_terms.order_item_id',
+                'consultation_terms.executed_status',
+                'consultation_terms.executed_at',
+            )
             ->leftJoin('consultation_terms', 'consultation_terms.consultation_id', '=', 'consultations.id');
         $consultationsCollection = ConsultationSimpleResource::collection($consultations->paginate(
             $listConsultationsRequest->get('per_page') ??
             config('escolalms_consultations.perPage', ConstantEnum::PER_PAGE)
         ));
         ConsultationSimpleResource::extend(function (ConsultationSimpleResource $consultation) {
-            return ['order_item_id' => $consultation->order_item_id];
+            return [
+                'order_item_id' => $consultation->order_item_id,
+                'executed_status' => $consultation->executed_status,
+                'executed_at' => $consultation->executed_at,
+            ];
         });
         return $consultationsCollection;
     }
