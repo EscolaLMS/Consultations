@@ -114,11 +114,8 @@ class ConsultationService implements ConsultationServiceContract
 
     public function setPivotOrderConsultation(Order $order, User $user): void
     {
-        Log::channel('single')->debug('orderId', ['orderKey' => $order->getKey()]);
         $order->items->each(function (OrderItem $item) use ($user) {
-            Log::channel('single')->debug('order item', ['orderItemKey' => $item->getKey()]);
             $item->buyable->productables->each(function (ProductProductable $product) use ($item, $user) {
-                Log::channel('single')->debug('productable id', ['productableKey' => $product->productable->getKey()]);
                 if ($product->productable instanceof Consultation) {
                     $data = [
                         'order_item_id' => $item->getKey(),
