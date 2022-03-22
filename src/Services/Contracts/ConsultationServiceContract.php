@@ -2,12 +2,13 @@
 
 namespace EscolaLms\Consultations\Services\Contracts;
 
+use EscolaLms\Cart\Models\Order;
+use EscolaLms\Cart\Models\User;
 use EscolaLms\Consultations\Dto\ConsultationDto;
 use EscolaLms\Consultations\Http\Requests\ListConsultationsRequest;
 use EscolaLms\Consultations\Models\Consultation;
 use EscolaLms\Consultations\Models\ConsultationTerm;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Collection;
 
 interface ConsultationServiceContract
@@ -17,7 +18,7 @@ interface ConsultationServiceContract
     public function update(int $id, ConsultationDto $consultationDto): Consultation;
     public function show(int $id): Consultation;
     public function delete(int $id): ?bool;
-    public function setPivotOrderConsultation($order, $user): void;
+    public function setPivotOrderConsultation(Order $order, User $user): void;
     public function reportTerm(int $orderItemId, string $executedAt): bool;
     public function approveTerm(int $consultationTermId): bool;
     public function rejectTerm(int $consultationTermId): bool;
