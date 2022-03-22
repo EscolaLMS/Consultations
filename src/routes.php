@@ -26,3 +26,4 @@ Route::group(['prefix' => 'api/consultations'], function () {
     Route::get('/{id}', [ConsultationAPIController::class, 'show']);
 });
 
+
