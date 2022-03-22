@@ -2,7 +2,11 @@
 
 namespace EscolaLms\Consultations\Services;
 
+use EscolaLms\Cart\Models\Order;
 use EscolaLms\Cart\Models\OrderItem;
+use EscolaLms\Cart\Models\Product;
+use EscolaLms\Cart\Models\ProductProductable;
+use EscolaLms\Cart\Models\User;
 use EscolaLms\Consultations\Dto\ConsultationDto;
 use EscolaLms\Consultations\Dto\FilterConsultationTermsListDto;
 use EscolaLms\Consultations\Dto\FilterListDto;
@@ -107,11 +111,11 @@ class ConsultationService implements ConsultationServiceContract
         });
     }
 
-    public function setPivotOrderConsultation($order, $user): void
+    public function setPivotOrderConsultation(Order $order, User $user): void
     {
-        foreach ($order->items as $item) {
-            foreach ($item->buyable->productables as $product) {
-                if ($product->productable instanceof Consultation) {
+        $order->items->each(function (OrderItem $item) use ($user) {
+            $item->buyable->productables->where('productable_type', Consultation::class)
+                ->each(function (ProductProductable $product) use ($item, $user) {
                     $data = [
                         'order_item_id' => $item->getKey(),
                         'consultation_id' => $product->productable->getKey(),
@@ -119,9 +123,8 @@ class ConsultationService implements ConsultationServiceContract
                         'executed_status' => ConsultationTermStatusEnum::NOT_REPORTED
                     ];
                     $this->consultationTermsRepositoryContract->create($data);
-                }
-            }
-        }
+            });
+        });
     }
 
     public function reportTerm(int $orderItemId, string $executedAt): bool
