@@ -382,7 +382,7 @@ interface ConsultationAPISwagger
      *      )
      * )
      */
-    public function forUser(ListConsultationsRequest $listConsultationsRequest): JsonResponse;
+    public function forCurrentUser(ListConsultationsRequest $listConsultationsRequest): JsonResponse;
 
     /**
      * @OA\Get(

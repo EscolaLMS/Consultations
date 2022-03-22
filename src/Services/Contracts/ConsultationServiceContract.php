@@ -3,9 +3,11 @@
 namespace EscolaLms\Consultations\Services\Contracts;
 
 use EscolaLms\Consultations\Dto\ConsultationDto;
+use EscolaLms\Consultations\Http\Requests\ListConsultationsRequest;
 use EscolaLms\Consultations\Models\Consultation;
 use EscolaLms\Consultations\Models\ConsultationTerm;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Collection;
 
 interface ConsultationServiceContract
@@ -26,5 +28,6 @@ interface ConsultationServiceContract
     public function setRelations(Consultation $consultation, array $relations = []): void;
     public function setFiles(Consultation $consultation, array $files = []): void;
     public function getConsultationTermsByConsultationId(int $consultationId, array $search = []): Collection;
-    public function getConsultationsListForUser(array $search = []): Builder;
+    public function getConsultationsListForCurrentUser(array $search = []): Builder;
+    public function forCurrentUserResponse(ListConsultationsRequest $listConsultationsRequest);
 }

@@ -3,6 +3,7 @@
 namespace EscolaLms\Consultations\Repositories;
 
 use EscolaLms\Consultations\Dto\FilterConsultationTermsListDto;
+use EscolaLms\Consultations\Enum\ConsultationStatusEnum;
 use EscolaLms\Consultations\Models\Consultation;
 use EscolaLms\Consultations\Models\ConsultationTerm;
 use EscolaLms\Consultations\Repositories\Contracts\ConsultationTermsRepositoryContract;

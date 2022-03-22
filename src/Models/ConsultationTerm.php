@@ -19,6 +19,7 @@ class ConsultationTerm extends Model
         'order_item_id',
         'executed_at',
         'executed_status',
+        'consultation_id',
     ];
 
     public function orderItem(): BelongsTo
@@ -29,6 +30,11 @@ class ConsultationTerm extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function consultation(): BelongsTo
+    {
+        return $this->belongsTo(Consultation::class);
     }
 
     public function isApproved(): bool

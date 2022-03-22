@@ -2,14 +2,18 @@
 
 namespace EscolaLms\Consultations\Services;
 
+use EscolaLms\Cart\Models\OrderItem;
 use EscolaLms\Consultations\Dto\ConsultationDto;
 use EscolaLms\Consultations\Dto\FilterConsultationTermsListDto;
 use EscolaLms\Consultations\Dto\FilterListDto;
+use EscolaLms\Consultations\Enum\ConstantEnum;
 use EscolaLms\Consultations\Enum\ConsultationTermStatusEnum;
 use EscolaLms\Consultations\Events\ApprovedTerm;
 use EscolaLms\Consultations\Events\RejectTerm;
 use EscolaLms\Consultations\Events\ReportTerm;
 use EscolaLms\Consultations\Helpers\StrategyHelper;
+use EscolaLms\Consultations\Http\Requests\ListConsultationsRequest;
+use EscolaLms\Consultations\Http\Resources\ConsultationSimpleResource;
 use EscolaLms\Consultations\Models\Consultation;
 use EscolaLms\Consultations\Models\ConsultationTerm;
 use EscolaLms\Consultations\Repositories\Contracts\ConsultationRepositoryContract;
@@ -53,13 +57,13 @@ class ConsultationService implements ConsultationServiceContract
         );
     }
 
-    public function getConsultationsListForUser(array $search = []): Builder
+    public function getConsultationsListForCurrentUser(array $search = []): Builder
     {
         $now = now()->format('Y-m-d');
         $search['active_to'] = $search['active_to'] ?? $now;
         $search['active_from'] = $search['active_from'] ?? $now;
         $criteria = FilterListDto::prepareFilters($search);
-        return $this->consultationRepositoryContract->forUser(
+        return $this->consultationRepositoryContract->forCurrentUser(
             $search,
             $criteria
         );
@@ -106,13 +110,16 @@ class ConsultationService implements ConsultationServiceContract
     public function setPivotOrderConsultation($order, $user): void
     {
         foreach ($order->items as $item) {
-            if ($item->buyable instanceof Consultation) {
-                $data = [
-                    'order_item_id' => $item->getKey(),
-                    'user_id' => $user->getKey(),
-                    'executed_status' => ConsultationTermStatusEnum::NOT_REPORTED
-                ];
-                $this->consultationTermsRepositoryContract->create($data);
+            foreach ($item->buyable->productables as $product) {
+                if ($product->productable instanceof Consultation) {
+                    $data = [
+                        'order_item_id' => $item->getKey(),
+                        'consultation_id' => $product->productable->getKey(),
+                        'user_id' => $user->getKey(),
+                        'executed_status' => ConsultationTermStatusEnum::NOT_REPORTED
+                    ];
+                    $this->consultationTermsRepositoryContract->create($data);
+                }
             }
         }
     }
@@ -126,7 +133,7 @@ class ConsultationService implements ConsultationServiceContract
                 'executed_at' => $executedAt
             ];
             $this->consultationTermsRepositoryContract->updateModel($consultationTerm, $data);
-            $author = $consultationTerm->orderItem->buyable->author;
+            $author = $consultationTerm->consultation->author;
             event(new ReportTerm($author, $consultationTerm));
             return true;
         });
@@ -203,8 +210,12 @@ class ConsultationService implements ConsultationServiceContract
 
     public function proposedTerms(int $orderItemId): ?Collection
     {
-        $consultation = $this->consultationRepositoryContract->getByOrderId($orderItemId);
-        return $consultation->proposedTerms ?? null;
+        $orderItem = OrderItem::find($orderItemId);
+        $proposedTerms = collect();
+        foreach ($orderItem->buyable->productables as $productable) {
+            $proposedTerms = $proposedTerms->merge($productable->productable->proposedTerms);
+        }
+        return $proposedTerms ?? null;
     }
 
     public function setFiles(Consultation $consultation, array $files = []): void
@@ -223,5 +234,22 @@ class ConsultationService implements ConsultationServiceContract
             $search,
             $filterConsultationTermsDto
         )->get();
+    }
+
+    public function forCurrentUserResponse(ListConsultationsRequest $listConsultationsRequest)
+    {
+        $search = $listConsultationsRequest->except(['limit', 'skip', 'order', 'order_by']);
+        $consultations = $this->getConsultationsListForCurrentUser($search);
+        $consultations
+            ->select('consultations.*', 'consultation_terms.order_item_id')
+            ->leftJoin('consultation_terms', 'consultation_terms.consultation_id', '=', 'consultations.id');
+        $consultationsCollection = ConsultationSimpleResource::collection($consultations->paginate(
+            $listConsultationsRequest->get('per_page') ??
+            config('escolalms_consultations.perPage', ConstantEnum::PER_PAGE)
+        ));
+        ConsultationSimpleResource::extend(function (ConsultationSimpleResource $consultation) {
+            return ['order_item_id' => $consultation->order_item_id];
+        });
+        return $consultationsCollection;
     }
 }

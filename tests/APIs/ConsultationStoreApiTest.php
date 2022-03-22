@@ -34,7 +34,8 @@ class ConsultationStoreApiTest extends TestCase
 
     public function testConsultationStore(): void
     {
-        $consultation = Consultation::factory()->make()->toArray();
+        $consultation = Consultation::factory()->make();
+        $consultationArr = $consultation->toArray();
         $this->assertTrue(!isset($consultation['image_path']));
         $proposedTerms = [
             now()->format('Y-m-d H:i:s'),
@@ -42,7 +43,7 @@ class ConsultationStoreApiTest extends TestCase
         ];
         $categories = Category::factory(2)->create()->pluck('id')->toArray();
         $requestArray = array_merge(
-            $consultation,
+            $consultationArr,
             ['proposed_terms' => $proposedTerms],
             ['image' => UploadedFile::fake()->image('image.jpg')],
             ['categories' => $categories]
@@ -54,10 +55,9 @@ class ConsultationStoreApiTest extends TestCase
         );
         $response->assertCreated();
         $response->assertJsonFragment([
-            'name' => $consultation['name'],
-            'short_desc' => $consultation['short_desc'],
-            'status' => $consultation['status'],
-            'author_id' => $consultation['author_id']
+            'name' => $consultationArr['name'],
+            'short_desc' => $consultationArr['short_desc'],
+            'status' => $consultationArr['status'],
         ]);
         $response->assertJsonFragment([
             'proposed_terms' => $proposedTerms

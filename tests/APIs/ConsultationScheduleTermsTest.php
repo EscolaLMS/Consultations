@@ -4,6 +4,8 @@ namespace EscolaLms\Consultations\Tests\APIs;
 
 use EscolaLms\Cart\Models\Order;
 use EscolaLms\Cart\Models\OrderItem;
+use EscolaLms\Cart\Models\Product;
+use EscolaLms\Cart\Models\ProductProductable;
 use EscolaLms\Cart\Models\User;
 use EscolaLms\Consultations\Database\Seeders\ConsultationsPermissionSeeder;
 use EscolaLms\Consultations\Enum\ConsultationTermStatusEnum;
@@ -43,10 +45,15 @@ class ConsultationScheduleTermsTest extends TestCase
             fn (Order $order) => $order->items()->saveMany(
                 collect([$this->consultation])->map(
                     function (Consultation $consultation) {
+                        $product = Product::factory()->create();
+                        $product->productables()->save(new ProductProductable([
+                            'productable_id' => $consultation->getKey(),
+                            'productable_type' => $consultation->getMorphClass(),
+                        ]));
                         return OrderItem::query()->make([
                             'quantity' => 1,
-                            'buyable_id' => $consultation->getKey(),
-                            'buyable_type' => Consultation::class,
+                            'buyable_id' => $product->getKey(),
+                            'buyable_type' => Product::class,
                         ]);
                     }
                 )

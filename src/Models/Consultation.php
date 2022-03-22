@@ -154,14 +154,14 @@ class Consultation extends Model
         return $this->hasMany(ConsultationProposedTerm::class, 'consultation_id');
     }
 
-    protected static function newFactory(): ConsultationFactory
-    {
-        return ConsultationFactory::new();
-    }
-
     public function categories(): BelongsToMany
     {
         return $this->belongsToMany(Category::class);
+    }
+
+    public function terms(): HasMany
+    {
+        return $this->hasMany(ConsultationTerm::class);
     }
 
     public function getBuyableDescription(): string
@@ -180,5 +180,10 @@ class Consultation extends Model
             return url(Storage::disk('public')->url($this->attributes['image_path']));
         }
         return '';
+    }
+
+    protected static function newFactory(): ConsultationFactory
+    {
+        return ConsultationFactory::new();
     }
 }
