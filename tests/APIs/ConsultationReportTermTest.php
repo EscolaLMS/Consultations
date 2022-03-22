@@ -84,7 +84,7 @@ class ConsultationReportTermTest extends TestCase
         $this->assertTrue($consultationTerm->executed_at === $now->format('Y-m-d H:i:s'));
         $this->assertTrue($consultationTerm->executed_status === ConsultationTermStatusEnum::REPORTED);
         $this->response->assertOk();
-        $authorId = $item->buyable->author->getKey();
+        $authorId = $consultationTerm->consultation->author->getKey();
         Event::assertDispatched(ReportTerm::class, fn (ReportTerm $event) =>
             $event->getUser()->getKey() === $authorId &&
             $event->getConsultationTerm()->getKey() === $consultationTerm->getKey()

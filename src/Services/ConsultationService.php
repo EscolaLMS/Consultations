@@ -133,7 +133,7 @@ class ConsultationService implements ConsultationServiceContract
                 'executed_at' => $executedAt
             ];
             $this->consultationTermsRepositoryContract->updateModel($consultationTerm, $data);
-            $author = $consultationTerm->orderItem->buyable->author;
+            $author = $consultationTerm->consultation->author;
             event(new ReportTerm($author, $consultationTerm));
             return true;
         });
