@@ -19,7 +19,7 @@ class ConsultationSimpleResource extends JsonResource
             'active_to' => $this->active_to,
             'name' => $this->name,
             'base_price' => $this->base_price,
-            'author' => $this->author,
+            'author' => ConsultationAuthorResource::make($this->author),
             'status' => $this->status,
             'description' => $this->description,
             'short_desc' => $this->short_desc,

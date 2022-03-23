@@ -7,6 +7,7 @@ use EscolaLms\Consultations\Models\Consultation;
 use EscolaLms\Consultations\Tests\TestCase;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Testing\Fluent\AssertableJson;
 
 class ConsultationShowApiTest extends TestCase
 {
@@ -45,6 +46,11 @@ class ConsultationShowApiTest extends TestCase
             'status' => $this->consultation->status,
             'created_at' => $this->consultation->created_at,
         ]);
+        $response->assertJson(fn (AssertableJson $json) =>
+            $json->has('data', fn (AssertableJson $json) =>
+                $json->has('author')->etc()
+            )->etc()
+        );
         $response->assertJsonFragment(['success' => true]);
     }
 

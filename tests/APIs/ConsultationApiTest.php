@@ -8,6 +8,7 @@ use EscolaLms\Consultations\Models\Consultation;
 use EscolaLms\Consultations\Tests\TestCase;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Collection;
+use Illuminate\Testing\Fluent\AssertableJson;
 
 class ConsultationApiTest extends TestCase
 {
@@ -74,6 +75,11 @@ class ConsultationApiTest extends TestCase
             'created_at' => $this->consultation->created_at,
             'categories' => $this->consultation->categories->toArray()
         ]);
+        $this->response->assertJson(fn (AssertableJson $json) =>
+            $json->has('data', fn (AssertableJson $json) =>
+                $json->each(fn (AssertableJson $json) => $json->has('author')->etc())->etc()
+            )->etc()
+        );
     }
 
     public function testConsultationsListUnauthorized(): void
