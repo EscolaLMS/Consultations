@@ -4,9 +4,9 @@ namespace EscolaLms\Consultations;
 
 use EscolaLms\Consultations\Providers\EventServiceProvider;
 use EscolaLms\Consultations\Repositories\ConsultationRepository;
-use EscolaLms\Consultations\Repositories\ConsultationTermsRepository;
+use EscolaLms\Consultations\Repositories\ConsultationUserRepository;
 use EscolaLms\Consultations\Repositories\Contracts\ConsultationRepositoryContract;
-use EscolaLms\Consultations\Repositories\Contracts\ConsultationTermsRepositoryContract;
+use EscolaLms\Consultations\Repositories\Contracts\ConsultationUserRepositoryContract;
 use EscolaLms\Consultations\Services\ConsultationService;
 use EscolaLms\Consultations\Services\Contracts\ConsultationServiceContract;
 use EscolaLms\Jitsi\EscolaLmsJitsiServiceProvider;
@@ -23,7 +23,7 @@ class EscolaLmsConsultationsServiceProvider extends ServiceProvider
     ];
     public const REPOSITORIES = [
         ConsultationRepositoryContract::class => ConsultationRepository::class,
-        ConsultationTermsRepositoryContract::class => ConsultationTermsRepository::class
+        ConsultationUserRepositoryContract::class => ConsultationUserRepository::class
     ];
 
     public $singletons = self::SERVICES + self::REPOSITORIES;

@@ -3,12 +3,12 @@
 namespace EscolaLms\Consultations\Database\Factories;
 
 use EscolaLms\Consultations\Enum\ConsultationTermStatusEnum;
-use EscolaLms\Consultations\Models\ConsultationTerm;
+use EscolaLms\Consultations\Models\ConsultationUserPivot;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-class ConsultationTermFactory extends Factory
+class ConsultationUserFactory extends Factory
 {
-    protected $model = ConsultationTerm::class;
+    protected $model = ConsultationUserPivot::class;
 
     public function definition(): array
     {

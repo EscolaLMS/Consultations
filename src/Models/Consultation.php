@@ -174,7 +174,7 @@ class Consultation extends Model
 
     public function terms(): HasMany
     {
-        return $this->hasMany(ConsultationTerm::class);
+        return $this->hasMany(ConsultationUserPivot::class);
     }
 
     public function getBuyableDescription(): string

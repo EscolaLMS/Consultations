@@ -57,9 +57,9 @@ class ConsultationAPIController extends EscolaLmsBaseController implements Consu
         );
     }
 
-    public function reportTerm(int $orderItemId, ReportTermConsultationRequest $request): JsonResponse
+    public function reportTerm(int $consultationTermId, ReportTermConsultationRequest $request): JsonResponse
     {
-        $this->consultationServiceContract->reportTerm($orderItemId, $request->input('term'));
+        $this->consultationServiceContract->reportTerm($consultationTermId, $request->input('term'));
         return $this->sendSuccess(__('Consultation reserved term successfully'));
     }
 

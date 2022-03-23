@@ -3,14 +3,14 @@
 namespace EscolaLms\Consultations\Repositories;
 
 use EscolaLms\Consultations\Dto\FilterConsultationTermsListDto;
-use EscolaLms\Consultations\Enum\ConsultationStatusEnum;
 use EscolaLms\Consultations\Models\Consultation;
 use EscolaLms\Consultations\Models\ConsultationTerm;
-use EscolaLms\Consultations\Repositories\Contracts\ConsultationTermsRepositoryContract;
+use EscolaLms\Consultations\Models\ConsultationUserPivot;
+use EscolaLms\Consultations\Repositories\Contracts\ConsultationUserRepositoryContract;
 use EscolaLms\Core\Repositories\BaseRepository;
 use Illuminate\Database\Eloquent\Builder;
 
-class ConsultationTermsRepository extends BaseRepository implements ConsultationTermsRepositoryContract
+class ConsultationUserRepository extends BaseRepository implements ConsultationUserRepositoryContract
 {
     protected $fieldSearchable = [];
 
@@ -21,7 +21,7 @@ class ConsultationTermsRepository extends BaseRepository implements Consultation
 
     public function model(): string
     {
-        return ConsultationTerm::class;
+        return ConsultationUserPivot::class;
     }
 
     public function allQueryBuilder(
@@ -41,16 +41,11 @@ class ConsultationTermsRepository extends BaseRepository implements Consultation
         return $query;
     }
 
-    public function findByOrderItem(int $orderItemId): ConsultationTerm
+    public function updateModel(ConsultationUserPivot $consultationUserPivot, array $data): ConsultationUserPivot
     {
-        return $this->model->newQuery()->whereOrderItemId($orderItemId)->firstOrFail();
-    }
-
-    public function updateModel(ConsultationTerm $consultationTerm, array $data): ConsultationTerm
-    {
-        $consultationTerm->fill($data);
-        $consultationTerm->save();
-        return $consultationTerm;
+        $consultationUserPivot->fill($data);
+        $consultationUserPivot->save();
+        return $consultationUserPivot;
     }
 
 }
