@@ -2,11 +2,9 @@
 
 namespace EscolaLms\Consultations\Models;
 
-use EscolaLms\Auth\Models\User;
 use EscolaLms\Cart\Models\OrderItem;
 use EscolaLms\Categories\Models\Category;
 use EscolaLms\Consultations\Database\Factories\ConsultationFactory;
-use EscolaLms\Consultations\Models\Traits\HasConsultations;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;

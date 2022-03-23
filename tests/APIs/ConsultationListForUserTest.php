@@ -43,7 +43,7 @@ class ConsultationListForUserTest extends TestCase
                 fn ($json) => $json->each(fn (AssertableJson $json) =>
                     $json->where('id', fn ($json) =>
                         in_array($json, $consArray)
-                    )
+                    )->has('author')
                     ->etc()
                 )
                 ->etc()

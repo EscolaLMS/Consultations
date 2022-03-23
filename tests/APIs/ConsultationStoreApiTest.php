@@ -75,7 +75,7 @@ class ConsultationStoreApiTest extends TestCase
                         ->etc()
                     )
                     ->etc()
-                )
+                )->has('author')
                 ->etc()
             )
             ->etc()
