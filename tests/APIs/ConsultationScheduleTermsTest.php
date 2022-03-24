@@ -58,7 +58,8 @@ class ConsultationScheduleTermsTest extends TestCase
             return [
                 'date' => Carbon::make($element->executed_at)->format('Y-m-d H:i:s') ?? '',
                 'status' => $element->executed_status ?? '',
-                'author' => $element->consultation->author->toArray() ?? ''
+                'author' => $element->consultation->author->toArray() ?? '',
+                'is_ended' => $element->isEnded()
             ];
         })->toArray();
         $this->response->assertJsonFragment($consultationTerms);
