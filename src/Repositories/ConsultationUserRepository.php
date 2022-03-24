@@ -29,15 +29,13 @@ class ConsultationUserRepository extends BaseRepository implements ConsultationU
         ?FilterConsultationTermsListDto $filterConsultationTermsListDto = null
     ): Builder {
         $query = $this->allQuery($search);
-        $criteria = $filterConsultationTermsListDto->getCriteria();
-        if ($criteria) {
-            $query = $this->applyCriteria($query, $criteria);
+        if ($filterConsultationTermsListDto) {
+            $criteria = $filterConsultationTermsListDto->getCriteria();
+            if ($criteria) {
+                $query = $this->applyCriteria($query, $criteria);
+            }
         }
-        $query->whereHas('orderItem', fn (Builder $query) =>
-            $query->whereHasMorph('buyable', [Consultation::class], fn (Builder $query) =>
-                $query->where('consultations.id', $filterConsultationTermsListDto->getConsultationId())
-            )
-        );
+
         return $query;
     }
 

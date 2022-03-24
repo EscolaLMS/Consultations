@@ -4,7 +4,6 @@ namespace EscolaLms\Consultations\Models;
 
 use EscolaLms\Consultations\Database\Factories\ConsultationUserFactory;
 use EscolaLms\Consultations\Enum\ConsultationTermStatusEnum;
-use EscolaLms\Core\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;

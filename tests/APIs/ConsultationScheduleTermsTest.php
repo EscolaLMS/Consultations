@@ -2,26 +2,21 @@
 
 namespace EscolaLms\Consultations\Tests\APIs;
 
-use EscolaLms\Cart\Models\Order;
-use EscolaLms\Cart\Models\OrderItem;
-use EscolaLms\Cart\Models\Product;
-use EscolaLms\Cart\Models\ProductProductable;
-use EscolaLms\Cart\Models\User;
+use EscolaLms\Consultations\Models\User;
 use EscolaLms\Consultations\Database\Seeders\ConsultationsPermissionSeeder;
 use EscolaLms\Consultations\Enum\ConsultationTermStatusEnum;
 use EscolaLms\Consultations\Models\Consultation;
 use EscolaLms\Consultations\Models\ConsultationProposedTerm;
-use EscolaLms\Consultations\Models\ConsultationTerm;
+use EscolaLms\Consultations\Models\ConsultationUserPivot;
 use EscolaLms\Consultations\Tests\TestCase;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Collection;
 
 class ConsultationScheduleTermsTest extends TestCase
 {
     use DatabaseTransactions;
     private Consultation $consultation;
-    private Collection $consultationTerms;
+    private ConsultationUserPivot $consultationUserPivot;
     private string $apiUrl;
 
     protected function setUp(): void
@@ -40,35 +35,12 @@ class ConsultationScheduleTermsTest extends TestCase
         $this->consultation = Consultation::factory()->create();
         $this->apiUrl = '/api/admin/consultations/' . $this->consultation->getKey() . '/schedule';
         $this->consultation->proposedTerms()->saveMany(ConsultationProposedTerm::factory(3)->create());
-        $price = $this->consultation->getBuyablePrice();
-        $this->order = Order::factory()->afterCreating(
-            fn (Order $order) => $order->items()->saveMany(
-                collect([$this->consultation])->map(
-                    function (Consultation $consultation) {
-                        $product = Product::factory()->create();
-                        $product->productables()->save(new ProductProductable([
-                            'productable_id' => $consultation->getKey(),
-                            'productable_type' => $consultation->getMorphClass(),
-                        ]));
-                        return OrderItem::query()->make([
-                            'quantity' => 1,
-                            'buyable_id' => $product->getKey(),
-                            'buyable_type' => Product::class,
-                        ]);
-                    }
-                )
-            )
-        )->create([
+        $this->consultationUserPivot = ConsultationUserPivot::factory([
+            'consultation_id' => $this->consultation->getKey(),
             'user_id' => $this->user->getKey(),
-            'total' => $price,
-            'subtotal' => $price,
-        ]);
-        $this->consultation->orderItems->each(fn ($item) =>
-            $this->consultationTerms->push(ConsultationTerm::factory([
-                'order_item_id' => $item->getKey(),
-                'user_id' => $this->user->getKey()
-            ])->create())
-        );
+            'executed_at' => now()->format('Y-m-d H:i:s'),
+            'executed_status' => ConsultationTermStatusEnum::APPROVED
+        ])->create();
     }
 
     public function testConsultationTermsListUnauthorized(): void
@@ -80,14 +52,13 @@ class ConsultationScheduleTermsTest extends TestCase
     public function testConsultationTermsList(): void
     {
         $this->initVariable();
-        $this->order->items->map(fn ($orderItem) => $orderItem->update(['executed_at' => now(), 'executed_status' => ConsultationTermStatusEnum::APPROVED]));
         $this->response = $this->actingAs($this->user, 'api')->get($this->apiUrl);
         $this->response->assertOk();
-        $consultationTerms = $this->consultationTerms->map(function (ConsultationTerm $element) {
+        $consultationTerms = collect([$this->consultationUserPivot])->map(function (ConsultationUserPivot $element) {
             return [
                 'date' => Carbon::make($element->executed_at)->format('Y-m-d H:i:s') ?? '',
                 'status' => $element->executed_status ?? '',
-                'author' => $element->orderItem->buyable->author->toArray() ?? ''
+                'author' => $element->consultation->author->toArray() ?? ''
             ];
         })->toArray();
         $this->response->assertJsonFragment($consultationTerms);

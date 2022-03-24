@@ -3,9 +3,7 @@
 namespace EscolaLms\Consultations\Services;
 
 use Carbon\Carbon;
-use EscolaLms\Cart\Models\Order;
-use EscolaLms\Cart\Models\OrderItem;
-use EscolaLms\Cart\Models\User;
+use EscolaLms\Consultations\Models\User;
 use EscolaLms\Consultations\Dto\ConsultationDto;
 use EscolaLms\Consultations\Dto\FilterConsultationTermsListDto;
 use EscolaLms\Consultations\Dto\FilterListDto;
@@ -160,7 +158,7 @@ class ConsultationService implements ConsultationServiceContract
 
         return $this->jitsiServiceContract->getChannelData(
             auth()->user(),
-            Str::studly($consultationTerm->orderItem->buyable->name)
+            Str::studly($consultationTerm->consultation->name)
         );
     }
 
@@ -194,14 +192,10 @@ class ConsultationService implements ConsultationServiceContract
         }
     }
 
-    public function proposedTerms(int $orderItemId): ?Collection
+    public function proposedTerms(int $consultationTermId): ?Collection
     {
-        $orderItem = OrderItem::find($orderItemId);
-        $proposedTerms = collect();
-        foreach ($orderItem->buyable->productables as $productable) {
-            $proposedTerms = $proposedTerms->merge($productable->productable->proposedTerms);
-        }
-        return $proposedTerms ?? null;
+        $consultationUserPivot = $this->consultationUserRepositoryContract->find($consultationTermId);
+        return $consultationUserPivot->consultation->proposedTerms ?? null;
     }
 
     public function setFiles(Consultation $consultation, array $files = []): void
@@ -229,18 +223,18 @@ class ConsultationService implements ConsultationServiceContract
         $consultations
             ->select(
                 'consultations.*',
-                'consultation_terms.order_item_id',
-                'consultation_terms.executed_status',
-                'consultation_terms.executed_at',
+                'consultation_user.id as cuid',
+                'consultation_user.executed_status',
+                'consultation_user.executed_at',
             )
-            ->leftJoin('consultation_terms', 'consultation_terms.consultation_id', '=', 'consultations.id');
+            ->leftJoin('consultation_user', 'consultation_user.consultation_id', '=', 'consultations.id');
         $consultationsCollection = ConsultationSimpleResource::collection($consultations->paginate(
             $listConsultationsRequest->get('per_page') ??
             config('escolalms_consultations.perPage', ConstantEnum::PER_PAGE)
         ));
         ConsultationSimpleResource::extend(function (ConsultationSimpleResource $consultation) {
             return [
-                'order_item_id' => $consultation->order_item_id,
+                'consultation_user_id' => $consultation->cuid,
                 'executed_status' => $consultation->executed_status,
                 'executed_at' => $consultation->executed_at,
             ];

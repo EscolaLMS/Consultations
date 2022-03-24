@@ -4,6 +4,7 @@ namespace EscolaLms\Consultations\Dto;
 
 use EscolaLms\Consultations\Repositories\Criteria\NotNullCriterion;
 use EscolaLms\Core\Repositories\Criteria\Primitives\DateCriterion;
+use EscolaLms\Core\Repositories\Criteria\Primitives\EqualCriterion;
 use EscolaLms\Core\Repositories\Criteria\Primitives\InCriterion;
 
 class FilterConsultationTermsListDto extends BaseDto
@@ -18,15 +19,18 @@ class FilterConsultationTermsListDto extends BaseDto
     public static function prepareFilters(array $search): self
     {
         $dto = new self($search);
-        $dto->addToCriteria(new NotNullCriterion('consultation_terms.executed_at'));
+        $dto->addToCriteria(new NotNullCriterion('consultation_user.executed_at'));
         if ($dto->getStatus()) {
-            $dto->addToCriteria(new InCriterion('consultation_terms.status', $dto->getStatus()));
+            $dto->addToCriteria(new InCriterion('consultation_user.status', $dto->getStatus()));
         }
         if ($dto->getDateFrom()) {
-            $dto->addToCriteria(new DateCriterion('consultation_terms.executed_at', $dto->getDateFrom(), '>='));
+            $dto->addToCriteria(new DateCriterion('consultation_user.executed_at', $dto->getDateFrom(), '>='));
         }
         if ($dto->getDateTo()) {
-            $dto->addToCriteria(new DateCriterion('consultation_terms.executed_at', $dto->getDateTo(), '<='));
+            $dto->addToCriteria(new DateCriterion('consultation_user.executed_at', $dto->getDateTo(), '<='));
+        }
+        if ($dto->getConsultationId()) {
+            $dto->addToCriteria(new EqualCriterion('consultation_user.consultation_id', $dto->getConsultationId(), '='));
         }
         return $dto;
     }

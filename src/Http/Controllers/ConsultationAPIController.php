@@ -75,9 +75,9 @@ class ConsultationAPIController extends EscolaLmsBaseController implements Consu
         return $this->sendSuccess(__('Consultation term reject successfully'));
     }
 
-    public function proposedTerms(int $orderItemId): JsonResponse
+    public function proposedTerms(int $consultationTermId): JsonResponse
     {
-        $proposedTerms = $this->consultationServiceContract->proposedTerms($orderItemId);
+        $proposedTerms = $this->consultationServiceContract->proposedTerms($consultationTermId);
         return $this->sendResponseForResource(
             ConsultationProposedTermResource::collection($proposedTerms),
             __('Consultations propsed terms retrieved successfully')

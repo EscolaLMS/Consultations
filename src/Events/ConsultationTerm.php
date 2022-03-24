@@ -6,7 +6,6 @@ use EscolaLms\Auth\Models\User;
 use EscolaLms\Consultations\Models\ConsultationUserPivot;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
-use EscolaLms\Consultations\Models\ConsultationTerm as ConsultationTermModel;
 
 abstract class ConsultationTerm
 {

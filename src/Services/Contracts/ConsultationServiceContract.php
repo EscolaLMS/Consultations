@@ -2,12 +2,10 @@
 
 namespace EscolaLms\Consultations\Services\Contracts;
 
-use EscolaLms\Cart\Models\Order;
-use EscolaLms\Cart\Models\User;
+use EscolaLms\Consultations\Models\User;
 use EscolaLms\Consultations\Dto\ConsultationDto;
 use EscolaLms\Consultations\Http\Requests\ListConsultationsRequest;
 use EscolaLms\Consultations\Models\Consultation;
-use EscolaLms\Consultations\Models\ConsultationTerm;
 use EscolaLms\Consultations\Models\ConsultationUserPivot;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
@@ -27,7 +25,7 @@ interface ConsultationServiceContract
     public function setStatus(ConsultationUserPivot $consultationTerm, string $status): ConsultationUserPivot;
     public function generateJitsi(int $consultationTermId): array;
     public function canGenerateJitsi(ConsultationUserPivot $consultationTerm): bool;
-    public function proposedTerms(int $orderItemId): ?Collection;
+    public function proposedTerms(int $consultationTermId): ?Collection;
     public function setRelations(Consultation $consultation, array $relations = []): void;
     public function setFiles(Consultation $consultation, array $files = []): void;
     public function getConsultationTermsByConsultationId(int $consultationId, array $search = []): Collection;

@@ -2,7 +2,6 @@
 
 namespace EscolaLms\Consultations\Models;
 
-use EscolaLms\Cart\Models\OrderItem;
 use EscolaLms\Categories\Models\Category;
 use EscolaLms\Consultations\Database\Factories\ConsultationFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -10,7 +9,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Support\Facades\Storage;
 
 
@@ -74,8 +72,8 @@ use Illuminate\Support\Facades\Storage;
  *          type="datetime",
  *      ),
  *      @OA\Property(
- *          property="order_item_id",
- *          description="order_item_id",
+ *          property="consultation_user_id",
+ *          description="consultation_user_id",
  *          type="integer",
  *      ),
  *      @OA\Property(
@@ -150,11 +148,6 @@ class Consultation extends Model
     public function author(): BelongsTo
     {
         return $this->belongsTo(User::class, 'author_id');
-    }
-
-    public function orderItems(): MorphMany
-    {
-        return $this->morphMany(OrderItem::class, 'buyable');
     }
 
     public function users(): BelongsToMany
