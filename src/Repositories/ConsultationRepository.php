@@ -56,6 +56,7 @@ class ConsultationRepository extends BaseRepository implements ConsultationRepos
                 'consultation_user.executed_status',
                 'consultation_user.executed_at',
             )
-            ->leftJoin('consultation_user', 'consultation_user.consultation_id', '=', 'consultations.id');
+            ->leftJoin('consultation_user', 'consultation_user.consultation_id', '=', 'consultations.id')
+            ->where(['consultation_user.user_id' => auth()->user()->getKey()]);
     }
 }
