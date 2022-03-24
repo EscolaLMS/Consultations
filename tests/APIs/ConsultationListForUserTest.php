@@ -4,11 +4,11 @@ namespace EscolaLms\Consultations\Tests\APIs;
 
 use EscolaLms\Consultations\Database\Seeders\ConsultationsPermissionSeeder;
 use EscolaLms\Consultations\Models\Consultation;
+use EscolaLms\Consultations\Tests\Models\User;
 use EscolaLms\Consultations\Tests\TestCase;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Collection;
 use Illuminate\Testing\Fluent\AssertableJson;
-use EscolaLms\Consultations\Models\User;
 
 class ConsultationListForUserTest extends TestCase
 {

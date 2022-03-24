@@ -4,6 +4,7 @@ namespace EscolaLms\Consultations\Models;
 
 use EscolaLms\Categories\Models\Category;
 use EscolaLms\Consultations\Database\Factories\ConsultationFactory;
+use EscolaLms\Consultations\Services\Contracts\ConsultationServiceContract;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -186,6 +187,12 @@ class Consultation extends Model
             return url(Storage::disk('public')->url($this->attributes['image_path']));
         }
         return '';
+    }
+
+    public function attachToUser(User $user): void
+    {
+        $consultationServiceContract = app(ConsultationServiceContract::class);
+        $consultationServiceContract->attachToUser($this, $user);
     }
 
     protected static function newFactory(): ConsultationFactory

@@ -3,6 +3,7 @@
 namespace EscolaLms\Consultations\Services;
 
 use Carbon\Carbon;
+use EscolaLms\Consultations\Events\ConsultationTerm;
 use EscolaLms\Consultations\Models\User;
 use EscolaLms\Consultations\Dto\ConsultationDto;
 use EscolaLms\Consultations\Dto\FilterConsultationTermsListDto;
@@ -164,18 +165,22 @@ class ConsultationService implements ConsultationServiceContract
 
     public function canGenerateJitsi(ConsultationUserPivot $consultationTerm): bool
     {
+        $now = now();
+        return !$consultationTerm->isApproved() ||
+            $now < $consultationTerm->executed_at ||
+            $now > $this->generateDateTo($consultationTerm);
+    }
+
+    public function generateDateTo(ConsultationUserPivot $consultationTerm): ?Carbon
+    {
         $modifyTimeStrings = [
             'seconds', 'minutes', 'hours', 'weeks', 'years'
         ];
-        $now = now();
         $explode = explode(' ', $consultationTerm->consultation->duration);
         $count = $explode[0];
         $string = in_array($explode[1], $modifyTimeStrings) ? $explode[1] : 'hours';
-        $dateTo = Carbon::make($consultationTerm->executed_at)->modify('+' . $count . ' ' . $string);
 
-        return !$consultationTerm->isApproved() ||
-            $now < $consultationTerm->executed_at ||
-            $now > $dateTo;
+        return Carbon::make($consultationTerm->executed_at)->modify('+' . $count . ' ' . $string);
     }
 
     public function setRelations(Consultation $consultation, array $relations = []): void

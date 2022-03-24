@@ -3,7 +3,7 @@
 namespace EscolaLms\Consultations\Tests\APIs;
 
 use Carbon\Carbon;
-use EscolaLms\Consultations\Models\User;
+use EscolaLms\Consultations\Tests\Models\User;
 use EscolaLms\Consultations\Database\Seeders\ConsultationsPermissionSeeder;
 use EscolaLms\Consultations\Models\Consultation;
 use EscolaLms\Consultations\Models\ConsultationProposedTerm;

@@ -2,6 +2,7 @@
 
 namespace EscolaLms\Consultations\Services\Contracts;
 
+use Carbon\Carbon;
 use EscolaLms\Consultations\Models\User;
 use EscolaLms\Consultations\Dto\ConsultationDto;
 use EscolaLms\Consultations\Http\Requests\ListConsultationsRequest;
@@ -31,4 +32,5 @@ interface ConsultationServiceContract
     public function getConsultationTermsByConsultationId(int $consultationId, array $search = []): Collection;
     public function getConsultationsListForCurrentUser(array $search = []): Builder;
     public function forCurrentUserResponse(ListConsultationsRequest $listConsultationsRequest): AnonymousResourceCollection;
+    public function generateDateTo(ConsultationUserPivot $consultationTerm): ?Carbon;
 }

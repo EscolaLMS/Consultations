@@ -2,7 +2,7 @@
 
 namespace EscolaLms\Consultations\Tests\APIs;
 
-use EscolaLms\Consultations\Models\User;
+use EscolaLms\Consultations\Tests\Models\User;
 use EscolaLms\Consultations\Enum\ConsultationTermStatusEnum;
 use EscolaLms\Consultations\Events\ApprovedTerm;
 use EscolaLms\Consultations\Events\RejectTerm;

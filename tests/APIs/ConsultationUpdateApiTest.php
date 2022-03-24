@@ -7,7 +7,7 @@ use EscolaLms\Consultations\Database\Seeders\ConsultationsPermissionSeeder;
 use EscolaLms\Consultations\Models\Consultation;
 use EscolaLms\Consultations\Tests\TestCase;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
-use Illuminate\Http\JsonResponse;
+use EscolaLms\Consultations\Tests\Models\User;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Testing\Fluent\AssertableJson;
 
@@ -22,7 +22,7 @@ class ConsultationUpdateApiTest extends TestCase
         parent::setUp();
         $this->seed(ConsultationsPermissionSeeder::class);
 
-        $this->user = config('auth.providers.users.model')::factory()->create();
+        $this->user = User::factory()->create();
         $this->user->guard_name = 'api';
         $this->user->assignRole('tutor');
         $this->consultation = Consultation::factory()->create();

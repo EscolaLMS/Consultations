@@ -4,6 +4,7 @@ namespace EscolaLms\Consultations\Models;
 
 use EscolaLms\Consultations\Database\Factories\ConsultationUserFactory;
 use EscolaLms\Consultations\Enum\ConsultationTermStatusEnum;
+use EscolaLms\Consultations\Services\Contracts\ConsultationServiceContract;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -39,6 +40,15 @@ class ConsultationUserPivot extends Model
     public function isRejected(): bool
     {
         return $this->executed_status === ConsultationTermStatusEnum::REJECT;
+    }
+
+    public function isEnded(): bool
+    {
+        $consultationServiceContract = app(ConsultationServiceContract::class);
+        $dateTo = $consultationServiceContract->generateDateTo($this);
+        return $dateTo ?
+            $dateTo->getTimestamp() >= now()->getTimestamp() :
+            false;
     }
 
     protected static function newFactory(): ConsultationUserFactory
