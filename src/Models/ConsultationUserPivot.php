@@ -42,15 +42,6 @@ class ConsultationUserPivot extends Model
         return $this->executed_status === ConsultationTermStatusEnum::REJECT;
     }
 
-    public function isEnded(): bool
-    {
-        $consultationServiceContract = app(ConsultationServiceContract::class);
-        $dateTo = $consultationServiceContract->generateDateTo($this);
-        return $dateTo ?
-            $dateTo->getTimestamp() >= now()->getTimestamp() :
-            false;
-    }
-
     protected static function newFactory(): ConsultationUserFactory
     {
         return ConsultationUserFactory::new();

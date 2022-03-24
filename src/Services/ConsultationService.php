@@ -168,19 +168,19 @@ class ConsultationService implements ConsultationServiceContract
         $now = now();
         return !$consultationTerm->isApproved() ||
             $now < $consultationTerm->executed_at ||
-            $now > $this->generateDateTo($consultationTerm);
+            $now > $this->generateDateTo($consultationTerm->executed_at, $consultationTerm->consultation->duration);
     }
 
-    public function generateDateTo(ConsultationUserPivot $consultationTerm): ?Carbon
+    public function generateDateTo(string $dateTo, string $duration): ?Carbon
     {
         $modifyTimeStrings = [
             'seconds', 'minutes', 'hours', 'weeks', 'years'
         ];
-        $explode = explode(' ', $consultationTerm->consultation->duration);
+        $explode = explode(' ', $duration);
         $count = $explode[0];
         $string = in_array($explode[1], $modifyTimeStrings) ? $explode[1] : 'hours';
 
-        return Carbon::make($consultationTerm->executed_at)->modify('+' . $count . ' ' . $string);
+        return Carbon::make($dateTo)->modify('+' . $count . ' ' . $string);
     }
 
     public function setRelations(Consultation $consultation, array $relations = []): void
@@ -224,15 +224,9 @@ class ConsultationService implements ConsultationServiceContract
     public function forCurrentUserResponse(ListConsultationsRequest $listConsultationsRequest): AnonymousResourceCollection
     {
         $search = $listConsultationsRequest->except(['limit', 'skip', 'order', 'order_by']);
-        $consultations = $this->getConsultationsListForCurrentUser($search);
-        $consultations
-            ->select(
-                'consultations.*',
-                'consultation_user.id as cuid',
-                'consultation_user.executed_status',
-                'consultation_user.executed_at',
-            )
-            ->leftJoin('consultation_user', 'consultation_user.consultation_id', '=', 'consultations.id');
+        $consultations = $this->consultationRepositoryContract->getBoughtConsultationsByQuery(
+            $this->getConsultationsListForCurrentUser($search)
+        );
         $consultationsCollection = ConsultationSimpleResource::collection($consultations->paginate(
             $listConsultationsRequest->get('per_page') ??
             config('escolalms_consultations.perPage', ConstantEnum::PER_PAGE)
@@ -242,6 +236,7 @@ class ConsultationService implements ConsultationServiceContract
                 'consultation_user_id' => $consultation->cuid,
                 'executed_status' => $consultation->executed_status,
                 'executed_at' => $consultation->executed_at,
+                'is_ended' => $this->isEnded($consultation->executed_at, $consultation->duration)
             ];
         });
         return $consultationsCollection;
@@ -255,5 +250,14 @@ class ConsultationService implements ConsultationServiceContract
             'executed_status' => ConsultationTermStatusEnum::NOT_REPORTED
         ];
         $this->consultationUserRepositoryContract->create($data);
+    }
+
+    public function isEnded(?string $executedAt, ?string $duration): bool
+    {
+        if ($executedAt && $duration) {
+            $dateTo = $this->generateDateTo($executedAt, $duration);
+            return $dateTo->getTimestamp() >= now()->getTimestamp();
+        }
+        return false;
     }
 }

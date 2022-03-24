@@ -36,8 +36,7 @@ class ConsultationTermsResource extends JsonResource
         return [
             'date' => Carbon::make($this->executed_at)->format('Y-m-d H:i:s') ?? '',
             'status' => $this->executed_status ?? '',
-            'author' => $this->consultation->author ?? null,
-            'is_ended' => $this->isEnded()
+            'author' => $this->consultation->author ?? null
         ];
     }
 }
