@@ -2,11 +2,11 @@
 
 namespace EscolaLms\Consultations\Tests\APIs;
 
+use EscolaLms\Consultations\Tests\Models\User;
 use EscolaLms\Consultations\Database\Seeders\ConsultationsPermissionSeeder;
 use EscolaLms\Consultations\Models\Consultation;
 use EscolaLms\Consultations\Tests\TestCase;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Testing\Fluent\AssertableJson;
 
 class ConsultationShowApiTest extends TestCase
@@ -20,7 +20,7 @@ class ConsultationShowApiTest extends TestCase
         parent::setUp();
         $this->seed(ConsultationsPermissionSeeder::class);
 
-        $this->user = config('auth.providers.users.model')::factory()->create();
+        $this->user = User::factory()->create();
         $this->user->guard_name = 'api';
         $this->user->assignRole('tutor');
         $this->consultation = Consultation::factory()->create();

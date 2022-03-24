@@ -2,10 +2,9 @@
 
 namespace EscolaLms\Consultations\Services;
 
-use EscolaLms\Cart\Models\Order;
-use EscolaLms\Cart\Models\OrderItem;
-use EscolaLms\Cart\Models\ProductProductable;
-use EscolaLms\Cart\Models\User;
+use Carbon\Carbon;
+use EscolaLms\Consultations\Events\ConsultationTerm;
+use EscolaLms\Consultations\Models\User;
 use EscolaLms\Consultations\Dto\ConsultationDto;
 use EscolaLms\Consultations\Dto\FilterConsultationTermsListDto;
 use EscolaLms\Consultations\Dto\FilterListDto;
@@ -18,33 +17,31 @@ use EscolaLms\Consultations\Helpers\StrategyHelper;
 use EscolaLms\Consultations\Http\Requests\ListConsultationsRequest;
 use EscolaLms\Consultations\Http\Resources\ConsultationSimpleResource;
 use EscolaLms\Consultations\Models\Consultation;
-use EscolaLms\Consultations\Models\ConsultationTerm;
+use EscolaLms\Consultations\Models\ConsultationUserPivot;
 use EscolaLms\Consultations\Repositories\Contracts\ConsultationRepositoryContract;
-use EscolaLms\Consultations\Repositories\Contracts\ConsultationTermsRepositoryContract;
+use EscolaLms\Consultations\Repositories\Contracts\ConsultationUserRepositoryContract;
 use EscolaLms\Consultations\Services\Contracts\ConsultationServiceContract;
 use EscolaLms\Jitsi\Services\Contracts\JitsiServiceContract;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class ConsultationService implements ConsultationServiceContract
 {
     private ConsultationRepositoryContract $consultationRepositoryContract;
-    private ConsultationTermsRepositoryContract $consultationTermsRepositoryContract;
+    private ConsultationUserRepositoryContract $consultationUserRepositoryContract;
     private JitsiServiceContract $jitsiServiceContract;
 
     public function __construct(
         ConsultationRepositoryContract $consultationRepositoryContract,
-        ConsultationTermsRepositoryContract $consultationTermsRepositoryContract,
+        ConsultationUserRepositoryContract $consultationUserRepositoryContract,
         JitsiServiceContract $jitsiServiceContract
     ) {
         $this->consultationRepositoryContract = $consultationRepositoryContract;
-        $this->consultationTermsRepositoryContract = $consultationTermsRepositoryContract;
+        $this->consultationUserRepositoryContract = $consultationUserRepositoryContract;
         $this->jitsiServiceContract = $jitsiServiceContract;
     }
 
@@ -112,32 +109,15 @@ class ConsultationService implements ConsultationServiceContract
         });
     }
 
-    public function setPivotOrderConsultation(Order $order, User $user): void
+    public function reportTerm(int $consultationTermId, string $executedAt): bool
     {
-        $order->items->each(function (OrderItem $item) use ($user) {
-            $item->buyable->productables->each(function (ProductProductable $product) use ($item, $user) {
-                if ($product->productable instanceof Consultation) {
-                    $data = [
-                        'order_item_id' => $item->getKey(),
-                        'consultation_id' => $product->productable->getKey(),
-                        'user_id' => $user->getKey(),
-                        'executed_status' => ConsultationTermStatusEnum::NOT_REPORTED
-                    ];
-                    $this->consultationTermsRepositoryContract->create($data);
-                }
-            });
-        });
-    }
-
-    public function reportTerm(int $orderItemId, string $executedAt): bool
-    {
-        return DB::transaction(function () use ($orderItemId, $executedAt) {
-            $consultationTerm = $this->consultationTermsRepositoryContract->findByOrderItem($orderItemId);
+        return DB::transaction(function () use ($consultationTermId, $executedAt) {
+            $consultationTerm = $this->consultationUserRepositoryContract->find($consultationTermId);
             $data = [
                 'executed_status' => ConsultationTermStatusEnum::REPORTED,
                 'executed_at' => $executedAt
             ];
-            $this->consultationTermsRepositoryContract->updateModel($consultationTerm, $data);
+            $this->consultationUserRepositoryContract->updateModel($consultationTerm, $data);
             $author = $consultationTerm->consultation->author;
             event(new ReportTerm($author, $consultationTerm));
             return true;
@@ -146,7 +126,7 @@ class ConsultationService implements ConsultationServiceContract
 
     public function approveTerm(int $consultationTermId): bool
     {
-        $consultationTerm = $this->consultationTermsRepositoryContract->find($consultationTermId);
+        $consultationTerm = $this->consultationUserRepositoryContract->find($consultationTermId);
         $this->setStatus($consultationTerm, ConsultationTermStatusEnum::APPROVED);
         event(new ApprovedTerm($consultationTerm->user, $consultationTerm));
         return true;
@@ -154,49 +134,53 @@ class ConsultationService implements ConsultationServiceContract
 
     public function rejectTerm(int $consultationTermId): bool
     {
-        $consultationTerm = $this->consultationTermsRepositoryContract->find($consultationTermId);
+        $consultationTerm = $this->consultationUserRepositoryContract->find($consultationTermId);
         $this->setStatus($consultationTerm, ConsultationTermStatusEnum::REJECT);
         event(new RejectTerm($consultationTerm->user, $consultationTerm));
         return true;
     }
 
-    public function setStatus(ConsultationTerm $consultationTerm, string $status): ConsultationTerm
+    public function setStatus(ConsultationUserPivot $consultationTerm, string $status): ConsultationUserPivot
     {
         return DB::transaction(function () use ($status, $consultationTerm) {
             if ($consultationTerm->executed_status !== ConsultationTermStatusEnum::REPORTED) {
                 throw new NotFoundHttpException(__('Consultation term not found'));
             }
-            return $this->consultationTermsRepositoryContract->updateModel($consultationTerm, ['executed_status' => $status]);
+            return $this->consultationUserRepositoryContract->updateModel($consultationTerm, ['executed_status' => $status]);
         });
     }
 
     public function generateJitsi(int $consultationTermId): array
     {
-        $consultationTerm = $this->consultationTermsRepositoryContract->find($consultationTermId);
+        $consultationTerm = $this->consultationUserRepositoryContract->find($consultationTermId);
         if ($this->canGenerateJitsi($consultationTerm)) {
             throw new NotFoundHttpException(__('Consultation term is not available'));
         }
 
         return $this->jitsiServiceContract->getChannelData(
             auth()->user(),
-            Str::studly($consultationTerm->orderItem->buyable->name)
+            Str::studly($consultationTerm->consultation->name)
         );
     }
 
-    public function canGenerateJitsi(ConsultationTerm $consultationTerm): bool
+    public function canGenerateJitsi(ConsultationUserPivot $consultationTerm): bool
+    {
+        $now = now();
+        return !$consultationTerm->isApproved() ||
+            $now < $consultationTerm->executed_at ||
+            $now > $this->generateDateTo($consultationTerm->executed_at, $consultationTerm->consultation->duration);
+    }
+
+    public function generateDateTo(string $dateTo, string $duration): ?Carbon
     {
         $modifyTimeStrings = [
             'seconds', 'minutes', 'hours', 'weeks', 'years'
         ];
-        $now = now();
-        $explode = explode(' ', $consultationTerm->orderItem->buyable->duration);
+        $explode = explode(' ', $duration);
         $count = $explode[0];
         $string = in_array($explode[1], $modifyTimeStrings) ? $explode[1] : 'hours';
-        $dateTo = Carbon::make($consultationTerm->executed_at)->modify('+' . $count . ' ' . $string);
 
-        return !$consultationTerm->isApproved() ||
-            $now < $consultationTerm->executed_at ||
-            $now > $dateTo;
+        return Carbon::make($dateTo)->modify('+' . $count . ' ' . $string);
     }
 
     public function setRelations(Consultation $consultation, array $relations = []): void
@@ -213,14 +197,10 @@ class ConsultationService implements ConsultationServiceContract
         }
     }
 
-    public function proposedTerms(int $orderItemId): ?Collection
+    public function proposedTerms(int $consultationTermId): ?Collection
     {
-        $orderItem = OrderItem::find($orderItemId);
-        $proposedTerms = collect();
-        foreach ($orderItem->buyable->productables as $productable) {
-            $proposedTerms = $proposedTerms->merge($productable->productable->proposedTerms);
-        }
-        return $proposedTerms ?? null;
+        $consultationUserPivot = $this->consultationUserRepositoryContract->find($consultationTermId);
+        return $consultationUserPivot->consultation->proposedTerms ?? null;
     }
 
     public function setFiles(Consultation $consultation, array $files = []): void
@@ -235,7 +215,7 @@ class ConsultationService implements ConsultationServiceContract
         $filterConsultationTermsDto = FilterConsultationTermsListDto::prepareFilters(
             array_merge($search, ['consultation_id' => $consultationId])
         );
-        return $this->consultationTermsRepositoryContract->allQueryBuilder(
+        return $this->consultationUserRepositoryContract->allQueryBuilder(
             $search,
             $filterConsultationTermsDto
         )->get();
@@ -244,26 +224,40 @@ class ConsultationService implements ConsultationServiceContract
     public function forCurrentUserResponse(ListConsultationsRequest $listConsultationsRequest): AnonymousResourceCollection
     {
         $search = $listConsultationsRequest->except(['limit', 'skip', 'order', 'order_by']);
-        $consultations = $this->getConsultationsListForCurrentUser($search);
-        $consultations
-            ->select(
-                'consultations.*',
-                'consultation_terms.order_item_id',
-                'consultation_terms.executed_status',
-                'consultation_terms.executed_at',
-            )
-            ->leftJoin('consultation_terms', 'consultation_terms.consultation_id', '=', 'consultations.id');
+        $consultations = $this->consultationRepositoryContract->getBoughtConsultationsByQuery(
+            $this->getConsultationsListForCurrentUser($search)
+        );
         $consultationsCollection = ConsultationSimpleResource::collection($consultations->paginate(
             $listConsultationsRequest->get('per_page') ??
             config('escolalms_consultations.perPage', ConstantEnum::PER_PAGE)
         ));
         ConsultationSimpleResource::extend(function (ConsultationSimpleResource $consultation) {
             return [
-                'order_item_id' => $consultation->order_item_id,
+                'consultation_user_id' => $consultation->cuid,
                 'executed_status' => $consultation->executed_status,
                 'executed_at' => $consultation->executed_at,
+                'is_ended' => $this->isEnded($consultation->executed_at, $consultation->duration)
             ];
         });
         return $consultationsCollection;
+    }
+
+    public function attachToUser(Consultation $consultation, User $user): void
+    {
+        $data = [
+            'consultation_id' => $consultation->getKey(),
+            'user_id' => $user->getKey(),
+            'executed_status' => ConsultationTermStatusEnum::NOT_REPORTED
+        ];
+        $this->consultationUserRepositoryContract->create($data);
+    }
+
+    public function isEnded(?string $executedAt, ?string $duration): bool
+    {
+        if ($executedAt && $duration) {
+            $dateTo = $this->generateDateTo($executedAt, $duration);
+            return $dateTo->getTimestamp() >= now()->getTimestamp();
+        }
+        return false;
     }
 }

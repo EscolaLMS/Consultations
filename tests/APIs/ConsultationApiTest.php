@@ -2,6 +2,7 @@
 
 namespace EscolaLms\Consultations\Tests\APIs;
 
+use EscolaLms\Consultations\Tests\Models\User;
 use EscolaLms\Categories\Models\Category;
 use EscolaLms\Consultations\Database\Seeders\ConsultationsPermissionSeeder;
 use EscolaLms\Consultations\Models\Consultation;
@@ -21,7 +22,7 @@ class ConsultationApiTest extends TestCase
         parent::setUp();
         $this->seed(ConsultationsPermissionSeeder::class);
 
-        $this->user = config('auth.providers.users.model')::factory()->create();
+        $this->user = User::factory()->create();
         $this->user->guard_name = 'api';
         $this->user->assignRole('tutor');
         $this->consultation = Consultation::factory()->create();

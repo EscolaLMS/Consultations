@@ -2,15 +2,14 @@
 
 namespace EscolaLms\Consultations\Models;
 
-use EscolaLms\Cart\Models\OrderItem;
 use EscolaLms\Categories\Models\Category;
 use EscolaLms\Consultations\Database\Factories\ConsultationFactory;
+use EscolaLms\Consultations\Services\Contracts\ConsultationServiceContract;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Support\Facades\Storage;
 
 
@@ -74,8 +73,8 @@ use Illuminate\Support\Facades\Storage;
  *          type="datetime",
  *      ),
  *      @OA\Property(
- *          property="order_item_id",
- *          description="order_item_id",
+ *          property="consultation_user_id",
+ *          description="consultation_user_id",
  *          type="integer",
  *      ),
  *      @OA\Property(
@@ -152,11 +151,6 @@ class Consultation extends Model
         return $this->belongsTo(User::class, 'author_id');
     }
 
-    public function orderItems(): MorphMany
-    {
-        return $this->morphMany(OrderItem::class, 'buyable');
-    }
-
     public function users(): BelongsToMany
     {
         return $this->belongsToMany(User::class, 'consultation_user');
@@ -174,7 +168,7 @@ class Consultation extends Model
 
     public function terms(): HasMany
     {
-        return $this->hasMany(ConsultationTerm::class);
+        return $this->hasMany(ConsultationUserPivot::class);
     }
 
     public function getBuyableDescription(): string
@@ -193,6 +187,12 @@ class Consultation extends Model
             return url(Storage::disk('public')->url($this->attributes['image_path']));
         }
         return '';
+    }
+
+    public function attachToUser(User $user): void
+    {
+        $consultationServiceContract = app(ConsultationServiceContract::class);
+        $consultationServiceContract->attachToUser($this, $user);
     }
 
     protected static function newFactory(): ConsultationFactory

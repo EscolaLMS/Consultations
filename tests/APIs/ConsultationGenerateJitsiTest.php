@@ -2,12 +2,10 @@
 
 namespace EscolaLms\Consultations\Tests\APIs;
 
-use EscolaLms\Cart\Models\Order;
-use EscolaLms\Cart\Models\OrderItem;
 use EscolaLms\Consultations\Database\Seeders\ConsultationsPermissionSeeder;
 use EscolaLms\Consultations\Enum\ConsultationTermStatusEnum;
 use EscolaLms\Consultations\Models\Consultation;
-use EscolaLms\Consultations\Models\ConsultationTerm;
+use EscolaLms\Consultations\Models\ConsultationUserPivot;
 use EscolaLms\Consultations\Tests\TestCase;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Str;
@@ -29,25 +27,11 @@ class ConsultationGenerateJitsiTest extends TestCase
 
     private function initVariable(): void
     {
-        $consultationsForOrder = Consultation::factory(3)->create();
-        $price = $consultationsForOrder->reduce(fn ($acc, Consultation $consultation) => $acc + $consultation->getBuyablePrice(), 0);
-        $this->order = Order::factory()->afterCreating(
-            fn (Order $order) => $order->items()->saveMany(
-                $consultationsForOrder->map(
-                    function (Consultation $consultation) {
-                        return OrderItem::query()->make([
-                            'quantity' => 1,
-                            'buyable_id' => $consultation->getKey(),
-                            'buyable_type' => Consultation::class,
-                        ]);
-                    }
-                )
-            )
-        )->create([
+        $consultation = Consultation::factory()->create();
+        $this->consultationUserPivot = ConsultationUserPivot::factory([
+            'consultation_id' => $consultation->getKey(),
             'user_id' => $this->user->getKey(),
-            'total' => $price,
-            'subtotal' => $price,
-        ]);
+        ])->create();
     }
 
     public function testGenerateJitsiUnAuthorized(): void
@@ -58,16 +42,15 @@ class ConsultationGenerateJitsiTest extends TestCase
 
     public function testGenerateJitsiWithApprovedTerm(): void
     {
-        $this->initVariable();
-        $orderItem = $this->order->items()->first();
-        $consultationTerm = ConsultationTerm::factory([
+        $consultation = Consultation::factory()->create();
+        $this->consultationUserPivot = ConsultationUserPivot::factory([
+            'consultation_id' => $consultation->getKey(),
             'user_id' => $this->user->getKey(),
-            'order_item_id' => $orderItem->getKey(),
+            'executed_at' => now()->format('Y-m-d H:i:s'),
             'executed_status' => ConsultationTermStatusEnum::APPROVED,
-            'executed_at' => now()
         ])->create();
 
-        $response = $this->actingAs($this->user, 'api')->json('GET', 'api/consultations/generate-jitsi/' . $consultationTerm->getKey());
+        $response = $this->actingAs($this->user, 'api')->json('GET', 'api/consultations/generate-jitsi/' . $this->consultationUserPivot->getKey());
         $response->assertOk();
         $response->assertJson(
             fn (AssertableJson $json) => $json->has('data',
@@ -78,7 +61,7 @@ class ConsultationGenerateJitsiTest extends TestCase
                                 ->where('displayName', "{$this->user->first_name} {$this->user->last_name}")
                                 ->where('email', $this->user->email)
                         )
-                        ->where('roomName', lcfirst(Str::studly($consultationTerm->orderItem->buyable->name)))
+                        ->where('roomName', lcfirst(Str::studly($this->consultationUserPivot->consultation->name)))
                         ->etc()
                 )
                     ->etc()
@@ -89,14 +72,7 @@ class ConsultationGenerateJitsiTest extends TestCase
     public function testGenerateJitsiWithRejectedTerm(): void
     {
         $this->initVariable();
-        $orderItem = $this->order->items()->first();
-        $consultationTerm = ConsultationTerm::factory([
-            'user_id' => $this->user->getKey(),
-            'order_item_id' => $orderItem->getKey(),
-            'executed_status' => ConsultationTermStatusEnum::REJECT
-        ])->create();
-
-        $response = $this->actingAs($this->user, 'api')->json('GET', 'api/consultations/generate-jitsi/' . $consultationTerm->getKey());
+        $response = $this->actingAs($this->user, 'api')->json('GET', 'api/consultations/generate-jitsi/' . $this->consultationUserPivot->getKey());
         $response->assertNotFound();
         $response->assertJson(fn (AssertableJson $json) => $json->where('message', __('Consultation term is not available'))->etc());
     }
@@ -104,15 +80,7 @@ class ConsultationGenerateJitsiTest extends TestCase
     public function testGenerateJitsiBeforeExecutedAt(): void
     {
         $this->initVariable();
-        $orderItem = $this->order->items()->first();
-        $consultationTerm = ConsultationTerm::factory([
-            'user_id' => $this->user->getKey(),
-            'order_item_id' => $orderItem->getKey(),
-            'executed_status' => ConsultationTermStatusEnum::APPROVED,
-            'executed_at' => now()->modify('+1 hour')
-        ])->create();
-
-        $response = $this->actingAs($this->user, 'api')->json('GET', 'api/consultations/generate-jitsi/' . $consultationTerm->getKey());
+        $response = $this->actingAs($this->user, 'api')->json('GET', 'api/consultations/generate-jitsi/' . $this->consultationUserPivot->getKey());
         $response->assertNotFound();
         $response->assertJson(fn (AssertableJson $json) => $json->where('message', __('Consultation term is not available'))->etc());
     }

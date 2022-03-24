@@ -47,16 +47,15 @@ class ConsultationRepository extends BaseRepository implements ConsultationRepos
         return $consultation;
     }
 
-    public function getByOrderId(int $orderItemId): ?Consultation
+    public function getBoughtConsultationsByQuery(Builder $query): Builder
     {
-        dd($this->model->newQuery()
-            ->whereRelation('orderItems', fn (Builder $query) =>
-            $query->whereId($orderItemId)
-            )->toSql());
-        return $this->model->newQuery()
-            ->whereRelation('orderItems', fn (Builder $query) =>
-                $query->whereId($orderItemId)
+        return $query
+            ->select(
+                'consultations.*',
+                'consultation_user.id as cuid',
+                'consultation_user.executed_status',
+                'consultation_user.executed_at',
             )
-            ->firstOrFail();
+            ->leftJoin('consultation_user', 'consultation_user.consultation_id', '=', 'consultations.id');
     }
 }

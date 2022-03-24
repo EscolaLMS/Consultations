@@ -11,6 +11,6 @@ trait HasConsultations
     public function consultations(): BelongsToMany
     {
         /* @var $this \EscolaLms\Core\Models\User */
-        return $this->belongsToMany(Consultation::class)->using(ConsultationUserPivot::class);
+        return $this->belongsToMany(Consultation::class, 'consultation_user');
     }
 }

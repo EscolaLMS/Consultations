@@ -21,6 +21,11 @@ class ConsultationTermsResource extends JsonResource
      *          description="date",
      *          type="datetime",
      *      ),
+     *      @OA\Property(
+     *          property="is_ended",
+     *          description="is_ended",
+     *          type="boolean",
+     *      ),
      * )
      *
      */
@@ -31,7 +36,7 @@ class ConsultationTermsResource extends JsonResource
         return [
             'date' => Carbon::make($this->executed_at)->format('Y-m-d H:i:s') ?? '',
             'status' => $this->executed_status ?? '',
-            'author' => $this->orderItem->buyable->author ?? null
+            'author' => $this->consultation->author ?? null
         ];
     }
 }
