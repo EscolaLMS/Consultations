@@ -14,8 +14,8 @@ class RemoveUniqueIndexInConsultaionUserTable extends Migration
     public function up()
     {
         Schema::table('consultation_user', function (Blueprint $table) {
-            $table->dropForeign(['user_id']);
-            $table->dropForeign(['consultation_id']);
+            $table->dropForeign('consultation_user_consultation_id_foreign');
+            $table->dropForeign('consultation_user_user_id_foreign');
             $table->dropUnique('consultation_user_unique');
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->foreign('consultation_id')->references('id')->on('consultations')->onDelete('cascade');
