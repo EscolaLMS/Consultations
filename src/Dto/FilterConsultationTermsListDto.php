@@ -4,9 +4,9 @@ namespace EscolaLms\Consultations\Dto;
 
 use EscolaLms\Consultations\Dto\Contracts\ModelDtoContract;
 use EscolaLms\Consultations\Models\ConsultationUserPivot;
-use EscolaLms\Consultations\Repositories\Criteria\NotNullCriterion;
-use EscolaLms\Consultations\Repositories\Criteria\WhereCriterion;
-use EscolaLms\Consultations\Repositories\Criteria\WhereNotInOrIsNullCriterion;
+use EscolaLms\Core\Repositories\Criteria\Primitives\NotNullCriterion;
+use EscolaLms\Core\Repositories\Criteria\Primitives\WhereCriterion;
+use EscolaLms\Core\Repositories\Criteria\Primitives\WhereNotInOrIsNullCriterion;
 use EscolaLms\Core\Repositories\Criteria\Primitives\DateCriterion;
 use EscolaLms\Core\Repositories\Criteria\Primitives\EqualCriterion;
 use EscolaLms\Core\Repositories\Criteria\Primitives\InCriterion;

@@ -4,7 +4,6 @@ namespace EscolaLms\Consultations\Jobs;
 
 use EscolaLms\Consultations\Services\Contracts\ConsultationServiceContract;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
@@ -20,7 +19,8 @@ class ReminderAboutConsultationJob implements ShouldQueue
      *
      * @return void
      */
-    public function __construct(string $status) {
+    public function __construct(string $status)
+    {
         $this->status = $status;
     }
 
