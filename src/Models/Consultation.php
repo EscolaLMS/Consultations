@@ -11,7 +11,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Storage;
-use EscolaLms\Core\Models\User;
 
 
 /**
@@ -149,7 +148,7 @@ class Consultation extends Model
 
     public function author(): BelongsTo
     {
-        return $this->belongsTo(\EscolaLms\Consultations\Models\User::class, 'author_id');
+        return $this->belongsTo(User::class, 'author_id');
     }
 
     public function users(): BelongsToMany
