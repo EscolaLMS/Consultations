@@ -34,4 +34,5 @@ interface ConsultationServiceContract
     public function forCurrentUserResponse(ListConsultationsRequest $listConsultationsRequest): AnonymousResourceCollection;
     public function generateDateTo(string $dateTo, string $duration): ?Carbon;
     public function isEnded(?string $executedAt, ?string $duration): bool;
+    public function reminderAboutConsultation(string $reminderStatus): void;
 }

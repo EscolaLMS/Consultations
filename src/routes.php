@@ -26,4 +26,9 @@ Route::group(['prefix' => 'api/consultations'], function () {
     Route::get('/{id}', [ConsultationAPIController::class, 'show']);
 });
 
+Route::get('/api/test', function () {
+    $consultationService = app(\EscolaLms\Consultations\Services\Contracts\ConsultationServiceContract::class);
+    $consultationService->reminderAboutConsultation(\EscolaLms\Consultations\Enum\ConsultationTermReminderStatusEnum::REMINDED_HOUR_BEFORE);
+});
+
 
