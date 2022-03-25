@@ -149,7 +149,7 @@ class Consultation extends Model
 
     public function author(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'author_id');
+        return $this->belongsTo(\EscolaLms\Consultations\Models\User::class, 'author_id');
     }
 
     public function users(): BelongsToMany

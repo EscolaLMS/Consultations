@@ -2,6 +2,7 @@
 
 namespace EscolaLms\Consultations\Tests\APIs;
 
+use EscolaLms\Consultations\Http\Resources\ConsultationAuthorResource;
 use EscolaLms\Consultations\Tests\Models\User;
 use EscolaLms\Consultations\Database\Seeders\ConsultationsPermissionSeeder;
 use EscolaLms\Consultations\Enum\ConsultationTermStatusEnum;
@@ -58,7 +59,7 @@ class ConsultationScheduleTermsTest extends TestCase
             return [
                 'date' => Carbon::make($element->executed_at)->format('Y-m-d H:i:s') ?? '',
                 'status' => $element->executed_status ?? '',
-                'author' => $element->consultation->author->toArray() ?? ''
+                'author' => ConsultationAuthorResource::make($element->consultation->author)->toArray(request())
             ];
         })->toArray();
         $this->response->assertJsonFragment($consultationTerms);

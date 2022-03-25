@@ -2,6 +2,8 @@
 
 namespace EscolaLms\Consultations;
 
+use EscolaLms\Consultations\Enum\ConsultationTermReminderStatusEnum;
+use EscolaLms\Consultations\Jobs\ReminderAboutConsultationJob;
 use EscolaLms\Consultations\Providers\EventServiceProvider;
 use EscolaLms\Consultations\Repositories\ConsultationRepository;
 use EscolaLms\Consultations\Repositories\ConsultationUserRepository;
@@ -11,6 +13,7 @@ use EscolaLms\Consultations\Services\ConsultationService;
 use EscolaLms\Consultations\Services\Contracts\ConsultationServiceContract;
 use EscolaLms\Jitsi\EscolaLmsJitsiServiceProvider;
 use EscolaLms\Settings\EscolaLmsSettingsServiceProvider;
+use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Support\ServiceProvider;
 
 /**
@@ -43,6 +46,16 @@ class EscolaLmsConsultationsServiceProvider extends ServiceProvider
         $this->publishes([
             __DIR__ . '/config.php' => config_path('config.php'),
         ], 'escolalms_consultations');
+
+        $this->app->booted(function () {
+            $schedule = $this->app->make(Schedule::class);
+            $schedule->job(
+                new ReminderAboutConsultationJob(ConsultationTermReminderStatusEnum::REMINDED_DAY_BEFORE)
+            )->everyFiveMinutes();
+            $schedule->job(
+                new ReminderAboutConsultationJob(ConsultationTermReminderStatusEnum::REMINDED_DAY_BEFORE)
+            )->everySixHours();
+        });
     }
 
     public function register()

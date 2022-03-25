@@ -3,7 +3,9 @@
 namespace EscolaLms\Consultations\Services;
 
 use Carbon\Carbon;
+use EscolaLms\Consultations\Enum\ConsultationTermReminderStatusEnum;
 use EscolaLms\Consultations\Events\ConsultationTerm;
+use EscolaLms\Consultations\Events\ReminderAboutTerm;
 use EscolaLms\Consultations\Models\User;
 use EscolaLms\Consultations\Dto\ConsultationDto;
 use EscolaLms\Consultations\Dto\FilterConsultationTermsListDto;
@@ -28,6 +30,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use function Clue\StreamFilter\fun;
 
 class ConsultationService implements ConsultationServiceContract
 {
@@ -177,8 +180,12 @@ class ConsultationService implements ConsultationServiceContract
             'seconds', 'minutes', 'hours', 'weeks', 'years'
         ];
         $explode = explode(' ', $duration);
-        $count = $explode[0];
-        $string = in_array($explode[1], $modifyTimeStrings) ? $explode[1] : 'hours';
+        $count = 0;
+        $string = 'hours';
+        if (isset($explode[0]) && $explode[1]) {
+            $count = $explode[0];
+            $string = in_array($explode[1], $modifyTimeStrings) ? $explode[1] : 'hours';
+        }
 
         return Carbon::make($dateTo)->modify('+' . $count . ' ' . $string);
     }
@@ -260,4 +267,33 @@ class ConsultationService implements ConsultationServiceContract
         }
         return false;
     }
+
+    public function reminderAboutConsultation(string $reminderStatus): void
+    {
+        $now = now();
+        $reminderDate = now()->modify(config('escolalms_consultations.modifier_date.' . $reminderStatus, '+1 hour'));
+        $exclusionStatuses = config('escolalms_consultations.exclusion_reminder_status.' . $reminderStatus, []);
+        $data = [
+            'date_time_to' => $reminderDate->format('Y-m-d H:i:s'),
+            'date_time_from' => $now->format('Y-m-d H:i:s'),
+            'reminder_status' => $exclusionStatuses,
+            'status' => [ConsultationTermStatusEnum::APPROVED]
+        ];
+        $incomingTerms = $this->consultationUserRepositoryContract->getIncomingTerm(
+            FilterConsultationTermsListDto::prepareFilters($data)->getCriteria()
+        );
+        foreach ($incomingTerms as $consultationTerm) {
+            event(new ReminderAboutTerm(
+                $consultationTerm->user,
+                $consultationTerm,
+                $reminderStatus
+            ));
+        }
+    }
+
+    public function setReminderStatus(ConsultationUserPivot $consultationTerm, string $status): void
+    {
+        $this->consultationUserRepositoryContract->updateModel($consultationTerm, ['reminder_status' => $status]);
+    }
+
 }

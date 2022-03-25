@@ -4,7 +4,6 @@ namespace EscolaLms\Consultations\Models;
 
 use EscolaLms\Consultations\Database\Factories\ConsultationUserFactory;
 use EscolaLms\Consultations\Enum\ConsultationTermStatusEnum;
-use EscolaLms\Consultations\Services\Contracts\ConsultationServiceContract;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -20,6 +19,7 @@ class ConsultationUserPivot extends Model
         'executed_at',
         'executed_status',
         'consultation_id',
+        'reminder_status',
     ];
 
     public function user(): BelongsTo

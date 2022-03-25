@@ -2,6 +2,7 @@
 
 namespace EscolaLms\Consultations\Tests\APIs;
 
+use EscolaLms\Categories\Models\Category;
 use EscolaLms\Consultations\Database\Seeders\ConsultationsPermissionSeeder;
 use EscolaLms\Consultations\Models\Consultation;
 use EscolaLms\Consultations\Tests\Models\User;
@@ -29,6 +30,8 @@ class ConsultationListForUserTest extends TestCase
 
     private function initVariable(): void
     {
+        $categories = Category::factory(5)->create();
+        $this->user->categories()->sync($categories);
         $this->consultations = Consultation::factory(3)->create();
         $this->user->consultations()->sync($this->consultations->pluck('id')->toArray());
     }

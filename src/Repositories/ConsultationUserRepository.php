@@ -9,6 +9,7 @@ use EscolaLms\Consultations\Models\ConsultationUserPivot;
 use EscolaLms\Consultations\Repositories\Contracts\ConsultationUserRepositoryContract;
 use EscolaLms\Core\Repositories\BaseRepository;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Collection;
 
 class ConsultationUserRepository extends BaseRepository implements ConsultationUserRepositoryContract
 {
@@ -44,6 +45,15 @@ class ConsultationUserRepository extends BaseRepository implements ConsultationU
         $consultationUserPivot->fill($data);
         $consultationUserPivot->save();
         return $consultationUserPivot;
+    }
+
+    public function getIncomingTerm(array $criteria = []): Collection
+    {
+        $query = $this->model->newQuery();
+        if ($criteria) {
+            $query = $this->applyCriteria($query, $criteria);
+        }
+        return $query->get();
     }
 
 }
