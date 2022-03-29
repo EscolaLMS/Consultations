@@ -19,14 +19,16 @@ class ConsultationSimpleResource extends JsonResource
             'active_to' => $this->active_to,
             'name' => $this->name,
             'base_price' => $this->base_price,
-            'author' => ConsultationAuthorResource::make($this->author),
+            'author' => $this->author ? ConsultationAuthorResource::make($this->author) : null,
             'status' => $this->status,
             'description' => $this->description,
             'short_desc' => $this->short_desc,
             'duration' => $this->duration,
             'image_path' => $this->image_path,
             'image_url' => $this->image_url,
-            'proposed_terms' => ConsultationProposedTermResource::collection($this->proposedTerms),
+            'proposed_terms' => $this->proposedTerms->count() > 0 ?
+                ConsultationProposedTermResource::collection($this->proposedTerms) :
+                [],
             'categories' => $this->categories,
         ];
         return self::apply($fields, $this);
