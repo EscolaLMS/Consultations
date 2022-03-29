@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Storage;
+use EscolaLms\Core\Models\User as CoreUser;
 
 
 /**
@@ -189,7 +190,7 @@ class Consultation extends Model
         return '';
     }
 
-    public function attachToUser(User $user): void
+    public function attachToUser(CoreUser $user): void
     {
         $consultationServiceContract = app(ConsultationServiceContract::class);
         $consultationServiceContract->attachToUser($this, $user);
