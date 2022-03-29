@@ -57,6 +57,7 @@ class ConsultationScheduleTermsTest extends TestCase
         $this->response->assertOk();
         $consultationTerms = collect([$this->consultationUserPivot])->map(function (ConsultationUserPivot $element) {
             return [
+                'consultation_term_id' => $element->getKey(),
                 'date' => Carbon::make($element->executed_at)->format('Y-m-d H:i:s') ?? '',
                 'status' => $element->executed_status ?? '',
                 'author' => ConsultationAuthorResource::make($element->consultation->author)->toArray(request())
