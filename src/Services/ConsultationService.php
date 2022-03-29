@@ -3,8 +3,7 @@
 namespace EscolaLms\Consultations\Services;
 
 use Carbon\Carbon;
-use EscolaLms\Consultations\Enum\ConsultationTermReminderStatusEnum;
-use EscolaLms\Consultations\Events\ConsultationTerm;
+use EscolaLms\Core\Models\User as CoreUser;
 use EscolaLms\Consultations\Events\ReminderAboutTerm;
 use EscolaLms\Consultations\Models\User;
 use EscolaLms\Consultations\Dto\ConsultationDto;
@@ -249,7 +248,7 @@ class ConsultationService implements ConsultationServiceContract
         return $consultationsCollection;
     }
 
-    public function attachToUser(Consultation $consultation, User $user): void
+    public function attachToUser(Consultation $consultation, CoreUser $user): void
     {
         $data = [
             'consultation_id' => $consultation->getKey(),

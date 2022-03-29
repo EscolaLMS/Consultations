@@ -8,6 +8,7 @@ use EscolaLms\Consultations\Dto\ConsultationDto;
 use EscolaLms\Consultations\Http\Requests\ListConsultationsRequest;
 use EscolaLms\Consultations\Models\Consultation;
 use EscolaLms\Consultations\Models\ConsultationUserPivot;
+use EscolaLms\Core\Models\User as CoreUser;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Collection;
@@ -19,7 +20,7 @@ interface ConsultationServiceContract
     public function update(int $id, ConsultationDto $consultationDto): Consultation;
     public function show(int $id): Consultation;
     public function delete(int $id): ?bool;
-    public function attachToUser(Consultation $consultation, User $user): void;
+    public function attachToUser(Consultation $consultation, CoreUser $user): void;
     public function reportTerm(int $orderItemId, string $executedAt): bool;
     public function approveTerm(int $consultationTermId): bool;
     public function rejectTerm(int $consultationTermId): bool;
