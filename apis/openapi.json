@@ -729,6 +729,45 @@
                     }
                 ]
             }
+        },
+        "/api/admin/change-term": {
+            "post": {
+                "tags": [
+                    "Admin Consultations"
+                ],
+                "summary": "Change term in consultation ",
+                "description": "Change term consultation",
+                "operationId": "bf054a1bcc3131aeb976e10e7e08a96e",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "executed_at": {
+                                        "type": "string",
+                                        "example": "New term consultation"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "successful operation",
+                        "content": {
+                            "application/json": {}
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "passport": []
+                    }
+                ]
+            }
         }
     },
     "components": {
@@ -746,6 +785,10 @@
                     "is_ended": {
                         "description": "is_ended",
                         "type": "boolean"
+                    },
+                    "consultation_term_id": {
+                        "description": "consultation_term_id",
+                        "type": "integer"
                     }
                 },
                 "type": "object"
