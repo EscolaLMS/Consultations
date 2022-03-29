@@ -30,7 +30,6 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use function Clue\StreamFilter\fun;
 
 class ConsultationService implements ConsultationServiceContract
 {
