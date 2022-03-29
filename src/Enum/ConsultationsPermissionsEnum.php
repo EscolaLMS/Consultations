@@ -11,4 +11,5 @@ class ConsultationsPermissionsEnum extends BasicEnum
     const CONSULTATION_UPDATE = 'consultation_update';
     const CONSULTATION_DELETE = 'consultation_delete';
     const CONSULTATION_READ = 'consultation_read';
+    const CONSULTATION_CHANGE_TERM = 'consultation_change_term';
 }

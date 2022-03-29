@@ -5,6 +5,7 @@ namespace EscolaLms\Consultations\Http\Controllers;
 use EscolaLms\Consultations\Dto\ConsultationDto;
 use EscolaLms\Consultations\Enum\ConstantEnum;
 use EscolaLms\Consultations\Http\Controllers\Swagger\ConsultationSwagger;
+use EscolaLms\Consultations\Http\Requests\ChangeTermConsultationRequest;
 use EscolaLms\Consultations\Http\Requests\ListConsultationsRequest;
 use EscolaLms\Consultations\Http\Requests\ScheduleConsultationRequest;
 use EscolaLms\Consultations\Http\Requests\ShowAPIConsultationRequest;
@@ -87,5 +88,14 @@ class ConsultationController extends EscolaLmsBaseController implements Consulta
     {
         $this->consultationServiceContract->delete($id);
         return $this->sendSuccess(__('Consultation deleted successfully'));
+    }
+
+    public function changeTerm(ChangeTermConsultationRequest $changeTermConsultationRequest, int $consultationTermId): JsonResponse
+    {
+        $this->consultationServiceContract->changeTerm(
+            $consultationTermId,
+            $changeTermConsultationRequest->input('executed_at')
+        );
+        return $this->sendSuccess(__('Consultation term changed successfully'));
     }
 }
