@@ -42,7 +42,9 @@ class ConsultationTermsResource extends JsonResource
             'consultation_term_id' => $this->getKey(),
             'date' => Carbon::make($this->executed_at)->format('Y-m-d H:i:s') ?? '',
             'status' => $this->executed_status ?? '',
-            'author' => isset($this->consultation->author) ? ConsultationAuthorResource::make($this->consultation->author) : null
+            'author' => isset($this->consultation->author) ?
+                ConsultationAuthorResource::make($this->consultation->author) :
+                null
         ];
     }
 }
