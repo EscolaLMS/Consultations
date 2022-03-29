@@ -3,6 +3,7 @@
 namespace EscolaLms\Consultations\Services;
 
 use Carbon\Carbon;
+use EscolaLms\Consultations\Events\ChangeTerm;
 use EscolaLms\Core\Models\User as CoreUser;
 use EscolaLms\Consultations\Events\ReminderAboutTerm;
 use EscolaLms\Consultations\Models\User;
@@ -29,7 +30,6 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use function Clue\StreamFilter\fun;
 
 class ConsultationService implements ConsultationServiceContract
 {
@@ -293,6 +293,15 @@ class ConsultationService implements ConsultationServiceContract
     public function setReminderStatus(ConsultationUserPivot $consultationTerm, string $status): void
     {
         $this->consultationUserRepositoryContract->updateModel($consultationTerm, ['reminder_status' => $status]);
+    }
+
+    public function changeTerm(int $consultationTermId, string $executedAt): bool
+    {
+        if ($consultationUser = $this->consultationUserRepositoryContract->update(['executed_at' => $executedAt], $consultationTermId)) {
+            event(new ChangeTerm($consultationUser->user, $consultationUser));
+            return true;
+        }
+        return false;
     }
 
 }

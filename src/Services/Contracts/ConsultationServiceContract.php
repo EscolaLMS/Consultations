@@ -36,4 +36,6 @@ interface ConsultationServiceContract
     public function generateDateTo(string $dateTo, string $duration): ?Carbon;
     public function isEnded(?string $executedAt, ?string $duration): bool;
     public function reminderAboutConsultation(string $reminderStatus): void;
+    public function setReminderStatus(ConsultationUserPivot $consultationTerm, string $status): void;
+    public function changeTerm(int $consultationTermId, string $executedAt): bool;
 }

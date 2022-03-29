@@ -22,6 +22,7 @@ class ConsultationsPermissionSeeder extends Seeder
         Permission::findOrCreate(ConsultationsPermissionsEnum::CONSULTATION_DELETE, 'api');
         Permission::findOrCreate(ConsultationsPermissionsEnum::CONSULTATION_CREATE, 'api');
         Permission::findOrCreate(ConsultationsPermissionsEnum::CONSULTATION_READ, 'api');
+        Permission::findOrCreate(ConsultationsPermissionsEnum::CONSULTATION_CHANGE_TERM, 'api');
 
         $admin->givePermissionTo([
             ConsultationsPermissionsEnum::CONSULTATION_LIST,
@@ -29,6 +30,7 @@ class ConsultationsPermissionSeeder extends Seeder
             ConsultationsPermissionsEnum::CONSULTATION_DELETE,
             ConsultationsPermissionsEnum::CONSULTATION_CREATE,
             ConsultationsPermissionsEnum::CONSULTATION_READ,
+            ConsultationsPermissionsEnum::CONSULTATION_CHANGE_TERM,
         ]);
         $tutor->givePermissionTo([
             ConsultationsPermissionsEnum::CONSULTATION_LIST,
@@ -36,6 +38,7 @@ class ConsultationsPermissionSeeder extends Seeder
             ConsultationsPermissionsEnum::CONSULTATION_DELETE,
             ConsultationsPermissionsEnum::CONSULTATION_CREATE,
             ConsultationsPermissionsEnum::CONSULTATION_READ,
+            ConsultationsPermissionsEnum::CONSULTATION_CHANGE_TERM,
         ]);
     }
 }

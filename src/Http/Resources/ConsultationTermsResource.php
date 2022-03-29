@@ -26,6 +26,11 @@ class ConsultationTermsResource extends JsonResource
      *          description="is_ended",
      *          type="boolean",
      *      ),
+     *      @OA\Property(
+     *          property="consultation_term_id",
+     *          description="consultation_term_id",
+     *          type="integer",
+     *      ),
      * )
      *
      */
@@ -34,6 +39,7 @@ class ConsultationTermsResource extends JsonResource
     public function toArray($request)
     {
         return [
+            'consultation_term_id' => $this->getKey(),
             'date' => Carbon::make($this->executed_at)->format('Y-m-d H:i:s') ?? '',
             'status' => $this->executed_status ?? '',
             'author' => isset($this->consultation->author) ? ConsultationAuthorResource::make($this->consultation->author) : null

@@ -1,6 +1,7 @@
 <?php
 namespace EscolaLms\Consultations\Http\Controllers\Swagger;
 
+use EscolaLms\Consultations\Http\Requests\ChangeTermConsultationRequest;
 use EscolaLms\Consultations\Http\Requests\ListConsultationsRequest;
 use EscolaLms\Consultations\Http\Requests\ScheduleConsultationRequest;
 use EscolaLms\Consultations\Http\Requests\ShowConsultationRequest;
@@ -361,4 +362,45 @@ interface ConsultationSwagger
      * )
      */
     public function schedule(int $id, ScheduleConsultationRequest $scheduleConsultationRequest): JsonResponse;
+
+    /**
+     * @OA\Post(
+     *      path="/api/admin/change-term",
+     *      summary="Change term in consultation ",
+     *      tags={"Admin Consultations"},
+     *      description="Change term consultation",
+     *      security={
+     *          {"passport": {}},
+     *      },
+     *      @OA\RequestBody(
+     *          required=true,
+     *          @OA\JsonContent(
+     *              @OA\Property(
+     *                  property="executed_at",
+     *                  type="string",
+     *                  example="New term consultation",
+     *              ),
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=201,
+     *          description="successful operation",
+     *          @OA\MediaType(
+     *              mediaType="application/json"
+     *          ),
+     *          @OA\Schema(
+     *              type="object",
+     *              @OA\Property(
+     *                  property="success",
+     *                  type="boolean"
+     *              ),
+     *              @OA\Property(
+     *                  property="message",
+     *                  type="string"
+     *              )
+     *          )
+     *      )
+     * )
+     */
+    public function changeTerm(ChangeTermConsultationRequest $changeTermConsultationRequest, int $consultationTermId): JsonResponse;
 }

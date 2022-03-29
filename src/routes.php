@@ -8,7 +8,8 @@ use Illuminate\Support\Facades\Route;
 Route::group(['middleware' => ['auth:api'], 'prefix' => 'api/admin'], function () {
     Route::post('consultations/{id}', [ConsultationController::class, 'update']);
     Route::resource('consultations', ConsultationController::class);
-    Route::get('/consultations/{id}/schedule', [ConsultationController::class, 'schedule']);
+    Route::get('consultations/{id}/schedule', [ConsultationController::class, 'schedule']);
+    Route::post('change-term/{consultationTermId}', [ConsultationController::class, 'changeTerm']);
 });
 
 // user endpoints
@@ -24,11 +25,6 @@ Route::group(['middleware' => ['auth:api'], 'prefix' => 'api/consultations'], fu
 Route::group(['prefix' => 'api/consultations'], function () {
     Route::get('/', [ConsultationAPIController::class, 'index']);
     Route::get('/{id}', [ConsultationAPIController::class, 'show']);
-});
-
-Route::get('/api/test', function () {
-    $consultationService = app(\EscolaLms\Consultations\Services\Contracts\ConsultationServiceContract::class);
-    $consultationService->reminderAboutConsultation(\EscolaLms\Consultations\Enum\ConsultationTermReminderStatusEnum::REMINDED_HOUR_BEFORE);
 });
 
 
