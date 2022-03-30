@@ -302,10 +302,9 @@ class ConsultationService implements ConsultationServiceContract
         }
         return false;
     }
-
+  
     public function getConsultationTermsByTutor(): Collection
     {
         return $this->consultationUserRepositoryContract->getByCurrentUserTutor();
     }
-
 }
