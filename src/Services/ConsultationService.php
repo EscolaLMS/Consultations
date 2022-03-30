@@ -6,7 +6,6 @@ use Carbon\Carbon;
 use EscolaLms\Consultations\Events\ChangeTerm;
 use EscolaLms\Core\Models\User as CoreUser;
 use EscolaLms\Consultations\Events\ReminderAboutTerm;
-use EscolaLms\Consultations\Models\User;
 use EscolaLms\Consultations\Dto\ConsultationDto;
 use EscolaLms\Consultations\Dto\FilterConsultationTermsListDto;
 use EscolaLms\Consultations\Dto\FilterListDto;
@@ -302,6 +301,11 @@ class ConsultationService implements ConsultationServiceContract
             return true;
         }
         return false;
+    }
+
+    public function getConsultationTermsByTutor(): Collection
+    {
+        return $this->consultationUserRepositoryContract->getByCurrentUserTutor();
     }
 
 }
