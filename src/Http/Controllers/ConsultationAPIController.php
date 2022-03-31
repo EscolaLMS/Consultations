@@ -7,9 +7,11 @@ use EscolaLms\Consultations\Http\Controllers\Swagger\ConsultationAPISwagger;
 use EscolaLms\Consultations\Http\Requests\ListAPIConsultationsRequest;
 use EscolaLms\Consultations\Http\Requests\ListConsultationsRequest;
 use EscolaLms\Consultations\Http\Requests\ReportTermConsultationRequest;
+use EscolaLms\Consultations\Http\Requests\ScheduleConsultationAPIRequest;
 use EscolaLms\Consultations\Http\Requests\ShowAPIConsultationRequest;
 use EscolaLms\Consultations\Http\Resources\ConsultationProposedTermResource;
 use EscolaLms\Consultations\Http\Resources\ConsultationSimpleResource;
+use EscolaLms\Consultations\Http\Resources\ConsultationTermsResource;
 use EscolaLms\Consultations\Services\Contracts\ConsultationServiceContract;
 use EscolaLms\Consultations\Tests\APIs\ConsultationShowApiTest;
 use EscolaLms\Core\Http\Controllers\EscolaLmsBaseController;
@@ -88,6 +90,15 @@ class ConsultationAPIController extends EscolaLmsBaseController implements Consu
     {
         return $this->sendResponse(
             $this->consultationServiceContract->generateJitsi($consultationTermId),
+            __('Consultation updated successfully')
+        );
+    }
+
+    public function schedule(ScheduleConsultationAPIRequest $scheduleConsultationAPIRequest): JsonResponse
+    {
+        $consultationTerms = $this->consultationServiceContract->getConsultationTermsByTutor();
+        return $this->sendResponse(
+            ConsultationTermsResource::collection($consultationTerms),
             __('Consultation updated successfully')
         );
     }

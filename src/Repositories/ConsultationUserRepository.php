@@ -56,4 +56,11 @@ class ConsultationUserRepository extends BaseRepository implements ConsultationU
         return $query->get();
     }
 
+    public function getByCurrentUserTutor(): Collection
+    {
+        $query = $this->model->newQuery();
+        $query->whereHas('consultation', fn (Builder $query) => $query->whereAuthorId(auth()->user()->getKey()));
+        return $query->get();
+    }
+
 }

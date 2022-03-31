@@ -15,6 +15,7 @@ Route::group(['middleware' => ['auth:api'], 'prefix' => 'api/admin'], function (
 // user endpoints
 Route::group(['middleware' => ['auth:api'], 'prefix' => 'api/consultations'], function () {
     Route::get('/me', [ConsultationAPIController::class, 'forCurrentUser']);
+    Route::get('/my-schedule', [ConsultationAPIController::class, 'schedule']);
     Route::post('/report-term/{consultationTermId}', [ConsultationAPIController::class, 'reportTerm']);
     Route::get('/proposed-terms/{consultationTermId}', [ConsultationAPIController::class, 'proposedTerms']);
     Route::get('/approve-term/{consultationTermId}', [ConsultationAPIController::class, 'approveTerm']);

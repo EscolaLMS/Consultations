@@ -16,4 +16,5 @@ interface ConsultationUserRepositoryContract
     ): Builder;
     public function updateModel(ConsultationUserPivot $consultationUserPivot, array $data): ConsultationUserPivot;
     public function getIncomingTerm(array $criteria = []): Collection;
+    public function getByCurrentUserTutor(): Collection;
 }

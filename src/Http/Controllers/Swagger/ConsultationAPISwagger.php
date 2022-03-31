@@ -4,6 +4,7 @@ namespace EscolaLms\Consultations\Http\Controllers\Swagger;
 use EscolaLms\Consultations\Http\Requests\ListAPIConsultationsRequest;
 use EscolaLms\Consultations\Http\Requests\ListConsultationsRequest;
 use EscolaLms\Consultations\Http\Requests\ReportTermConsultationRequest;
+use EscolaLms\Consultations\Http\Requests\ScheduleConsultationAPIRequest;
 use EscolaLms\Consultations\Http\Requests\ShowAPIConsultationRequest;
 use Illuminate\Http\JsonResponse;
 
@@ -473,4 +474,39 @@ interface ConsultationAPISwagger
      * )
      */
     public function show(ShowAPIConsultationRequest $showAPIConsultationRequest, int $id): JsonResponse;
+
+    /**
+     * @OA\Get(
+     *      path="/api/consultations/my-schedule",
+     *      tags={"Consultations"},
+     *      description="Get Consultation schedule for tutor",
+     *      security={
+     *          {"passport": {}},
+     *      },
+     *      @OA\Response(
+     *          response=200,
+     *          description="successful operation",
+     *          @OA\MediaType(
+     *              mediaType="application/json"
+     *          ),
+     *          @OA\Schema(
+     *              type="object",
+     *              @OA\Property(
+     *                  property="success",
+     *                  type="boolean"
+     *              ),
+     *              @OA\Property(
+     *                  property="data",
+     *                  type="array",
+     *                  @OA\Items(ref="#/components/schemas/ConsultationTerm")
+     *              ),
+     *              @OA\Property(
+     *                  property="message",
+     *                  type="string"
+     *              )
+     *          )
+     *      )
+     * )
+     */
+    public function schedule(ScheduleConsultationAPIRequest $scheduleConsultationAPIRequest): JsonResponse;
 }

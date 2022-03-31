@@ -38,4 +38,5 @@ interface ConsultationServiceContract
     public function reminderAboutConsultation(string $reminderStatus): void;
     public function setReminderStatus(ConsultationUserPivot $consultationTerm, string $status): void;
     public function changeTerm(int $consultationTermId, string $executedAt): bool;
+    public function getConsultationTermsByTutor(): Collection;
 }
