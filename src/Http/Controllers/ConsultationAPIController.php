@@ -96,7 +96,7 @@ class ConsultationAPIController extends EscolaLmsBaseController implements Consu
 
     public function schedule(ScheduleConsultationAPIRequest $scheduleConsultationAPIRequest): JsonResponse
     {
-        $consultationTerms = $this->consultationServiceContract->getConsultationTermsByTutor();
+        $consultationTerms = $this->consultationServiceContract->getConsultationTermsForTutor();
         return $this->sendResponse(
             ConsultationTermsResource::collection($consultationTerms),
             __('Consultation updated successfully')

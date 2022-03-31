@@ -4,6 +4,7 @@ namespace EscolaLms\Consultations\Services;
 
 use Carbon\Carbon;
 use EscolaLms\Consultations\Events\ChangeTerm;
+use EscolaLms\Consultations\Events\ReminderTrainerAboutTerm;
 use EscolaLms\Core\Models\User as CoreUser;
 use EscolaLms\Consultations\Events\ReminderAboutTerm;
 use EscolaLms\Consultations\Dto\ConsultationDto;
@@ -268,21 +269,14 @@ class ConsultationService implements ConsultationServiceContract
 
     public function reminderAboutConsultation(string $reminderStatus): void
     {
-        $now = now();
-        $reminderDate = now()->modify(config('escolalms_consultations.modifier_date.' . $reminderStatus, '+1 hour'));
-        $exclusionStatuses = config('escolalms_consultations.exclusion_reminder_status.' . $reminderStatus, []);
-        $data = [
-            'date_time_to' => $reminderDate->format('Y-m-d H:i:s'),
-            'date_time_from' => $now->format('Y-m-d H:i:s'),
-            'reminder_status' => $exclusionStatuses,
-            'status' => [ConsultationTermStatusEnum::APPROVED]
-        ];
-        $incomingTerms = $this->consultationUserRepositoryContract->getIncomingTerm(
-            FilterConsultationTermsListDto::prepareFilters($data)->getCriteria()
-        );
-        foreach ($incomingTerms as $consultationTerm) {
+        foreach ($this->getReminderData($reminderStatus) as $consultationTerm) {
             event(new ReminderAboutTerm(
                 $consultationTerm->user,
+                $consultationTerm,
+                $reminderStatus
+            ));
+            event(new ReminderTrainerAboutTerm(
+                $consultationTerm->consultation->author,
                 $consultationTerm,
                 $reminderStatus
             ));
@@ -302,9 +296,25 @@ class ConsultationService implements ConsultationServiceContract
         }
         return false;
     }
-  
-    public function getConsultationTermsByTutor(): Collection
+
+    public function getConsultationTermsForTutor(): Collection
     {
         return $this->consultationUserRepositoryContract->getByCurrentUserTutor();
+    }
+
+    private function getReminderData(string $reminderStatus): Collection
+    {
+        $now = now();
+        $reminderDate = now()->modify(config('escolalms_consultations.modifier_date.' . $reminderStatus, '+1 hour'));
+        $exclusionStatuses = config('escolalms_consultations.exclusion_reminder_status.' . $reminderStatus, []);
+        $data = [
+            'date_time_to' => $reminderDate->format('Y-m-d H:i:s'),
+            'date_time_from' => $now->format('Y-m-d H:i:s'),
+            'reminder_status' => $exclusionStatuses,
+            'status' => [ConsultationTermStatusEnum::APPROVED]
+        ];
+        return $this->consultationUserRepositoryContract->getIncomingTerm(
+            FilterConsultationTermsListDto::prepareFilters($data)->getCriteria()
+        );
     }
 }

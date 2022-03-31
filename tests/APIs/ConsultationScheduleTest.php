@@ -6,6 +6,7 @@ use EscolaLms\Consultations\Database\Seeders\ConsultationsPermissionSeeder;
 use EscolaLms\Consultations\Enum\ConsultationTermReminderStatusEnum;
 use EscolaLms\Consultations\Enum\ConsultationTermStatusEnum;
 use EscolaLms\Consultations\Events\ReminderAboutTerm;
+use EscolaLms\Consultations\Events\ReminderTrainerAboutTerm;
 use EscolaLms\Consultations\Jobs\ReminderAboutConsultationJob;
 use EscolaLms\Consultations\Models\Consultation;
 use EscolaLms\Consultations\Models\ConsultationProposedTerm;
@@ -58,6 +59,7 @@ class ConsultationScheduleTest extends TestCase
         $job = new ReminderAboutConsultationJob(ConsultationTermReminderStatusEnum::REMINDED_HOUR_BEFORE);
         $job->handle();
         Event::assertNotDispatched(ReminderAboutTerm::class);
+        Event::assertNotDispatched(ReminderTrainerAboutTerm::class);
         $this->consultationUserPivot->refresh();
         $this->assertTrue(
             $this->consultationUserPivot->reminder_status === null
@@ -135,6 +137,7 @@ class ConsultationScheduleTest extends TestCase
         $job->handle();
         $this->consultationUserPivot->refresh();
         Event::assertNotDispatched(ReminderAboutTerm::class);
+        Event::assertNotDispatched(ReminderTrainerAboutTerm::class);
         $this->assertTrue(
             $this->consultationUserPivot->reminder_status === ConsultationTermReminderStatusEnum::REMINDED_HOUR_BEFORE
         );
