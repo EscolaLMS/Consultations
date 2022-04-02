@@ -145,9 +145,6 @@ class ConsultationService implements ConsultationServiceContract
     public function setStatus(ConsultationUserPivot $consultationTerm, string $status): ConsultationUserPivot
     {
         return DB::transaction(function () use ($status, $consultationTerm) {
-            if ($consultationTerm->executed_status !== ConsultationTermStatusEnum::REPORTED) {
-                throw new NotFoundHttpException(__('Consultation term not found'));
-            }
             return $this->consultationUserRepositoryContract->updateModel($consultationTerm, ['executed_status' => $status]);
         });
     }

@@ -89,8 +89,24 @@ interface ConsultationAPISwagger
      *          response=200,
      *          description="successful operation",
      *          @OA\MediaType(
-     *              mediaType="application/json",
+     *              mediaType="application/json"
      *          ),
+     *          @OA\Schema(
+     *              type="object",
+     *              @OA\Property(
+     *                  property="success",
+     *                  type="boolean"
+     *              ),
+     *              @OA\Property(
+     *                  property="data",
+     *                  type="array",
+     *                  @OA\Items(ref="#/components/schemas/ConsultationTerm")
+     *              ),
+     *              @OA\Property(
+     *                  property="message",
+     *                  type="string"
+     *              )
+     *          )
      *      ),
      *      @OA\Response(
      *          response=404,
@@ -123,8 +139,24 @@ interface ConsultationAPISwagger
      *          response=200,
      *          description="successful operation",
      *          @OA\MediaType(
-     *              mediaType="application/json",
+     *              mediaType="application/json"
      *          ),
+     *          @OA\Schema(
+     *              type="object",
+     *              @OA\Property(
+     *                  property="success",
+     *                  type="boolean"
+     *              ),
+     *              @OA\Property(
+     *                  property="data",
+     *                  type="array",
+     *                  @OA\Items(ref="#/components/schemas/ConsultationTerm")
+     *              ),
+     *              @OA\Property(
+     *                  property="message",
+     *                  type="string"
+     *              )
+     *          )
      *      ),
      *      @OA\Response(
      *          response=404,
