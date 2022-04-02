@@ -13,7 +13,7 @@ class ConsultationTermsSeeder extends Seeder
     public function run()
     {
         $users = User::limit(5)->get();
-        Consultation::factory(5)->create()->each(function (Consultation $consultation) use($users) {
+        Consultation::factory([], 5)->create()->each(function (Consultation $consultation) use($users) {
             ConsultationUserPivot::factory([
                 'consultation_id' => $consultation->getKey(),
                 'user_id' => $users->random(1)->first()->getKey(),
