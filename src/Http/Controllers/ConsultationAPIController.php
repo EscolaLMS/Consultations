@@ -68,13 +68,21 @@ class ConsultationAPIController extends EscolaLmsBaseController implements Consu
     public function approveTerm(int $consultationTermId): JsonResponse
     {
         $this->consultationServiceContract->approveTerm($consultationTermId);
-        return $this->sendSuccess(__('Consultation term approved successfully'));
+        $consultationTerms = $this->consultationServiceContract->getConsultationTermsForTutor();
+        return $this->sendResponse(
+            ConsultationTermsResource::collection($consultationTerms),
+            __('Consultation term approved successfully')
+        );
     }
 
     public function rejectTerm(int $consultationTermId): JsonResponse
     {
         $this->consultationServiceContract->rejectTerm($consultationTermId);
-        return $this->sendSuccess(__('Consultation term reject successfully'));
+        $consultationTerms = $this->consultationServiceContract->getConsultationTermsForTutor();
+        return $this->sendResponse(
+            ConsultationTermsResource::collection($consultationTerms),
+            __('Consultation term reject successfully')
+        );
     }
 
     public function proposedTerms(int $consultationTermId): JsonResponse
@@ -82,7 +90,7 @@ class ConsultationAPIController extends EscolaLmsBaseController implements Consu
         $proposedTerms = $this->consultationServiceContract->proposedTerms($consultationTermId);
         return $this->sendResponseForResource(
             ConsultationProposedTermResource::collection($proposedTerms),
-            __('Consultations propsed terms retrieved successfully')
+            __('Consultations proposed terms retrieved successfully')
         );
     }
 
