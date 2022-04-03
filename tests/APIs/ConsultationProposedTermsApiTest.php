@@ -52,7 +52,7 @@ class ConsultationProposedTermsApiTest extends TestCase
     {
         $this->initVariable();
         $consultationProposedTerms = $this->consultation->proposedTerms->map(
-            fn (ConsultationProposedTerm $consultationTerm) => Carbon::make($consultationTerm->proposed_at)->format('Y-m-d H:i:s')
+            fn (ConsultationProposedTerm $consultationTerm) => (string)Carbon::make($consultationTerm->proposed_at)
         )->toArray();
         $this->response = $this->actingAs($this->user, 'api')->json(
             'GET',
@@ -61,7 +61,14 @@ class ConsultationProposedTermsApiTest extends TestCase
         $this->response->assertOk();
         $this->response->assertJson(fn (AssertableJson $json) => $json
             ->where('success', true)
-            ->where('data', $consultationProposedTerms)
+            ->where('data', function ($json) use ($consultationProposedTerms) {
+                foreach ($json->toArray() as $date) {
+                    if (!in_array((string)Carbon::make($date), $consultationProposedTerms)) {
+                        return false;
+                    }
+                }
+                return true;
+            })
             ->etc()
         );
     }

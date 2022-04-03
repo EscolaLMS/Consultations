@@ -46,7 +46,7 @@ class ConsultationGenerateJitsiTest extends TestCase
         $this->consultationUserPivot = ConsultationUserPivot::factory([
             'consultation_id' => $consultation->getKey(),
             'user_id' => $this->user->getKey(),
-            'executed_at' => now()->format('Y-m-d H:i:s'),
+            'executed_at' => now(),
             'executed_status' => ConsultationTermStatusEnum::APPROVED,
         ])->create();
 

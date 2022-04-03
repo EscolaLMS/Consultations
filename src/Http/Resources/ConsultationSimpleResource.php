@@ -2,6 +2,7 @@
 
 namespace EscolaLms\Consultations\Http\Resources;
 
+use Carbon\Carbon;
 use EscolaLms\Auth\Traits\ResourceExtandable;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -13,10 +14,10 @@ class ConsultationSimpleResource extends JsonResource
     {
         $fields = [
             'id' => $this->id,
-            'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at,
-            'active_from' => $this->active_from,
-            'active_to' => $this->active_to,
+            'created_at' => Carbon::make($this->created_at),
+            'updated_at' => Carbon::make($this->updated_at),
+            'active_from' => Carbon::make($this->active_from),
+            'active_to' => Carbon::make($this->active_to),
             'name' => $this->name,
             'base_price' => $this->base_price,
             'author' => $this->author ? ConsultationAuthorResource::make($this->author) : null,

@@ -39,8 +39,8 @@ class ConsultationStoreApiTest extends TestCase
         $consultationArr = $consultation->toArray();
         $this->assertTrue(!isset($consultation['image_path']));
         $proposedTerms = [
-            now()->format('Y-m-d H:i:s'),
-            now()->modify('+1 day')->format('Y-m-d H:i:s')
+            now()->format("Y-m-d\TH:i:s.000000\Z"),
+            now()->modify('+1 day')->format("Y-m-d\TH:i:s.000000\Z")
         ];
         $categories = Category::factory(2)->create()->pluck('id')->toArray();
         $requestArray = array_merge(

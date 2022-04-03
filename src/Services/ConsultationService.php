@@ -51,8 +51,8 @@ class ConsultationService implements ConsultationServiceContract
     {
         if ($onlyActive) {
             $now = now()->format('Y-m-d');
-            $search['active_to'] = $search['active_to'] ?? $now;
-            $search['active_from'] = $search['active_from'] ?? $now;
+            $search['active_to'] = isset($search['active_to']) ? Carbon::make($search['active_to'])->format('Y-m-d') : $now;
+            $search['active_from'] = isset($search['active_from']) ? Carbon::make($search['active_from'])->format('Y-m-d') : $now;
         }
         $criteria = FilterListDto::prepareFilters($search);
         return $this->consultationRepositoryContract->allQueryBuilder(
@@ -63,9 +63,9 @@ class ConsultationService implements ConsultationServiceContract
 
     public function getConsultationsListForCurrentUser(array $search = []): Builder
     {
-        $now = now()->format('Y-m-d');
-        $search['active_to'] = $search['active_to'] ?? $now;
-        $search['active_from'] = $search['active_from'] ?? $now;
+        $now = now();
+        $search['active_to'] = isset($search['active_to']) ? Carbon::make($search['active_to']) : $now;
+        $search['active_from'] = isset($search['active_from']) ? Carbon::make($search['active_from']) : $now;
         $criteria = FilterListDto::prepareFilters($search);
         return $this->consultationRepositoryContract->forCurrentUser(
             $search,
@@ -117,7 +117,7 @@ class ConsultationService implements ConsultationServiceContract
             $consultationTerm = $this->consultationUserRepositoryContract->find($consultationTermId);
             $data = [
                 'executed_status' => ConsultationTermStatusEnum::REPORTED,
-                'executed_at' => $executedAt
+                'executed_at' => Carbon::make($executedAt)
             ];
             $this->consultationUserRepositoryContract->updateModel($consultationTerm, $data);
             $author = $consultationTerm->consultation->author;
@@ -152,7 +152,7 @@ class ConsultationService implements ConsultationServiceContract
     public function generateJitsi(int $consultationTermId): array
     {
         $consultationTerm = $this->consultationUserRepositoryContract->find($consultationTermId);
-        if ($this->canGenerateJitsi($consultationTerm)) {
+        if (!$this->canGenerateJitsi($consultationTerm)) {
             throw new NotFoundHttpException(__('Consultation term is not available'));
         }
 
@@ -165,9 +165,10 @@ class ConsultationService implements ConsultationServiceContract
     public function canGenerateJitsi(ConsultationUserPivot $consultationTerm): bool
     {
         $now = now();
-        return !$consultationTerm->isApproved() ||
-            $now < $consultationTerm->executed_at ||
-            $now > $this->generateDateTo($consultationTerm->executed_at, $consultationTerm->consultation->duration);
+        $dateTo = Carbon::make($consultationTerm->executed_at);
+        return $consultationTerm->isApproved() &&
+            $now->getTimestamp() >= $dateTo->getTimestamp() &&
+            !$this->isEnded($consultationTerm->executed_at, $consultationTerm->consultation->duration);
     }
 
     public function generateDateTo(string $dateTo, string $duration): ?Carbon
@@ -237,8 +238,12 @@ class ConsultationService implements ConsultationServiceContract
         ConsultationSimpleResource::extend(function (ConsultationSimpleResource $consultation) {
             return [
                 'consultation_user_id' => $consultation->cuid,
+                'name' => $consultation->name,
+                'image_path' => $consultation->image_path,
+                'image_url' => $consultation->image_url,
                 'executed_status' => $consultation->executed_status,
-                'executed_at' => $consultation->executed_at,
+                'executed_at' => Carbon::make($consultation->executed_at),
+                'is_started' => $this->isStarted($consultation->executed_at, $consultation->executed_status, $consultation->duration),
                 'is_ended' => $this->isEnded($consultation->executed_at, $consultation->duration)
             ];
         });
@@ -259,7 +264,19 @@ class ConsultationService implements ConsultationServiceContract
     {
         if ($executedAt && $duration) {
             $dateTo = $this->generateDateTo($executedAt, $duration);
-            return $dateTo->getTimestamp() >= now()->getTimestamp();
+            return $dateTo->getTimestamp() <= now()->getTimestamp();
+        }
+        return false;
+    }
+
+    public function isStarted(?string $executedAt, ?string $status, ?string $duration): bool
+    {
+        $now = now();
+        $dateAt = Carbon::make($executedAt);
+        if ($executedAt && $status) {
+            return $dateAt->getTimestamp() >= $now->getTimestamp() &&
+                $status === ConsultationTermStatusEnum::APPROVED &&
+                !$this->isEnded($executedAt, $duration);
         }
         return false;
     }
@@ -287,7 +304,7 @@ class ConsultationService implements ConsultationServiceContract
 
     public function changeTerm(int $consultationTermId, string $executedAt): bool
     {
-        if ($consultationUser = $this->consultationUserRepositoryContract->update(['executed_at' => $executedAt], $consultationTermId)) {
+        if ($consultationUser = $this->consultationUserRepositoryContract->update(['executed_at' => Carbon::make($executedAt)], $consultationTermId)) {
             event(new ChangeTerm($consultationUser->user, $consultationUser));
             return true;
         }
@@ -305,8 +322,8 @@ class ConsultationService implements ConsultationServiceContract
         $reminderDate = now()->modify(config('escolalms_consultations.modifier_date.' . $reminderStatus, '+1 hour'));
         $exclusionStatuses = config('escolalms_consultations.exclusion_reminder_status.' . $reminderStatus, []);
         $data = [
-            'date_time_to' => $reminderDate->format('Y-m-d H:i:s'),
-            'date_time_from' => $now->format('Y-m-d H:i:s'),
+            'date_time_to' => $reminderDate,
+            'date_time_from' => $now,
             'reminder_status' => $exclusionStatuses,
             'status' => [ConsultationTermStatusEnum::APPROVED]
         ];
