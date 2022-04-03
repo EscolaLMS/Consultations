@@ -63,4 +63,14 @@ class ConsultationDto extends BaseDto implements ModelDtoContract
     {
         $this->files['image_path'] = $file;
     }
+
+    protected function setActiveTo(?string $activeTo): void
+    {
+        $this->activeTo = $activeTo ? Carbon::make($activeTo) : null;
+    }
+
+    protected function setActiveFrom(?string $activeFrom): void
+    {
+        $this->activeFrom = $activeFrom ? Carbon::make($activeFrom) : null;
+    }
 }

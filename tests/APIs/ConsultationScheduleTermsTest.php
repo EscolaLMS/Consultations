@@ -65,11 +65,11 @@ class ConsultationScheduleTermsTest extends TestCase
         $consultationTerms = collect([$this->consultationUserPivot])->map(function (ConsultationUserPivot $element) {
             return [
                 'consultation_term_id' => $element->getKey(),
-                'date' => Carbon::make($element->executed_at)->format('Y-m-d H:i:s') ?? '',
+                'date' => isset($element->executed_at) ? Carbon::make($element->executed_at) : '',
                 'status' => $element->executed_status ?? '',
                 'duration' => $element->consultation->duration ?? '',
-                'author' => $element->consultation->author ?
-                    ConsultationAuthorResource::make($element->consultation->author)->toArray(request()) :
+                'user' => $element->user ?
+                    ConsultationAuthorResource::make($element->user)->toArray(request()) :
                     null
             ];
         })->toArray();
@@ -84,11 +84,11 @@ class ConsultationScheduleTermsTest extends TestCase
             fn (AssertableJson $json) =>
                 $json->each(fn (AssertableJson $json) => $json
                     ->etc()
-                    ->has('author', fn (AssertableJson $json) => $json->where('id', $this->user->getKey())->etc()))
+                )
         )->etc());
         $this->response->assertJsonFragment([
             'consultation_term_id' => $this->consultationUserPivot->getKey(),
-            'date' => Carbon::make($this->consultationUserPivot->executed_at)->format('Y-m-d H:i:s') ?? '',
+            'date' => isset($this->consultationUserPivot->executed_at) ? Carbon::make($this->consultationUserPivot->executed_at)->format("Y-m-d\TH:i:s.000000\Z") : '',
             'status' => $this->consultationUserPivot->executed_status ?? '',
         ]);
     }

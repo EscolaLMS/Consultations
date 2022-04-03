@@ -38,8 +38,8 @@ class ConsultationUpdateApiTest extends TestCase
     public function testConsultationUpdate(): void
     {
         $proposedTerms = [
-            now()->format('Y-m-d H:i:s'),
-            now()->modify('+1 day')->format('Y-m-d H:i:s')
+            now()->format("Y-m-d\TH:i:s.000000\Z"),
+            now()->modify('+1 day')->format("Y-m-d\TH:i:s.000000\Z")
         ];
         $consultationUpdate = Consultation::factory()->make();
         $consultationUpdateArray = $consultationUpdate->toArray();
