@@ -24,7 +24,7 @@ class ConsultationTermsSeeder extends Seeder
         $users = User::limit(5)->get();
         $author = $this->author ?? $users->random(1)->first()->getKey();
 
-        return Consultation::factory([
+        Consultation::factory([
             'author_id' => $author
         ], 5)->create()->each(function (Consultation $consultation) use($users) {
             $user = $this->user ?? $users->random(1)->first()->getKey();
