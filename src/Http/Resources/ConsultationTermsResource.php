@@ -3,6 +3,7 @@
 namespace EscolaLms\Consultations\Http\Resources;
 
 use EscolaLms\Auth\Traits\ResourceExtandable;
+use EscolaLms\Consultations\Services\Contracts\ConsultationServiceContract;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Carbon;
 
@@ -38,6 +39,7 @@ class ConsultationTermsResource extends JsonResource
 
     public function toArray($request)
     {
+        $consultationServiceContract = app(ConsultationServiceContract::class);
         return [
             'consultation_term_id' => $this->getKey(),
             'date' => Carbon::make($this->executed_at) ?? '',
@@ -45,7 +47,13 @@ class ConsultationTermsResource extends JsonResource
             'duration' => $this->consultation->duration ?? '',
             'user' => isset($this->user) ?
                 ConsultationAuthorResource::make($this->user) :
-                null
+                null,
+            'is_started' => $consultationServiceContract->isStarted(
+                $this->executed_at,
+                $this->executed_status,
+                $this->consultation->duration
+            ),
+            'is_ended' => $consultationServiceContract->isEnded($this->executed_at, $this->consultation->duration)
         ];
     }
 }

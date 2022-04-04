@@ -4,6 +4,7 @@ namespace EscolaLms\Consultations\Services;
 
 use Carbon\Carbon;
 use EscolaLms\Consultations\Events\ChangeTerm;
+use EscolaLms\Consultations\Events\ConsultationTerm;
 use EscolaLms\Consultations\Events\ReminderTrainerAboutTerm;
 use EscolaLms\Core\Models\User as CoreUser;
 use EscolaLms\Consultations\Events\ReminderAboutTerm;
@@ -152,7 +153,11 @@ class ConsultationService implements ConsultationServiceContract
     public function generateJitsi(int $consultationTermId): array
     {
         $consultationTerm = $this->consultationUserRepositoryContract->find($consultationTermId);
-        if (!$this->canGenerateJitsi($consultationTerm)) {
+        if (!$this->canGenerateJitsi(
+            $consultationTerm->executed_at,
+            $consultationTerm->executed_status,
+            $consultationTerm->consultation->duration
+        )) {
             throw new NotFoundHttpException(__('Consultation term is not available'));
         }
 
@@ -162,13 +167,16 @@ class ConsultationService implements ConsultationServiceContract
         );
     }
 
-    public function canGenerateJitsi(ConsultationUserPivot $consultationTerm): bool
+    public function canGenerateJitsi(?string $executedAt, ?string $status, ?string $duration): bool
     {
         $now = now();
-        $dateTo = Carbon::make($consultationTerm->executed_at);
-        return $consultationTerm->isApproved() &&
-            $now->getTimestamp() >= $dateTo->getTimestamp() &&
-            !$this->isEnded($consultationTerm->executed_at, $consultationTerm->consultation->duration);
+        if (isset($executedAt)) {
+            $dateTo = Carbon::make($executedAt);
+            return $status === ConsultationTermStatusEnum::APPROVED &&
+                $now->getTimestamp() >= $dateTo->getTimestamp() &&
+                !$this->isEnded($executedAt, $duration);
+        }
+        return false;
     }
 
     public function generateDateTo(string $dateTo, string $duration): ?Carbon
@@ -243,7 +251,11 @@ class ConsultationService implements ConsultationServiceContract
                 'image_url' => $consultation->image_url,
                 'executed_status' => $consultation->executed_status,
                 'executed_at' => Carbon::make($consultation->executed_at),
-                'is_started' => $this->isStarted($consultation->executed_at, $consultation->executed_status, $consultation->duration),
+                'is_started' => $this->isStarted(
+                    $consultation->executed_at,
+                    $consultation->executed_status,
+                    $consultation->duration
+                ),
                 'is_ended' => $this->isEnded($consultation->executed_at, $consultation->duration)
             ];
         });
@@ -271,14 +283,7 @@ class ConsultationService implements ConsultationServiceContract
 
     public function isStarted(?string $executedAt, ?string $status, ?string $duration): bool
     {
-        $now = now();
-        $dateAt = Carbon::make($executedAt);
-        if ($executedAt && $status) {
-            return $dateAt->getTimestamp() >= $now->getTimestamp() &&
-                $status === ConsultationTermStatusEnum::APPROVED &&
-                !$this->isEnded($executedAt, $duration);
-        }
-        return false;
+        return $this->canGenerateJitsi($executedAt, $status, $duration);
     }
 
     public function reminderAboutConsultation(string $reminderStatus): void

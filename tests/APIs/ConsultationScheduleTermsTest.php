@@ -3,6 +3,7 @@
 namespace EscolaLms\Consultations\Tests\APIs;
 
 use EscolaLms\Consultations\Http\Resources\ConsultationAuthorResource;
+use EscolaLms\Consultations\Services\Contracts\ConsultationServiceContract;
 use EscolaLms\Consultations\Tests\Models\User;
 use EscolaLms\Consultations\Database\Seeders\ConsultationsPermissionSeeder;
 use EscolaLms\Consultations\Enum\ConsultationTermStatusEnum;
@@ -62,7 +63,8 @@ class ConsultationScheduleTermsTest extends TestCase
         $this->initVariable();
         $this->response = $this->actingAs($this->user, 'api')->get($this->apiUrl);
         $this->response->assertOk();
-        $consultationTerms = collect([$this->consultationUserPivot])->map(function (ConsultationUserPivot $element) {
+        $consultationServiceContract = app(ConsultationServiceContract::class);
+        $consultationTerms = collect([$this->consultationUserPivot])->map(function (ConsultationUserPivot $element) use($consultationServiceContract) {
             return [
                 'consultation_term_id' => $element->getKey(),
                 'date' => isset($element->executed_at) ? Carbon::make($element->executed_at) : '',
@@ -70,7 +72,13 @@ class ConsultationScheduleTermsTest extends TestCase
                 'duration' => $element->consultation->duration ?? '',
                 'user' => $element->user ?
                     ConsultationAuthorResource::make($element->user)->toArray(request()) :
-                    null
+                    null,
+                'is_started' => $consultationServiceContract->isStarted(
+                    $element->executed_at,
+                    $element->executed_status,
+                    $element->consultation->duration
+                ),
+                'is_ended' => $consultationServiceContract->isEnded($element->executed_at, $element->consultation->duration)
             ];
         })->toArray();
         $this->response->assertJsonFragment($consultationTerms);
