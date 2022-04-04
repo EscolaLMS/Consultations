@@ -26,7 +26,7 @@ interface ConsultationServiceContract
     public function rejectTerm(int $consultationTermId): bool;
     public function setStatus(ConsultationUserPivot $consultationTerm, string $status): ConsultationUserPivot;
     public function generateJitsi(int $consultationTermId): array;
-    public function canGenerateJitsi(ConsultationUserPivot $consultationTerm): bool;
+    public function canGenerateJitsi(?string $executedAt, ?string $status, ?string $duration): bool;
     public function proposedTerms(int $consultationTermId): ?Collection;
     public function setRelations(Consultation $consultation, array $relations = []): void;
     public function setFiles(Consultation $consultation, array $files = []): void;
@@ -35,6 +35,7 @@ interface ConsultationServiceContract
     public function forCurrentUserResponse(ListConsultationsRequest $listConsultationsRequest): AnonymousResourceCollection;
     public function generateDateTo(string $dateTo, string $duration): ?Carbon;
     public function isEnded(?string $executedAt, ?string $duration): bool;
+    public function isStarted(?string $executedAt, ?string $status, ?string $duration): bool;
     public function reminderAboutConsultation(string $reminderStatus): void;
     public function setReminderStatus(ConsultationUserPivot $consultationTerm, string $status): void;
     public function changeTerm(int $consultationTermId, string $executedAt): bool;

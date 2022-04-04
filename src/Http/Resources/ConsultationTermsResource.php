@@ -48,8 +48,12 @@ class ConsultationTermsResource extends JsonResource
             'user' => isset($this->user) ?
                 ConsultationAuthorResource::make($this->user) :
                 null,
-            'is_started' => $consultationServiceContract->isStarted($this->resource),
-            'is_ended' => $consultationServiceContract->isEnded($this->executed_at, $this->duration)
+            'is_started' => $consultationServiceContract->isStarted(
+                $this->executed_at,
+                $this->executed_status,
+                $this->consultation->duration
+            ),
+            'is_ended' => $consultationServiceContract->isEnded($this->executed_at, $this->consultation->duration)
         ];
     }
 }

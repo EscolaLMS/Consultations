@@ -153,7 +153,11 @@ class ConsultationService implements ConsultationServiceContract
     public function generateJitsi(int $consultationTermId): array
     {
         $consultationTerm = $this->consultationUserRepositoryContract->find($consultationTermId);
-        if (!$this->canGenerateJitsi($consultationTerm)) {
+        if (!$this->canGenerateJitsi(
+            $consultationTerm->executed_at,
+            $consultationTerm->executed_status,
+            $consultationTerm->consultation->duration
+        )) {
             throw new NotFoundHttpException(__('Consultation term is not available'));
         }
 
@@ -163,14 +167,14 @@ class ConsultationService implements ConsultationServiceContract
         );
     }
 
-    public function canGenerateJitsi(ConsultationUserPivot $consultationTerm): bool
+    public function canGenerateJitsi(?string $executedAt, ?string $status, ?string $duration): bool
     {
         $now = now();
-        if (isset($consultationTerm->executed_at)) {
-            $dateTo = Carbon::make($consultationTerm->executed_at);
-            return $consultationTerm->isApproved() &&
+        if (isset($executedAt)) {
+            $dateTo = Carbon::make($executedAt);
+            return $status === ConsultationTermStatusEnum::APPROVED &&
                 $now->getTimestamp() >= $dateTo->getTimestamp() &&
-                !$this->isEnded($consultationTerm->executed_at, $consultationTerm->consultation->duration);
+                !$this->isEnded($executedAt, $duration);
         }
         return false;
     }
@@ -247,7 +251,11 @@ class ConsultationService implements ConsultationServiceContract
                 'image_url' => $consultation->image_url,
                 'executed_status' => $consultation->executed_status,
                 'executed_at' => Carbon::make($consultation->executed_at),
-                'is_started' => $this->isStarted($consultation->resource),
+                'is_started' => $this->isStarted(
+                    $consultation->executed_at,
+                    $consultation->executed_status,
+                    $consultation->duration
+                ),
                 'is_ended' => $this->isEnded($consultation->executed_at, $consultation->duration)
             ];
         });
@@ -273,9 +281,9 @@ class ConsultationService implements ConsultationServiceContract
         return false;
     }
 
-    public function isStarted(ConsultationUserPivot $consultationTerm): bool
+    public function isStarted(?string $executedAt, ?string $status, ?string $duration): bool
     {
-        return $this->canGenerateJitsi($consultationTerm);
+        return $this->canGenerateJitsi($executedAt, $status, $duration);
     }
 
     public function reminderAboutConsultation(string $reminderStatus): void
