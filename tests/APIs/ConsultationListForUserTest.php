@@ -56,6 +56,30 @@ class ConsultationListForUserTest extends TestCase
         $this->response->assertOk();
     }
 
+    public function testConsultationListForUserFilterConsultationTerm(): void
+    {
+        $this->initVariable();
+        $consultationTermRandom = $this->consultations->random(1)->first()->terms->random(1)->first();
+        $filterData = [
+            'consultation_term_id=' . $consultationTermRandom->getKey(),
+        ];
+        $this->response = $this->actingAs($this->user, 'api')->json('GET', $this->apiUrl. '?' . implode('&', $filterData));
+        $this->response->assertJson(fn (AssertableJson $json) => $json->has(
+            'data',
+            fn ($json) => $json->each(fn (AssertableJson $json) =>
+            $json->where('consultation_term_id', fn ($json) => in_array($json, [$consultationTermRandom->getKey()]))
+                ->where('id', fn ($json) =>
+            in_array($json, [$consultationTermRandom->consultation->getKey()])
+            )->has('author')
+                ->etc()
+            )
+                ->etc()
+        )
+            ->etc()
+        );
+        $this->response->assertOk();
+    }
+
     public function testConsultationReportTermUnauthorized(): void
     {
         $this->initVariable();

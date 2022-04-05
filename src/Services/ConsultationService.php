@@ -172,7 +172,7 @@ class ConsultationService implements ConsultationServiceContract
         $now = now();
         if (isset($executedAt)) {
             $dateTo = Carbon::make($executedAt);
-            return $status === ConsultationTermStatusEnum::APPROVED &&
+            return in_array($status, [ConsultationTermStatusEnum::APPROVED, ConsultationTermStatusEnum::REJECT]) &&
                 $now->getTimestamp() >= $dateTo->getTimestamp() &&
                 !$this->isEnded($executedAt, $duration);
         }
@@ -182,16 +182,12 @@ class ConsultationService implements ConsultationServiceContract
     public function generateDateTo(string $dateTo, string $duration): ?Carbon
     {
         $modifyTimeStrings = [
-            'seconds', 'minutes', 'hours', 'weeks', 'years'
+            'seconds', 'second', 'minutes', 'minute', 'hours', 'hour', 'weeks', 'week', 'years', 'year'
         ];
         $explode = explode(' ', $duration);
-        $count = 0;
-        $string = 'hours';
-        if (isset($explode[0]) && $explode[1]) {
-            $count = $explode[0];
-            $string = in_array($explode[1], $modifyTimeStrings) ? $explode[1] : 'hours';
-        }
-
+        $count = $explode[0] ?? 0;
+        $string = $explode[1] ?? 'hours';
+        $string = in_array($string, $modifyTimeStrings) ? $string : 'hours';
         return Carbon::make($dateTo)->modify('+' . $count . ' ' . $string);
     }
 
@@ -236,16 +232,14 @@ class ConsultationService implements ConsultationServiceContract
     public function forCurrentUserResponse(ListConsultationsRequest $listConsultationsRequest): AnonymousResourceCollection
     {
         $search = $listConsultationsRequest->except(['limit', 'skip', 'order', 'order_by']);
-        $consultations = $this->consultationRepositoryContract->getBoughtConsultationsByQuery(
-            $this->getConsultationsListForCurrentUser($search)
-        );
+        $consultations = $this->getConsultationsListForCurrentUser($search);
         $consultationsCollection = ConsultationSimpleResource::collection($consultations->paginate(
             $listConsultationsRequest->get('per_page') ??
             config('escolalms_consultations.perPage', ConstantEnum::PER_PAGE)
         ));
         ConsultationSimpleResource::extend(function (ConsultationSimpleResource $consultation) {
             return [
-                'consultation_user_id' => $consultation->cuid,
+                'consultation_term_id' => $consultation->consultation_user_id,
                 'name' => $consultation->name,
                 'image_path' => $consultation->image_path,
                 'image_url' => $consultation->image_url,
@@ -256,7 +250,8 @@ class ConsultationService implements ConsultationServiceContract
                     $consultation->executed_status,
                     $consultation->duration
                 ),
-                'is_ended' => $this->isEnded($consultation->executed_at, $consultation->duration)
+                'is_ended' => $this->isEnded($consultation->executed_at, $consultation->duration),
+                'in_coming' => $this->inComing($consultation->executed_at, $consultation->duration),
             ];
         });
         return $consultationsCollection;
@@ -284,6 +279,15 @@ class ConsultationService implements ConsultationServiceContract
     public function isStarted(?string $executedAt, ?string $status, ?string $duration): bool
     {
         return $this->canGenerateJitsi($executedAt, $status, $duration);
+    }
+
+    public function inComing(?string $executedAt, ?string $status): bool
+    {
+        if ($executedAt && $status) {
+            $executedAt = Carbon::make($executedAt);
+            return $executedAt->getTimestamp() <= now()->getTimestamp();
+        }
+        return false;
     }
 
     public function reminderAboutConsultation(string $reminderStatus): void

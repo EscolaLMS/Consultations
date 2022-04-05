@@ -10,4 +10,5 @@ interface ConsultationRepositoryContract
     public function allQueryBuilder(array $search = [], array $criteria = []): Builder;
     public function updateModel(Consultation $consultation, array $data): Consultation;
     public function getBoughtConsultationsByQuery(Builder $query): Builder;
+    public function forCurrentUser(array $search = [], array $criteria = []): Builder;
 }
