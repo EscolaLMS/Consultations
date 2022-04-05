@@ -4,6 +4,7 @@ namespace EscolaLms\Consultations\Dto;
 
 use EscolaLms\Consultations\Repositories\Criteria\CategoriesCriterion;
 use EscolaLms\Consultations\Repositories\Criteria\ConsultationSearch;
+use EscolaLms\Consultations\Repositories\Criteria\ConsultationTermEqualCriterion;
 use EscolaLms\Core\Repositories\Criteria\Primitives\DateCriterion;
 use EscolaLms\Core\Repositories\Criteria\Primitives\EqualCriterion;
 use EscolaLms\Core\Repositories\Criteria\Primitives\InCriterion;
@@ -12,6 +13,7 @@ class FilterListDto extends BaseDto
 {
     private string $name;
     private int $basePrice;
+    private int $consultationTermId;
     private array $status;
     private string $dateTo;
     private string $dateFrom;
@@ -40,13 +42,20 @@ class FilterListDto extends BaseDto
         if ($dto->getCategories()) {
             $dto->addToCriteria(new CategoriesCriterion($dto->getCategories()));
         }
-
+        if ($dto->getConsultationTermId()) {
+            $dto->addToCriteria(new ConsultationTermEqualCriterion($dto->getConsultationTermId()));
+        }
         return $dto->criteria;
     }
 
     public function getName(): ?string
     {
         return $this->name ?? null;
+    }
+
+    public function getConsultationTermId(): ?int
+    {
+        return $this->consultationTermId ?? null;
     }
 
     public function getBasePrice(): ?int
@@ -82,6 +91,11 @@ class FilterListDto extends BaseDto
     protected function setBasePrice(int $basePrice): void
     {
         $this->basePrice = $basePrice;
+    }
+
+    protected function setConsultationTermId(int $consultationTermId): void
+    {
+        $this->consultationTermId = $consultationTermId;
     }
 
     protected function setStatus(array $status): void

@@ -33,10 +33,11 @@ class ConsultationRepository extends BaseRepository implements ConsultationRepos
 
     public function forCurrentUser(array $search = [], array $criteria = []): Builder
     {
-        $q = $this->allQueryBuilder($search, $criteria);
-        $q->whereHas('users', fn ($query) =>
-            $query->where(['users.id' => auth()->user()->getKey()])
-        );
+        $q = $this->allQuery($search);
+        $this->getBoughtConsultationsByQuery($q);
+        if (!empty($criteria)) {
+            $q = $this->applyCriteria($q, $criteria);
+        }
         return $q;
     }
 
@@ -52,7 +53,7 @@ class ConsultationRepository extends BaseRepository implements ConsultationRepos
         return $query
             ->select(
                 'consultations.*',
-                'consultation_user.id as cuid',
+                'consultation_user.id as consultation_user_id',
                 'consultation_user.executed_status',
                 'consultation_user.executed_at',
             )
