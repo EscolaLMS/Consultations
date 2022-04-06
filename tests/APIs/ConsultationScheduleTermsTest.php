@@ -78,7 +78,8 @@ class ConsultationScheduleTermsTest extends TestCase
                     $element->executed_status,
                     $element->consultation->duration
                 ),
-                'is_ended' => $consultationServiceContract->isEnded($element->executed_at, $element->consultation->duration)
+                'is_ended' => $consultationServiceContract->isEnded($element->executed_at, $element->consultation->duration),
+                'in_coming' => $consultationServiceContract->inComing($element->executed_at, $element->consultation->duration),
             ];
         })->toArray();
         $this->response->assertJsonFragment($consultationTerms);

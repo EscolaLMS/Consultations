@@ -3,8 +3,8 @@
 namespace EscolaLms\Consultations\Services;
 
 use Carbon\Carbon;
+use EscolaLms\Consultations\Enum\ConsultationStatusEnum;
 use EscolaLms\Consultations\Events\ChangeTerm;
-use EscolaLms\Consultations\Events\ConsultationTerm;
 use EscolaLms\Consultations\Events\ReminderTrainerAboutTerm;
 use EscolaLms\Core\Models\User as CoreUser;
 use EscolaLms\Consultations\Events\ReminderAboutTerm;
@@ -54,6 +54,7 @@ class ConsultationService implements ConsultationServiceContract
             $now = now()->format('Y-m-d');
             $search['active_to'] = isset($search['active_to']) ? Carbon::make($search['active_to'])->format('Y-m-d') : $now;
             $search['active_from'] = isset($search['active_from']) ? Carbon::make($search['active_from'])->format('Y-m-d') : $now;
+            $search['status'] = [ConsultationStatusEnum::PUBLISHED];
         }
         $criteria = FilterListDto::prepareFilters($search);
         return $this->consultationRepositoryContract->allQueryBuilder(
@@ -285,7 +286,7 @@ class ConsultationService implements ConsultationServiceContract
     {
         if ($executedAt && $status) {
             $executedAt = Carbon::make($executedAt);
-            return $executedAt->getTimestamp() <= now()->getTimestamp();
+            return $executedAt->getTimestamp() > now()->getTimestamp();
         }
         return false;
     }
