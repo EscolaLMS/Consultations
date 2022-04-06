@@ -7,6 +7,7 @@ use EscolaLms\Consultations\Enum\ConsultationTermStatusEnum;
 use EscolaLms\Consultations\Models\Consultation;
 use EscolaLms\Consultations\Models\ConsultationUserPivot;
 use EscolaLms\Consultations\Tests\TestCase;
+use EscolaLms\Jitsi\Services\Contracts\JitsiServiceContract;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Str;
 use Illuminate\Testing\Fluent\AssertableJson;
@@ -50,6 +51,24 @@ class ConsultationGenerateJitsiTest extends TestCase
             'executed_status' => ConsultationTermStatusEnum::APPROVED,
         ])->create();
 
+        $returnData = [
+            'data' =>
+                [
+                    'domain' => 'meet-stage.escolalms.com',
+                    'roomName' => lcfirst(Str::studly($this->consultationUserPivot->consultation->name)),
+                    'configOverwrite' => [],
+                    'interfaceConfigOverwrite' => [],
+                    'userInfo' => [
+                        'displayName' => "{$this->user->first_name} {$this->user->last_name}",
+                        'email' => $this->user->email,
+                    ],
+                    'jwt' => 'test',
+                ],
+            "domain" => "meet-stage.escolalms.com",
+            "url" => "test",
+        ];
+        $jitsiService = $this->mock(JitsiServiceContract::class);
+        $jitsiService->shouldReceive('getChannelData')->once()->andReturn($returnData);
         $response = $this->actingAs($this->user, 'api')->json('GET', 'api/consultations/generate-jitsi/' . $this->consultationUserPivot->getKey());
         $response->assertOk();
         $response->assertJson(
