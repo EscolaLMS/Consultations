@@ -9,7 +9,7 @@ Route::group(['middleware' => ['auth:api'], 'prefix' => 'api/admin'], function (
     Route::post('consultations/{id}', [ConsultationController::class, 'update']);
     Route::resource('consultations', ConsultationController::class);
     Route::get('consultations/{id}/schedule', [ConsultationController::class, 'schedule']);
-    Route::post('change-term/{consultationTermId}', [ConsultationController::class, 'changeTerm']);
+    Route::post('consultations/change-term/{consultationTermId}', [ConsultationController::class, 'changeTerm']);
 });
 
 // user endpoints
