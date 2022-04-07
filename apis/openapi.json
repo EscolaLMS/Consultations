@@ -752,14 +752,25 @@
                 ]
             }
         },
-        "/api/admin/change-term": {
+        "/api/admin/consultations/change-term/{termId}": {
             "post": {
                 "tags": [
                     "Admin Consultations"
                 ],
                 "summary": "Change term in consultation ",
                 "description": "Change term consultation",
-                "operationId": "bf054a1bcc3131aeb976e10e7e08a96e",
+                "operationId": "2d9ce804b2e5d49900336c1fe5449a17",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "id of Consultation Term",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
                 "requestBody": {
                     "required": true,
                     "content": {
