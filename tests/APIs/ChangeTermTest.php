@@ -33,7 +33,7 @@ class ChangeTermTest extends TestCase
         $term = $this->consultation->terms()->first();
         $newTerm = now()->modify('+2 hours')->format('Y-m-d H:i:s');
         $this->response = $this->actingAs($this->user, 'api')->post(
-            '/api/admin/change-term/' . $term->getKey(),
+            '/api/admin/consultations/change-term/' . $term->getKey(),
             ['executed_at' => $newTerm]
         );
         $this->response->assertOk();
