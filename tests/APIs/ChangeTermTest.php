@@ -44,7 +44,7 @@ class ChangeTermTest extends TestCase
 
     public function testChangeTermUnauthorized()
     {
-        $this->response = $this->json('POST','/api/admin/change-term/1');
+        $this->response = $this->json('POST','/api/admin/consultations/change-term/1');
         $this->response->assertUnauthorized();
     }
 }
