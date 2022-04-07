@@ -365,13 +365,23 @@ interface ConsultationSwagger
 
     /**
      * @OA\Post(
-     *      path="/api/admin/change-term",
+     *      path="/api/admin/consultations/change-term/{termId}",
      *      summary="Change term in consultation ",
      *      tags={"Admin Consultations"},
      *      description="Change term consultation",
      *      security={
      *          {"passport": {}},
      *      },
+     *      @OA\Parameter(
+     *          name="termId",
+     *          description="id of Consultation Term",
+     *          required=true,
+     *          in="path",
+     *          @OA\Schema(
+     *              type="integer",
+     *          ),
+     *          name="id",
+     *      ),
      *      @OA\RequestBody(
      *          required=true,
      *          @OA\JsonContent(
