@@ -63,7 +63,7 @@ class ConsultationScheduleTermsTest extends TestCase
         $this->initVariable();
         $this->response = $this->actingAs($this->user, 'api')->get($this->apiUrl);
         $this->response->assertOk();
-        $consultationTerms = collect([$this->consultationUserPivot])->map(function (ConsultationUserPivot $element) use($consultationServiceContract) {
+        $consultationTerms = collect([$this->consultationUserPivot])->map(function (ConsultationUserPivot $element) {
             return [
                 'consultation_term_id' => $element->getKey(),
                 'date' => isset($element->executed_at) ? Carbon::make($element->executed_at) : '',
