@@ -185,7 +185,7 @@ class Consultation extends Model
     public function getImageUrlAttribute(): string
     {
         if ($this->attributes['image_path'] ?? null) {
-            return url(Storage::disk('public')->url($this->attributes['image_path']));
+            return url(Storage::url($this->attributes['image_path']));
         }
         return '';
     }
