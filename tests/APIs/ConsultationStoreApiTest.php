@@ -38,6 +38,7 @@ class ConsultationStoreApiTest extends TestCase
         $consultation = Consultation::factory()->make();
         $consultationArr = $consultation->toArray();
         $this->assertTrue(!isset($consultation['image_path']));
+        $this->assertTrue(!isset($consultation['logotype_path']));
         $proposedTerms = [
             now()->format("Y-m-d\TH:i:s.000000\Z"),
             now()->modify('+1 day')->format("Y-m-d\TH:i:s.000000\Z")
@@ -47,6 +48,7 @@ class ConsultationStoreApiTest extends TestCase
             $consultationArr,
             ['proposed_terms' => $proposedTerms],
             ['image' => UploadedFile::fake()->image('image.jpg')],
+            ['logotype' => UploadedFile::fake()->image('image.jpg')],
             ['categories' => $categories]
         );
         $response = $this->actingAs($this->user, 'api')->json(
@@ -68,6 +70,7 @@ class ConsultationStoreApiTest extends TestCase
             'data',
             fn ($json) => $json
                 ->has('image_path')
+                ->has('logotype_path')
                 ->has('categories', fn (AssertableJson $json) =>
                     $json->each(fn (AssertableJson $json) =>
                         $json->where('id', fn ($json) =>
