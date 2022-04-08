@@ -206,7 +206,10 @@ class Consultation extends Model
     public function getImageUrlAttribute(): string
     {
         if ($this->attributes['image_path'] ?? null) {
-            return url(Storage::url($this->attributes['image_path']));
+            $imagePath = Storage::url($this->attributes['image_path']);
+            return preg_match('/^(http|https):.*$/', $imagePath, $oa) ?
+                $imagePath :
+                url($imagePath);
         }
         return '';
     }
@@ -214,7 +217,10 @@ class Consultation extends Model
     public function getLogotypeUrlAttribute(): string
     {
         if ($this->attributes['logotype_path'] ?? null) {
-            return url(Storage::url($this->attributes['logotype_path']));
+            $logotype = Storage::url($this->attributes['logotype_path']);
+            return preg_match('/^(http|https):.*$/', $logotype, $oa) ?
+                $logotype :
+                url($logotype);
         }
         return '';
     }
