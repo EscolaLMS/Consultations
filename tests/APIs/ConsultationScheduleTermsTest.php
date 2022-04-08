@@ -63,7 +63,6 @@ class ConsultationScheduleTermsTest extends TestCase
         $this->initVariable();
         $this->response = $this->actingAs($this->user, 'api')->get($this->apiUrl);
         $this->response->assertOk();
-        $consultationServiceContract = app(ConsultationServiceContract::class);
         $consultationTerms = collect([$this->consultationUserPivot])->map(function (ConsultationUserPivot $element) use($consultationServiceContract) {
             return [
                 'consultation_term_id' => $element->getKey(),
@@ -73,13 +72,9 @@ class ConsultationScheduleTermsTest extends TestCase
                 'user' => $element->user ?
                     ConsultationAuthorResource::make($element->user)->toArray(request()) :
                     null,
-                'is_started' => $consultationServiceContract->isStarted(
-                    $element->executed_at,
-                    $element->executed_status,
-                    $element->consultation->duration
-                ),
-                'is_ended' => $consultationServiceContract->isEnded($element->executed_at, $element->consultation->duration),
-                'in_coming' => $consultationServiceContract->inComing($element->executed_at, $element->consultation->duration),
+                'is_started' => true,
+                'is_ended' => false,
+                'in_coming' => false,
             ];
         })->toArray();
         $this->response->assertJsonFragment($consultationTerms);

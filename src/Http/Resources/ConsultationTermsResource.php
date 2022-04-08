@@ -53,8 +53,15 @@ class ConsultationTermsResource extends JsonResource
                 $this->executed_status,
                 $this->consultation->duration
             ),
-            'is_ended' => $consultationServiceContract->isEnded($this->executed_at, $this->consultation->duration),
-            'in_coming' => $consultationServiceContract->inComing($this->executed_at, $this->duration),
+            'is_ended' => $consultationServiceContract->isEnded(
+                $this->executed_at,
+                $this->consultation->duration
+            ),
+            'in_coming' => $consultationServiceContract->inComing(
+                $this->executed_at,
+                $this->executed_status,
+                $this->duration
+            ),
         ];
     }
 }
