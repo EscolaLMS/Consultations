@@ -161,10 +161,22 @@ class ConsultationService implements ConsultationServiceContract
         )) {
             throw new NotFoundHttpException(__('Consultation term is not available'));
         }
+        $isModerator = false;
+        $configOverwrite = [];
+        if ($consultationTerm->consultation->author === auth()->user()->getKey()) {
+            $configOverwrite = [
+                "disableModeratorIndicator" => true,
+                "startScreenSharing" => false,
+                "enableEmailInStats" => false,
+            ];
+            $isModerator = true;
+        }
 
         return $this->jitsiServiceContract->getChannelData(
             auth()->user(),
-            Str::studly($consultationTerm->consultation->name)
+            Str::studly($consultationTerm->consultation->name),
+            $isModerator,
+            $configOverwrite
         );
     }
 
@@ -189,7 +201,7 @@ class ConsultationService implements ConsultationServiceContract
         $count = $explode[0] ?? 0;
         $string = $explode[1] ?? 'hours';
         $string = in_array($string, $modifyTimeStrings) ? $string : 'hours';
-        return Carbon::make($dateTo)->modify('+' . $count . ' ' . $string);
+        return Carbon::make($dateTo)->modify('+' . ((int)$count) . ' ' . $string);
     }
 
     public function setRelations(Consultation $consultation, array $relations = []): void
@@ -252,7 +264,7 @@ class ConsultationService implements ConsultationServiceContract
                     $consultation->duration
                 ),
                 'is_ended' => $this->isEnded($consultation->executed_at, $consultation->duration),
-                'in_coming' => $this->inComing($consultation->executed_at, $consultation->duration),
+                'in_coming' => $this->inComing($consultation->executed_at, $consultation->executed_status, $consultation->duration),
             ];
         });
         return $consultationsCollection;
@@ -282,13 +294,9 @@ class ConsultationService implements ConsultationServiceContract
         return $this->canGenerateJitsi($executedAt, $status, $duration);
     }
 
-    public function inComing(?string $executedAt, ?string $status): bool
+    public function inComing(?string $executedAt, ?string $status, ?string $duration): bool
     {
-        if ($executedAt && $status) {
-            $executedAt = Carbon::make($executedAt);
-            return $executedAt->getTimestamp() > now()->getTimestamp();
-        }
-        return false;
+        return !$this->isStarted($executedAt, $status, $duration) && !$this->isEnded($executedAt, $duration);
     }
 
     public function reminderAboutConsultation(string $reminderStatus): void
