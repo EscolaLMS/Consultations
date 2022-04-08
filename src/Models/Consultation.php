@@ -84,6 +84,26 @@ use EscolaLms\Core\Models\User as CoreUser;
  *          type="string",
  *      ),
  *      @OA\Property(
+ *          property="image_path",
+ *          description="image_path",
+ *          type="string",
+ *      ),
+ *      @OA\Property(
+ *          property="image_url",
+ *          description="image_url",
+ *          type="string",
+ *      ),
+ *      @OA\Property(
+ *          property="logotype_path",
+ *          description="logotype_path",
+ *          type="string",
+ *      ),
+ *      @OA\Property(
+ *          property="logotype_url",
+ *          description="logotype_url",
+ *          type="string",
+ *      ),
+ *      @OA\Property(
  *          property="executed_at",
  *          description="executed_at",
  *          type="datetime",
@@ -142,6 +162,7 @@ class Consultation extends Model
         'description',
         'short_desc',
         'image_path',
+        'logotype_path',
         'author_id',
         'active_from',
         'active_to',
@@ -186,6 +207,14 @@ class Consultation extends Model
     {
         if ($this->attributes['image_path'] ?? null) {
             return url(Storage::url($this->attributes['image_path']));
+        }
+        return '';
+    }
+
+    public function getLogotypeUrlAttribute(): string
+    {
+        if ($this->attributes['logotype_path'] ?? null) {
+            return url(Storage::url($this->attributes['logotype_path']));
         }
         return '';
     }

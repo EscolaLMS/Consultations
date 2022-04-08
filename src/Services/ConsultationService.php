@@ -163,6 +163,7 @@ class ConsultationService implements ConsultationServiceContract
         }
         $isModerator = false;
         $configOverwrite = [];
+        $configInterface = [];
         if ($consultationTerm->consultation->author === auth()->user()->getKey()) {
             $configOverwrite = [
                 "disableModeratorIndicator" => true,
@@ -171,12 +172,20 @@ class ConsultationService implements ConsultationServiceContract
             ];
             $isModerator = true;
         }
+        if ($consultationTerm->consultation->logotype) {
+            $configInterface = [
+                'DEFAULT_LOGO_URL' => $consultationTerm->consultation->logotype_url,
+                'DEFAULT_WELCOME_PAGE_LOGO_URL' => $consultationTerm->consultation->logotype_url,
+                'HIDE_INVITE_MORE_HEADER' => true
+            ];
+        }
 
         return $this->jitsiServiceContract->getChannelData(
             auth()->user(),
             Str::studly($consultationTerm->consultation->name),
             $isModerator,
-            $configOverwrite
+            $configOverwrite,
+            $configInterface
         );
     }
 

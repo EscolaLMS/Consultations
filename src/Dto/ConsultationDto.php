@@ -20,6 +20,7 @@ class ConsultationDto extends BaseDto implements ModelDtoContract
     protected ?int $basePrice;
     protected ?int $authorId;
     protected $imagePath = false;
+    protected $logotypePath = false;
 
     public function model(): Consultation
     {
@@ -36,6 +37,14 @@ class ConsultationDto extends BaseDto implements ModelDtoContract
     {
         if ($this->imagePath !== false) {
             return $this->imagePath === null ? '' : $this->imagePath;
+        }
+        return false;
+    }
+
+    public function getLogotypePath()
+    {
+        if ($this->logotypePath !== false) {
+            return $this->logotypePath === null ? '' : $this->logotypePath;
         }
         return false;
     }
@@ -62,6 +71,11 @@ class ConsultationDto extends BaseDto implements ModelDtoContract
     protected function setImage(UploadedFile $file): void
     {
         $this->files['image_path'] = $file;
+    }
+
+    protected function setLogotype(UploadedFile $logotype): void
+    {
+        $this->files['logotype_path'] = $logotype;
     }
 
     protected function setActiveTo(?string $activeTo): void
