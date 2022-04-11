@@ -16,7 +16,7 @@ class CreateConsultationCategoryTable extends Migration
         Schema::create('category_consultation', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('consultation_id');
-            $table->unsignedBigInteger('category_id');
+            $table->unsignedInteger('category_id');
             $table->timestamps();
         });
         Schema::table('category_consultation', function (Blueprint $table) {
