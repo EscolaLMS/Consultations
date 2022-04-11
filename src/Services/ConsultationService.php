@@ -174,6 +174,7 @@ class ConsultationService implements ConsultationServiceContract
         }
         if ($consultationTerm->consultation->logotype_path) {
             $configInterface = [
+                'BRAND_WATERMARK_LINK' => '',
                 'DEFAULT_LOGO_URL' => $consultationTerm->consultation->logotype_url,
                 'DEFAULT_WELCOME_PAGE_LOGO_URL' => $consultationTerm->consultation->logotype_url,
                 'HIDE_INVITE_MORE_HEADER' => true
