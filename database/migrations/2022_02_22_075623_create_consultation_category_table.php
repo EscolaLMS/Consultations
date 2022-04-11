@@ -18,7 +18,8 @@ class CreateConsultationCategoryTable extends Migration
             $table->unsignedBigInteger('consultation_id');
             $table->unsignedBigInteger('category_id');
             $table->timestamps();
-
+        });
+        Schema::table('category_consultation', function (Blueprint $table) {
             $table->foreign('consultation_id')->on('consultations')->references('id')->cascadeOnDelete();
             $table->foreign('category_id')->on('categories')->references('id')->cascadeOnDelete();
         });
