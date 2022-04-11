@@ -33,7 +33,7 @@ class ChangeTermTest extends TestCase
         $term = $this->consultation->terms()->first();
         $newTerm = now()->modify('+2 hours')->format('Y-m-d H:i:s');
         $this->response = $this->actingAs($this->user, 'api')->post(
-            '/api/admin/change-term/' . $term->getKey(),
+            '/api/admin/consultations/change-term/' . $term->getKey(),
             ['executed_at' => $newTerm]
         );
         $this->response->assertOk();
@@ -44,7 +44,7 @@ class ChangeTermTest extends TestCase
 
     public function testChangeTermUnauthorized()
     {
-        $this->response = $this->json('POST','/api/admin/change-term/1');
+        $this->response = $this->json('POST','/api/admin/consultations/change-term/1');
         $this->response->assertUnauthorized();
     }
 }
