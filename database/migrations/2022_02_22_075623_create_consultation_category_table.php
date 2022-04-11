@@ -21,9 +21,7 @@ class CreateConsultationCategoryTable extends Migration
         });
         Schema::table('category_consultation', function (Blueprint $table) {
             $table->foreign('consultation_id')->on('consultations')->references('id')->cascadeOnDelete();
-            if (Schema::hasTable('categories')) {
-                $table->foreign('category_id')->on('categories')->references('id')->cascadeOnDelete();
-            }
+            $table->foreign('category_id')->on('categories')->references('id')->cascadeOnDelete();
         });
     }
 

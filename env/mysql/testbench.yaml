@@ -8,7 +8,9 @@ env:
   - APP_DEBUG=true
 
 providers:
-  - Spatie\Permission\PermissionServiceProvider
   - Laravel\Passport\PassportServiceProvider
+  - Spatie\Permission\PermissionServiceProvider
   - EscolaLms\Core\EscolaLmsServiceProvider
   - EscolaLms\Consultations\EscolaLmsConsultationsServiceProvider
+  - EscolaLms\Settings\EscolaLmsSettingsServiceProvider
+  - EscolaLms\Categories\EscolaLmsCategoriesServiceProvider
