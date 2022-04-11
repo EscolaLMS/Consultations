@@ -2,6 +2,7 @@
 
 namespace EscolaLms\Consultations;
 
+use EscolaLms\Auth\EscolaLmsAuthServiceProvider;
 use EscolaLms\Categories\EscolaLmsCategoriesServiceProvider;
 use EscolaLms\Consultations\Enum\ConsultationTermReminderStatusEnum;
 use EscolaLms\Consultations\Jobs\ReminderAboutConsultationJob;
@@ -67,5 +68,6 @@ class EscolaLmsConsultationsServiceProvider extends ServiceProvider
         $this->app->register(EscolaLmsSettingsServiceProvider::class);
         $this->app->register(EscolaLmsCategoriesServiceProvider::class);
         $this->app->register(EventServiceProvider::class);
+        $this->app->register(EscolaLmsAuthServiceProvider::class);
     }
 }

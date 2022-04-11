@@ -14,3 +14,4 @@ providers:
   - EscolaLms\Consultations\EscolaLmsConsultationsServiceProvider
   - EscolaLms\Settings\EscolaLmsSettingsServiceProvider
   - EscolaLms\Categories\EscolaLmsCategoriesServiceProvider
+  - EscolaLms\Auth\EscolaLmsAuthServiceProvider
