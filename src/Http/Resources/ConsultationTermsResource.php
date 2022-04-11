@@ -21,10 +21,31 @@ class ConsultationTermsResource extends JsonResource
      *          property="date",
      *          description="date",
      *          type="datetime",
+     *          example="2022-04-15T04:00:00.000Z",
+     *      ),
+     *      @OA\Property(
+     *          property="duration",
+     *          description="duration",
+     *          type="string",
+     *          example="2 hours",
+     *      ),
+     *      @OA\Property(
+     *          property="user",
+     *          ref="#/components/schemas/User"
      *      ),
      *      @OA\Property(
      *          property="is_ended",
      *          description="is_ended",
+     *          type="boolean",
+     *      ),
+     *      @OA\Property(
+     *          property="is_started",
+     *          description="is_started",
+     *          type="boolean",
+     *      ),
+     *      @OA\Property(
+     *          property="in_coming",
+     *          description="in_coming",
      *          type="boolean",
      *      ),
      *      @OA\Property(

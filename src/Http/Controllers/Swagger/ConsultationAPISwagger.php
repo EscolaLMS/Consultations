@@ -405,7 +405,7 @@ interface ConsultationAPISwagger
      *              @OA\Property(
      *                  property="data",
      *                  type="array",
-     *                  @OA\Items(ref="#/components/schemas/Consultation")
+     *                  @OA\Items(ref="#/components/schemas/ConsultationTermForUserCurrent")
      *              ),
      *              @OA\Property(
      *                  property="message",

@@ -172,7 +172,7 @@ class ConsultationService implements ConsultationServiceContract
             ];
             $isModerator = true;
         }
-        if ($consultationTerm->consultation->logotype) {
+        if ($consultationTerm->consultation->logotype_path) {
             $configInterface = [
                 'DEFAULT_LOGO_URL' => $consultationTerm->consultation->logotype_url,
                 'DEFAULT_WELCOME_PAGE_LOGO_URL' => $consultationTerm->consultation->logotype_url,
@@ -273,7 +273,11 @@ class ConsultationService implements ConsultationServiceContract
                     $consultation->duration
                 ),
                 'is_ended' => $this->isEnded($consultation->executed_at, $consultation->duration),
-                'in_coming' => $this->inComing($consultation->executed_at, $consultation->executed_status, $consultation->duration),
+                'in_coming' => $this->inComing(
+                    $consultation->executed_at,
+                    $consultation->executed_status,
+                    $consultation->duration
+                ),
             ];
         });
         return $consultationsCollection;

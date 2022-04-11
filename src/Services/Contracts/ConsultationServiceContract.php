@@ -32,6 +32,59 @@ interface ConsultationServiceContract
     public function setFiles(Consultation $consultation, array $files = []): void;
     public function getConsultationTermsByConsultationId(int $consultationId, array $search = []): Collection;
     public function getConsultationsListForCurrentUser(array $search = []): Builder;
+
+    /**
+     * @OA\Schema(
+     *      schema="ConsultationTermForUserCurrent",
+     *      @OA\Property(
+     *          property="name",
+     *          description="name",
+     *          type="string",
+     *      ),
+     *      @OA\Property(
+     *          property="image_path",
+     *          description="image_path",
+     *          type="string",
+     *      ),
+     *      @OA\Property(
+     *          property="image_url",
+     *          description="image_url",
+     *          type="string",
+     *      ),
+     *      @OA\Property(
+     *          property="executed_status",
+     *          description="executed_status",
+     *          type="string",
+     *      ),
+     *      @OA\Property(
+     *          property="executed_at",
+     *          description="executed_at",
+     *          type="datetime",
+     *          example="2022-04-15T04:00:00.000Z",
+     *      ),
+     *      @OA\Property(
+     *          property="is_ended",
+     *          description="is_ended",
+     *          type="boolean",
+     *      ),
+     *      @OA\Property(
+     *          property="is_started",
+     *          description="is_started",
+     *          type="boolean",
+     *      ),
+     *      @OA\Property(
+     *          property="in_coming",
+     *          description="in_coming",
+     *          type="boolean",
+     *      ),
+     *      @OA\Property(
+     *          property="consultation_term_id",
+     *          description="consultation_term_id",
+     *          type="integer",
+     *      ),
+     * )
+     *
+     */
     public function forCurrentUserResponse(ListConsultationsRequest $listConsultationsRequest): AnonymousResourceCollection;
     public function generateDateTo(string $dateTo, string $duration): ?Carbon;
     public function isEnded(?string $executedAt, ?string $duration): bool;
