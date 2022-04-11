@@ -813,10 +813,27 @@
                     },
                     "date": {
                         "description": "date",
-                        "type": "datetime"
+                        "type": "datetime",
+                        "example": "2022-04-15T04:00:00.000Z"
+                    },
+                    "duration": {
+                        "description": "duration",
+                        "type": "string",
+                        "example": "2 hours"
+                    },
+                    "user": {
+                        "$ref": "#/components/schemas/User"
                     },
                     "is_ended": {
                         "description": "is_ended",
+                        "type": "boolean"
+                    },
+                    "is_started": {
+                        "description": "is_started",
+                        "type": "boolean"
+                    },
+                    "in_coming": {
+                        "description": "in_coming",
                         "type": "boolean"
                     },
                     "consultation_term_id": {
@@ -943,6 +960,48 @@
                             },
                             "type": "object"
                         }
+                    }
+                },
+                "type": "object"
+            },
+            "ConsultationTermForUserCurrent": {
+                "properties": {
+                    "name": {
+                        "description": "name",
+                        "type": "string"
+                    },
+                    "image_path": {
+                        "description": "image_path",
+                        "type": "string"
+                    },
+                    "image_url": {
+                        "description": "image_url",
+                        "type": "string"
+                    },
+                    "executed_status": {
+                        "description": "executed_status",
+                        "type": "string"
+                    },
+                    "executed_at": {
+                        "description": "executed_at",
+                        "type": "datetime",
+                        "example": "2022-04-15T04:00:00.000Z"
+                    },
+                    "is_ended": {
+                        "description": "is_ended",
+                        "type": "boolean"
+                    },
+                    "is_started": {
+                        "description": "is_started",
+                        "type": "boolean"
+                    },
+                    "in_coming": {
+                        "description": "in_coming",
+                        "type": "boolean"
+                    },
+                    "consultation_term_id": {
+                        "description": "consultation_term_id",
+                        "type": "integer"
                     }
                 },
                 "type": "object"
