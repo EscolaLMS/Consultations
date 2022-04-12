@@ -220,7 +220,7 @@ class Consultation extends Model
     public function getLogotypeUrlAttribute(): string
     {
         if ($this->attributes['logotype_path'] ?? null) {
-            $path = trim(trim($this->attributes['image_path'], '/'));
+            $path = trim(trim($this->attributes['logotype_path'], '/'));
             if ($path) {
                 $logotype = Storage::url(trim($this->attributes['logotype_path'], '/'));
                 return preg_match('/^(http|https):.*$/', $logotype, $oa) ?
