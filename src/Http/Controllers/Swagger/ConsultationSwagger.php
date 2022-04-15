@@ -24,7 +24,7 @@ interface ConsultationSwagger
      *          in="query",
      *          @OA\Schema(
      *              type="string",
-     *              enum={"finished_at", "started_at", "created_at", "name", "base_price"}
+     *              enum={"finished_at", "started_at", "created_at", "name", "base_price", "only_with_categories"}
      *          ),
      *      ),
      *      @OA\Parameter(
@@ -81,6 +81,15 @@ interface ConsultationSwagger
      *          in="query",
      *          @OA\Schema(
      *              type="string",
+     *          ),
+     *      ),
+     *      @OA\Parameter(
+     *          name="only_with_categories",
+     *          description="Consultation has categories",
+     *          required=false,
+     *          in="query",
+     *          @OA\Schema(
+     *              type="boolean",
      *          ),
      *      ),
      *      @OA\Response(
