@@ -26,7 +26,9 @@ class ConsultationApiTest extends TestCase
         $this->user = User::factory()->create();
         $this->user->guard_name = 'api';
         $this->user->assignRole('tutor');
-        $this->consultation = Consultation::factory()->create();
+        $this->consultation = Consultation::factory([
+            'status' => ConsultationStatusEnum::PUBLISHED
+        ])->create();
         $this->consultation->author()->associate($this->user);
         $this->categories = Category::factory(2)->create();
         $this->consultation->categories()->sync($this->categories->pluck('id')->toArray());
@@ -54,11 +56,16 @@ class ConsultationApiTest extends TestCase
             'only_with_categories=true'
         ];
         $response = $this->actingAs($this->user, 'api')->get('/api/admin/consultations?' . implode('&', $filterData));
+
         $response->assertOk();
-        $response->assertJsonMissing(['id' => $consultation->getKey()]);
+        $responseConsultationId = collect(json_decode($response->content(), true)['data'])->pluck('id')->toArray();
+
+        $this->assertTrue(!in_array($consultation->getKey(), $responseConsultationId));
         $response = $this->actingAs($this->user, 'api')->get('/api/admin/consultations');
+
         $response->assertOk();
-        $response->assertJsonFragment(['id' => $consultation->getKey()]);
+        $responseConsultationId = collect(json_decode($response->content(), true)['data'])->pluck('id')->toArray();
+        $this->assertTrue(in_array($consultation->getKey(), $responseConsultationId));
     }
 
     public function testConsultationListAPIFilterOnlyWithCategories(): void
@@ -70,11 +77,15 @@ class ConsultationApiTest extends TestCase
             'only_with_categories=true'
         ];
         $response = $this->get('/api/consultations?' . implode('&', $filterData));
+
         $response->assertOk();
-        $response->assertJsonMissing(['id' => $consultation->getKey()]);
+        $responseConsultationId = collect(json_decode($response->content(), true)['data'])->pluck('id')->toArray();
+
+        $this->assertTrue(!in_array($consultation->getKey(), $responseConsultationId));
         $response = $this->get('/api/consultations');
         $response->assertOk();
-        $response->assertJsonFragment(['id' => $consultation->getKey()]);
+        $responseConsultationId = collect(json_decode($response->content(), true)['data'])->pluck('id')->toArray();
+        $this->assertTrue(in_array($consultation->getKey(), $responseConsultationId));
     }
 
     public function testConsultationsListByDate(): void
@@ -85,6 +96,7 @@ class ConsultationApiTest extends TestCase
             'active_to' => (clone $now)->modify('+1 days')
         ])->create();
         $this->response = $this->actingAs($this->user, 'api')->get('/api/consultations');
+
         $this->response->assertOk();
         $this->response->assertJsonMissing([$cons->toArray()]);
     }
@@ -99,6 +111,7 @@ class ConsultationApiTest extends TestCase
             'categories[]=' . $categories[0]
         ];
         $this->response = $this->actingAs($this->user, 'api')->get('/api/admin/consultations?' . implode('&', $filterData));
+
         $this->response->assertOk();
         $this->response->assertJsonFragment([
             'id' => $this->consultation->getKey(),
@@ -117,6 +130,7 @@ class ConsultationApiTest extends TestCase
     public function testConsultationsListUnauthorized(): void
     {
         $this->response = $this->json('GET','/api/admin/consultations');
+
         $this->response->assertUnauthorized();
     }
 
