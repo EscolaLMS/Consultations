@@ -98,9 +98,9 @@ class FilterListDto extends BaseDto
         $this->name = $name;
     }
 
-    protected function setOnlyWithCategories(bool $onlyWithCategories): void
+    protected function setOnlyWithCategories(string $onlyWithCategories): void
     {
-        $this->onlyWithCategories = $onlyWithCategories;
+        $this->onlyWithCategories = $onlyWithCategories === 'true';
     }
 
     protected function setBasePrice(int $basePrice): void
