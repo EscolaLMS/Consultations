@@ -194,7 +194,8 @@
                                 "started_at",
                                 "created_at",
                                 "name",
-                                "base_price"
+                                "base_price",
+                                "only_with_categories"
                             ]
                         }
                     },
@@ -208,6 +209,15 @@
                                 "ASC",
                                 "DESC"
                             ]
+                        }
+                    },
+                    {
+                        "name": "only_with_categories",
+                        "in": "query",
+                        "description": "Consultation has categories",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean"
                         }
                     },
                     {
@@ -474,7 +484,8 @@
                                 "started_at",
                                 "created_at",
                                 "name",
-                                "base_price"
+                                "base_price",
+                                "only_with_categories"
                             ]
                         }
                     },
@@ -535,6 +546,15 @@
                         "required": false,
                         "schema": {
                             "type": "string"
+                        }
+                    },
+                    {
+                        "name": "only_with_categories",
+                        "in": "query",
+                        "description": "Consultation has categories",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean"
                         }
                     }
                 ],
