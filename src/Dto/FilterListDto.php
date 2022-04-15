@@ -7,6 +7,7 @@ use EscolaLms\Consultations\Repositories\Criteria\ConsultationSearch;
 use EscolaLms\Consultations\Repositories\Criteria\ConsultationTermEqualCriterion;
 use EscolaLms\Core\Repositories\Criteria\Primitives\DateCriterion;
 use EscolaLms\Core\Repositories\Criteria\Primitives\EqualCriterion;
+use EscolaLms\Core\Repositories\Criteria\Primitives\HasCriterion;
 use EscolaLms\Core\Repositories\Criteria\Primitives\InCriterion;
 
 class FilterListDto extends BaseDto
@@ -18,6 +19,7 @@ class FilterListDto extends BaseDto
     private string $dateTo;
     private string $dateFrom;
     private array $categories;
+    private bool $onlyWithCategories;
 
     private array $criteria = [];
 
@@ -44,6 +46,9 @@ class FilterListDto extends BaseDto
         }
         if ($dto->getConsultationTermId()) {
             $dto->addToCriteria(new ConsultationTermEqualCriterion($dto->getConsultationTermId()));
+        }
+        if ($dto->getOnlyWithCategories()) {
+            $dto->addToCriteria(new HasCriterion('categories', null));
         }
         return $dto->criteria;
     }
@@ -83,9 +88,19 @@ class FilterListDto extends BaseDto
         return $this->categories ?? null;
     }
 
+    public function getOnlyWithCategories(): ?bool
+    {
+        return $this->onlyWithCategories ?? null;
+    }
+
     protected function setName(string $name): void
     {
         $this->name = $name;
+    }
+
+    protected function setOnlyWithCategories(bool $onlyWithCategories): void
+    {
+        $this->onlyWithCategories = $onlyWithCategories;
     }
 
     protected function setBasePrice(int $basePrice): void
