@@ -2,6 +2,7 @@
 
 namespace EscolaLms\Consultations\Tests\APIs;
 
+use EscolaLms\Consultations\Enum\ConsultationStatusEnum;
 use EscolaLms\Consultations\Tests\Models\User;
 use EscolaLms\Categories\Models\Category;
 use EscolaLms\Consultations\Database\Seeders\ConsultationsPermissionSeeder;
@@ -44,6 +45,36 @@ class ConsultationApiTest extends TestCase
             '/api/consultations/'
         );
         $response->assertOk();
+    }
+
+    public function testConsultationListAdminFilterOnlyWithCategories(): void
+    {
+        $consultation = Consultation::factory()->create();
+        $filterData = [
+            'only_with_categories=true'
+        ];
+        $response = $this->actingAs($this->user, 'api')->get('/api/admin/consultations?' . implode('&', $filterData));
+        $response->assertOk();
+        $response->assertJsonMissing(['id' => $consultation->getKey()]);
+        $response = $this->actingAs($this->user, 'api')->get('/api/admin/consultations');
+        $response->assertOk();
+        $response->assertJsonFragment(['id' => $consultation->getKey()]);
+    }
+
+    public function testConsultationListAPIFilterOnlyWithCategories(): void
+    {
+        $consultation = Consultation::factory([
+            'status' => ConsultationStatusEnum::PUBLISHED
+        ])->create();
+        $filterData = [
+            'only_with_categories=true'
+        ];
+        $response = $this->get('/api/consultations?' . implode('&', $filterData));
+        $response->assertOk();
+        $response->assertJsonMissing(['id' => $consultation->getKey()]);
+        $response = $this->get('/api/consultations');
+        $response->assertOk();
+        $response->assertJsonFragment(['id' => $consultation->getKey()]);
     }
 
     public function testConsultationsListByDate(): void
