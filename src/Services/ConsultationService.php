@@ -157,7 +157,7 @@ class ConsultationService implements ConsultationServiceContract
         if (!$this->canGenerateJitsi(
             $consultationTerm->executed_at,
             $consultationTerm->executed_status,
-            $consultationTerm->consultation->duration
+            $consultationTerm->consultation->getDuration()
         )) {
             throw new NotFoundHttpException(__('Consultation term is not available'));
         }
@@ -271,13 +271,13 @@ class ConsultationService implements ConsultationServiceContract
                 'is_started' => $this->isStarted(
                     $consultation->executed_at,
                     $consultation->executed_status,
-                    $consultation->duration
+                    $consultation->getDuration()
                 ),
-                'is_ended' => $this->isEnded($consultation->executed_at, $consultation->duration),
+                'is_ended' => $this->isEnded($consultation->executed_at, $consultation->getDuration()),
                 'in_coming' => $this->inComing(
                     $consultation->executed_at,
                     $consultation->executed_status,
-                    $consultation->duration
+                    $consultation->getDuration()
                 ),
             ];
         });

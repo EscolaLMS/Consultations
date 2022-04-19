@@ -65,23 +65,23 @@ class ConsultationTermsResource extends JsonResource
             'consultation_term_id' => $this->getKey(),
             'date' => Carbon::make($this->executed_at) ?? '',
             'status' => $this->executed_status ?? '',
-            'duration' => $this->consultation->duration ?? '',
+            'duration' => $this->consultation->getDuration(),
             'user' => isset($this->user) ?
                 ConsultationAuthorResource::make($this->user) :
                 null,
             'is_started' => $consultationServiceContract->isStarted(
                 $this->executed_at,
                 $this->executed_status,
-                $this->consultation->duration
+                $this->consultation->getDuration()
             ),
             'is_ended' => $consultationServiceContract->isEnded(
                 $this->executed_at,
-                $this->consultation->duration
+                $this->consultation->getDuration()
             ),
             'in_coming' => $consultationServiceContract->inComing(
                 $this->executed_at,
                 $this->executed_status,
-                $this->duration
+                $this->consultation->getDuration()
             ),
         ];
     }

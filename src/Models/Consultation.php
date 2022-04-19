@@ -49,11 +49,6 @@ use EscolaLms\Core\Models\User as CoreUser;
  *          type="integer",
  *      ),
  *      @OA\Property(
- *          property="base_price",
- *          description="base_price",
- *          type="integer",
- *      ),
- *      @OA\Property(
  *          property="active_to",
  *          description="active_to",
  *          type="datetime",
@@ -155,7 +150,6 @@ class Consultation extends Model
     use HasFactory;
 
     protected $fillable = [
-        'base_price',
         'name',
         'status',
         'duration',
@@ -193,16 +187,6 @@ class Consultation extends Model
         return $this->hasMany(ConsultationUserPivot::class);
     }
 
-    public function getBuyableDescription(): string
-    {
-        return '';
-    }
-
-    public function getBuyablePrice(?array $options = null): int
-    {
-        return $this->base_price ?? 0;
-    }
-
     public function getImageUrlAttribute(): string
     {
         if ($this->attributes['image_path'] ?? null) {
@@ -235,6 +219,11 @@ class Consultation extends Model
     {
         $consultationServiceContract = app(ConsultationServiceContract::class);
         $consultationServiceContract->attachToUser($this, $user);
+    }
+
+    public function getDuration(): string
+    {
+        return $this->duration ?? '';
     }
 
     protected static function newFactory(): ConsultationFactory

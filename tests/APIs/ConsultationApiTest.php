@@ -105,7 +105,6 @@ class ConsultationApiTest extends TestCase
     {
         $categories = $this->categories->pluck('id')->toArray();
         $filterData = [
-            'base_price=' . $this->consultation->base_price,
             'name=' . $this->consultation->name,
             'status[]=' . $this->consultation->status,
             'categories[]=' . $categories[0]

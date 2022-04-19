@@ -19,7 +19,6 @@ class UpdateConsultationRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'base_price' => ['integer'],
             'name' => ['string', 'max:255', 'min:3'],
             'status' => ['string', Rule::in(ConsultationStatusEnum::getValues())],
             'description' => ['string', 'min:3'],
