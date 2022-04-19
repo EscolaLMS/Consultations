@@ -194,7 +194,6 @@
                                 "started_at",
                                 "created_at",
                                 "name",
-                                "base_price",
                                 "only_with_categories"
                             ]
                         }
@@ -250,15 +249,6 @@
                         }
                     },
                     {
-                        "name": "base_price",
-                        "in": "query",
-                        "description": "Consultation base_price >= ",
-                        "required": false,
-                        "schema": {
-                            "type": "integer"
-                        }
-                    },
-                    {
                         "name": "status",
                         "in": "query",
                         "description": "Consultation status == ",
@@ -297,8 +287,7 @@
                                 "finished_at",
                                 "started_at",
                                 "created_at",
-                                "name",
-                                "base_price"
+                                "name"
                             ]
                         }
                     },
@@ -341,15 +330,6 @@
                         "required": false,
                         "schema": {
                             "type": "string"
-                        }
-                    },
-                    {
-                        "name": "base_price",
-                        "in": "query",
-                        "description": "Consultation base_price >= ",
-                        "required": false,
-                        "schema": {
-                            "type": "integer"
                         }
                     },
                     {
@@ -484,7 +464,6 @@
                                 "started_at",
                                 "created_at",
                                 "name",
-                                "base_price",
                                 "only_with_categories"
                             ]
                         }
@@ -528,15 +507,6 @@
                         "required": false,
                         "schema": {
                             "type": "string"
-                        }
-                    },
-                    {
-                        "name": "base_price",
-                        "in": "query",
-                        "description": "Consultation base_price >= ",
-                        "required": false,
-                        "schema": {
-                            "type": "integer"
                         }
                     },
                     {
@@ -893,10 +863,6 @@
                     },
                     "author_id": {
                         "description": "author_id",
-                        "type": "integer"
-                    },
-                    "base_price": {
-                        "description": "base_price",
                         "type": "integer"
                     },
                     "active_to": {
