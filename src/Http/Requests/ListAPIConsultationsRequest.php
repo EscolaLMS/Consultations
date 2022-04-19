@@ -18,7 +18,6 @@ class ListAPIConsultationsRequest extends FormRequest
     {
         return [
             'name' => ['string'],
-            'base_price' => ['integer'],
             'status' => ['array'],
             'status.*' => ['string'],
         ];

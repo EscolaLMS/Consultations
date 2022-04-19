@@ -6,14 +6,12 @@ use EscolaLms\Consultations\Repositories\Criteria\CategoriesCriterion;
 use EscolaLms\Consultations\Repositories\Criteria\ConsultationSearch;
 use EscolaLms\Consultations\Repositories\Criteria\ConsultationTermEqualCriterion;
 use EscolaLms\Core\Repositories\Criteria\Primitives\DateCriterion;
-use EscolaLms\Core\Repositories\Criteria\Primitives\EqualCriterion;
 use EscolaLms\Core\Repositories\Criteria\Primitives\HasCriterion;
 use EscolaLms\Core\Repositories\Criteria\Primitives\InCriterion;
 
 class FilterListDto extends BaseDto
 {
     private string $name;
-    private int $basePrice;
     private int $consultationTermId;
     private array $status;
     private string $dateTo;
@@ -28,9 +26,6 @@ class FilterListDto extends BaseDto
         $dto = new self($search);
         if ($dto->getName()) {
             $dto->addToCriteria(new ConsultationSearch($dto->getName()));
-        }
-        if ($dto->getBasePrice()) {
-            $dto->addToCriteria(new EqualCriterion('consultations.base_price', $dto->getBasePrice()));
         }
         if ($dto->getStatus()) {
             $dto->addToCriteria(new InCriterion('consultations.status', $dto->getStatus()));
@@ -61,11 +56,6 @@ class FilterListDto extends BaseDto
     public function getConsultationTermId(): ?int
     {
         return $this->consultationTermId ?? null;
-    }
-
-    public function getBasePrice(): ?int
-    {
-        return $this->basePrice ?? null;
     }
 
     public function getStatus(): ?array
@@ -101,11 +91,6 @@ class FilterListDto extends BaseDto
     protected function setOnlyWithCategories(string $onlyWithCategories): void
     {
         $this->onlyWithCategories = $onlyWithCategories === 'true';
-    }
-
-    protected function setBasePrice(int $basePrice): void
-    {
-        $this->basePrice = $basePrice;
     }
 
     protected function setConsultationTermId(int $consultationTermId): void

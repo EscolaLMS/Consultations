@@ -230,7 +230,7 @@ interface ConsultationAPISwagger
      *          in="query",
      *          @OA\Schema(
      *              type="string",
-     *              enum={"finished_at", "started_at", "created_at", "name", "base_price", "only_with_categories"}
+     *              enum={"finished_at", "started_at", "created_at", "name", "only_with_categories"}
      *          ),
      *      ),
      *      @OA\Parameter(
@@ -278,15 +278,6 @@ interface ConsultationAPISwagger
      *          in="query",
      *          @OA\Schema(
      *              type="string",
-     *          ),
-     *      ),
-     *      @OA\Parameter(
-     *          name="base_price",
-     *          description="Consultation base_price >= ",
-     *          required=false,
-     *          in="query",
-     *          @OA\Schema(
-     *              type="integer",
      *          ),
      *      ),
      *      @OA\Parameter(
@@ -340,7 +331,7 @@ interface ConsultationAPISwagger
      *          in="query",
      *          @OA\Schema(
      *              type="string",
-     *              enum={"finished_at", "started_at", "created_at", "name", "base_price"}
+     *              enum={"finished_at", "started_at", "created_at", "name"}
      *          ),
      *      ),
      *      @OA\Parameter(
@@ -379,15 +370,6 @@ interface ConsultationAPISwagger
      *          in="query",
      *          @OA\Schema(
      *              type="string",
-     *          ),
-     *      ),
-     *      @OA\Parameter(
-     *          name="base_price",
-     *          description="Consultation base_price >= ",
-     *          required=false,
-     *          in="query",
-     *          @OA\Schema(
-     *              type="integer",
      *          ),
      *      ),
      *      @OA\Parameter(

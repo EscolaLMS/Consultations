@@ -19,7 +19,6 @@ class ConsultationSimpleResource extends JsonResource
             'active_from' => Carbon::make($this->active_from),
             'active_to' => Carbon::make($this->active_to),
             'name' => $this->name,
-            'base_price' => $this->base_price,
             'author' => $this->author ? ConsultationAuthorResource::make($this->author) : null,
             'status' => $this->status,
             'description' => $this->description,

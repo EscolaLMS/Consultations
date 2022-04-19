@@ -17,7 +17,6 @@ class ConsultationFactory extends Factory
         $tutor = User::role(UserRole::TUTOR)->inRandomOrder()->first();
         $now = now();
         return [
-            'base_price' => $this->faker->numberBetween(1, 200),
             'name' => $this->faker->sentence(10),
             'status' => $this->faker->randomElement(ConsultationStatusEnum::getValues()),
             'description' => $this->faker->sentence,
