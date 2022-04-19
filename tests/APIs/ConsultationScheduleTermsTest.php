@@ -68,7 +68,7 @@ class ConsultationScheduleTermsTest extends TestCase
                 'consultation_term_id' => $element->getKey(),
                 'date' => isset($element->executed_at) ? Carbon::make($element->executed_at) : '',
                 'status' => $element->executed_status ?? '',
-                'duration' => $element->consultation->duration ?? '',
+                'duration' => $element->consultation->getDuration() ?? '',
                 'user' => $element->user ?
                     ConsultationAuthorResource::make($element->user)->toArray(request()) :
                     null,
