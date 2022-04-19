@@ -221,9 +221,9 @@ class Consultation extends Model
         $consultationServiceContract->attachToUser($this, $user);
     }
 
-    public function getDuration(): ?string
+    public function getDuration(): string
     {
-        return $this->duration ?? null;
+        return $this->duration ?? '';
     }
 
     protected static function newFactory(): ConsultationFactory
