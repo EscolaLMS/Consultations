@@ -3,6 +3,8 @@
 namespace EscolaLms\Consultations\Http\Resources;
 
 use EscolaLms\Auth\Traits\ResourceExtandable;
+use EscolaLms\ModelFields\Enum\MetaFieldVisibilityEnum;
+use EscolaLms\ModelFields\Facades\ModelFields;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class ConsultationAuthorResource extends JsonResource
@@ -13,8 +15,10 @@ class ConsultationAuthorResource extends JsonResource
     {
         $fields = array_merge(
             $this->resource->toArray(),
-            ['categories' => $this->categories]
+            ['categories' => $this->categories],
+            ModelFields::getExtraAttributesValues($this->resource, MetaFieldVisibilityEnum::PUBLIC)
         );
+
         return self::apply($fields, $this);
     }
 }
