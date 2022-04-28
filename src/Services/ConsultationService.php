@@ -5,6 +5,7 @@ namespace EscolaLms\Consultations\Services;
 use Carbon\Carbon;
 use EscolaLms\Consultations\Enum\ConsultationStatusEnum;
 use EscolaLms\Consultations\Events\ChangeTerm;
+use EscolaLms\Consultations\Events\RejectTermWithTrainer;
 use EscolaLms\Consultations\Events\ReminderTrainerAboutTerm;
 use EscolaLms\Core\Models\User as CoreUser;
 use EscolaLms\Consultations\Events\ReminderAboutTerm;
@@ -14,6 +15,7 @@ use EscolaLms\Consultations\Dto\FilterListDto;
 use EscolaLms\Consultations\Enum\ConstantEnum;
 use EscolaLms\Consultations\Enum\ConsultationTermStatusEnum;
 use EscolaLms\Consultations\Events\ApprovedTerm;
+use EscolaLms\Consultations\Events\ApprovedTermWithTrainer;
 use EscolaLms\Consultations\Events\RejectTerm;
 use EscolaLms\Consultations\Events\ReportTerm;
 use EscolaLms\Consultations\Helpers\StrategyHelper;
@@ -133,6 +135,7 @@ class ConsultationService implements ConsultationServiceContract
         $consultationTerm = $this->consultationUserRepositoryContract->find($consultationTermId);
         $this->setStatus($consultationTerm, ConsultationTermStatusEnum::APPROVED);
         event(new ApprovedTerm($consultationTerm->user, $consultationTerm));
+        event(new ApprovedTermWithTrainer(auth()->user(), $consultationTerm));
         return true;
     }
 
@@ -141,6 +144,7 @@ class ConsultationService implements ConsultationServiceContract
         $consultationTerm = $this->consultationUserRepositoryContract->find($consultationTermId);
         $this->setStatus($consultationTerm, ConsultationTermStatusEnum::REJECT);
         event(new RejectTerm($consultationTerm->user, $consultationTerm));
+        event(new RejectTermWithTrainer(auth()->user(), $consultationTerm));
         return true;
     }
 

@@ -2,6 +2,8 @@
 
 namespace EscolaLms\Consultations\Tests\APIs;
 
+use EscolaLms\Consultations\Events\ApprovedTermWithTrainer;
+use EscolaLms\Consultations\Events\RejectTermWithTrainer;
 use EscolaLms\Consultations\Tests\Models\User;
 use EscolaLms\Consultations\Enum\ConsultationTermStatusEnum;
 use EscolaLms\Consultations\Events\ApprovedTerm;
@@ -70,7 +72,10 @@ class ConsultationReportTermTest extends TestCase
 
     public function testConsultationTermApproved(): void
     {
-        Event::fake([ApprovedTerm::class]);
+        Event::fake([
+            ApprovedTerm::class,
+            ApprovedTermWithTrainer::class,
+        ]);
         $this->initVariable();
         $now = now()->modify('+1 day');
         $this->response = $this->actingAs($this->user, 'api')->json('POST',
@@ -90,6 +95,10 @@ class ConsultationReportTermTest extends TestCase
             $event->getUser()->getKey() === $userId &&
             $event->getConsultationTerm()->getKey() === $this->consultationUserPivot->getKey()
         );
+        Event::assertDispatched(ApprovedTermWithTrainer::class, fn (ApprovedTermWithTrainer $event) =>
+            $event->getUser()->getKey() === $this->user->getKey() &&
+            $event->getConsultationTerm()->getKey() === $this->consultationUserPivot->getKey()
+        );
         $this->consultationUserPivot->refresh();
         $this->response->assertOk();
         $this->assertTrue($this->consultationUserPivot->executed_status === ConsultationTermStatusEnum::APPROVED);
@@ -106,7 +115,10 @@ class ConsultationReportTermTest extends TestCase
 
     public function testConsultationTermReject(): void
     {
-        Event::fake([RejectTerm::class]);
+        Event::fake([
+            RejectTerm::class,
+            RejectTermWithTrainer::class
+        ]);
         $this->initVariable();
         $now = now()->modify('+1 day');
         $this->response = $this->actingAs($this->user, 'api')->json('POST',
@@ -123,6 +135,10 @@ class ConsultationReportTermTest extends TestCase
         $userId = $this->user->getKey();
         Event::assertDispatched(RejectTerm::class, fn (RejectTerm $event) =>
             $event->getUser()->getKey() === $userId &&
+            $event->getConsultationTerm()->getKey() === $this->consultationUserPivot->getKey()
+        );
+        Event::assertDispatched(RejectTermWithTrainer::class, fn (RejectTermWithTrainer $event) =>
+            $event->getUser()->getKey() === $this->user->getKey() &&
             $event->getConsultationTerm()->getKey() === $this->consultationUserPivot->getKey()
         );
         $this->consultationUserPivot->refresh();
