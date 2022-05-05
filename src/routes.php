@@ -2,7 +2,7 @@
 
 use EscolaLms\Consultations\Http\Controllers\ConsultationAPIController;
 use EscolaLms\Consultations\Http\Controllers\ConsultationController;
-use Illuminate\Routing\Route;
+use Illuminate\Support\Facades\Route;
 
 // admin endpoints
 Route::group(['middleware' => ['auth:api'], 'prefix' => 'api/admin'], function () {
