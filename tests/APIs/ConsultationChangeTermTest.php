@@ -10,7 +10,7 @@ use EscolaLms\Core\Models\User;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\Event;
 
-class ChangeTermTest extends TestCase
+class ConsultationChangeTermTest extends TestCase
 {
     use DatabaseTransactions;
 
