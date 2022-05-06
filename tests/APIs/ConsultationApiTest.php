@@ -133,4 +133,24 @@ class ConsultationApiTest extends TestCase
         $this->response->assertUnauthorized();
     }
 
+    public function testSetTimezoneForUsers(): void
+    {
+        $this->withMiddleware();
+        $timezone = 'Europe/Warsaw';
+        dd($this->user);
+        $response = $this->actingAs($this->user, 'api')->json('GET', 'api/admin/consultations', [], [
+            'CURRENT_TIMEZONE' => $timezone
+        ]);
+        $response->assertOk();
+        $this->user->refresh();
+        $this->assertTrue($this->user->current_timezone === $timezone);
+        $timezone = 'America/New_York';
+        $response = $this->actingAs($this->user, 'api')->json('GET', 'api/admin/consultations', [], [
+            'CURRENT_TIMEZONE' => $timezone
+        ]);
+        $response->assertOk();
+        $this->user->refresh();
+        $this->assertTrue($this->user->current_timezone === $timezone);
+    }
+
 }

@@ -4,6 +4,7 @@ use EscolaLms\Consultations\Http\Controllers\ConsultationAPIController;
 use EscolaLms\Consultations\Http\Controllers\ConsultationController;
 use Illuminate\Support\Facades\Route;
 
+
 // admin endpoints
 Route::group(['middleware' => ['auth:api'], 'prefix' => 'api/admin'], function () {
     Route::post('consultations/{id}', [ConsultationController::class, 'update']);
