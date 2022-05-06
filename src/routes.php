@@ -2,11 +2,10 @@
 
 use EscolaLms\Consultations\Http\Controllers\ConsultationAPIController;
 use EscolaLms\Consultations\Http\Controllers\ConsultationController;
-use EscolaLms\Core\Http\Facades\Route;
-
+use Illuminate\Support\Facades\Route;
 
 // admin endpoints
-Route::group(['middleware' => Route::apply(['auth:api']), 'prefix' => 'api/admin'], function () {
+Route::group(['middleware' => ['auth:api'], 'prefix' => 'api/admin'], function () {
     Route::post('consultations/{id}', [ConsultationController::class, 'update']);
     Route::resource('consultations', ConsultationController::class);
     Route::get('consultations/{id}/schedule', [ConsultationController::class, 'schedule']);
@@ -14,7 +13,7 @@ Route::group(['middleware' => Route::apply(['auth:api']), 'prefix' => 'api/admin
 });
 
 // user endpoints
-Route::group(['middleware' => Route::apply(['auth:api']), 'prefix' => 'api/consultations'], function () {
+Route::group(['middleware' => ['auth:api'], 'prefix' => 'api/consultations'], function () {
     Route::get('/me', [ConsultationAPIController::class, 'forCurrentUser']);
     Route::get('/my-schedule', [ConsultationAPIController::class, 'schedule']);
     Route::post('/report-term/{consultationTermId}', [ConsultationAPIController::class, 'reportTerm']);
