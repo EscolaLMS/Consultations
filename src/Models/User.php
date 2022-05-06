@@ -2,12 +2,12 @@
 
 namespace EscolaLms\Consultations\Models;
 
-use EscolaLms\Core\Models\User as CoreUser;
+use EscolaLms\Auth\Models\User as AuthUser;
 use EscolaLms\Categories\Models\Category;
 use EscolaLms\Consultations\Models\Traits\HasConsultations;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
-class User extends CoreUser
+class User extends AuthUser
 {
     use HasConsultations;
 
