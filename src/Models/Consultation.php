@@ -223,7 +223,7 @@ class Consultation extends Model
 
     public function getDuration(): string
     {
-        return $this->duration ?? '';
+        return $this->duration ?? '0';
     }
 
     protected static function newFactory(): ConsultationFactory
