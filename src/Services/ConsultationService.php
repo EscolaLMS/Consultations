@@ -211,7 +211,7 @@ class ConsultationService implements ConsultationServiceContract
         $modifyTimeStrings = [
             'seconds', 'second', 'minutes', 'minute', 'hours', 'hour', 'weeks', 'week', 'years', 'year'
         ];
-        $explode = explode(' ', $duration);
+        $explode = array_filter(explode(' ', $duration));
         $count = $explode[0] ?? 0;
         $string = $explode[1] ?? 'hours';
         $string = in_array($string, $modifyTimeStrings) ? $string : 'hours';
