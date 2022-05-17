@@ -300,7 +300,7 @@ class ConsultationService implements ConsultationServiceContract
 
     public function isEnded(?string $executedAt, ?string $duration): bool
     {
-        if ($executedAt && $duration) {
+        if ($executedAt && $duration !== '') {
             $dateTo = $this->generateDateTo($executedAt, $duration);
             return $dateTo->getTimestamp() <= now()->getTimestamp();
         }
