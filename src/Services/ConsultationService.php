@@ -119,6 +119,9 @@ class ConsultationService implements ConsultationServiceContract
     {
         return DB::transaction(function () use ($consultationTermId, $executedAt) {
             $consultationTerm = $this->consultationUserRepositoryContract->find($consultationTermId);
+            if ($this->termIsBusy($consultationTerm->consultation_id, $executedAt)) {
+                abort(400, __('Term is busy, change your term.'));
+            }
             $data = [
                 'executed_status' => ConsultationTermStatusEnum::REPORTED,
                 'executed_at' => Carbon::make($executedAt)
@@ -350,6 +353,18 @@ class ConsultationService implements ConsultationServiceContract
     public function getConsultationTermsForTutor(): Collection
     {
         return $this->consultationUserRepositoryContract->getByCurrentUserTutor();
+    }
+
+    public function termIsBusy(int $consultationId, string $date): bool
+    {
+        return $this->consultationUserRepositoryContract->getBusyTerms($consultationId, $date)->count() > 0;
+    }
+
+    public function getBusyTermsFormatDate(int $consultationId): array
+    {
+        return $this->consultationUserRepositoryContract->getBusyTerms($consultationId)->map(
+            fn ($term) => Carbon::make($term->executed_at)
+        )->unique()->toArray();
     }
 
     private function getReminderData(string $reminderStatus): Collection

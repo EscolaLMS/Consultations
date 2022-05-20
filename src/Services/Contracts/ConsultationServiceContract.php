@@ -94,4 +94,6 @@ interface ConsultationServiceContract
     public function setReminderStatus(ConsultationUserPivot $consultationTerm, string $status): void;
     public function changeTerm(int $consultationTermId, string $executedAt): bool;
     public function getConsultationTermsForTutor(): Collection;
+    public function termIsBusy(int $consultationId, string $date): bool;
+    public function getBusyTermsFormatDate(int $consultationId): array;
 }
