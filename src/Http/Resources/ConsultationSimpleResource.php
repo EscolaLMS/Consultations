@@ -30,9 +30,7 @@ class ConsultationSimpleResource extends JsonResource
             'image_url' => $this->image_url,
             'logotype_path' => $this->logotype_path,
             'logotype_url' => $this->logotype_url,
-            'proposed_terms' => $this->proposedTerms->count() > 0 ?
-                ConsultationProposedTermResource::collection($this->proposedTerms) :
-                [],
+            'proposed_terms' => ConsultationProposedTermResource::collection($consultationServiceContract->filterProposedTerms($this->getKey(), $this->proposedTerms)),
             'busy_terms' => ConsultationTermResource::collection($consultationServiceContract->getBusyTermsFormatDate($this->getKey())),
             'categories' => $this->categories,
         ];

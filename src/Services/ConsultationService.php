@@ -7,6 +7,7 @@ use EscolaLms\Consultations\Enum\ConsultationStatusEnum;
 use EscolaLms\Consultations\Events\ChangeTerm;
 use EscolaLms\Consultations\Events\RejectTermWithTrainer;
 use EscolaLms\Consultations\Events\ReminderTrainerAboutTerm;
+use EscolaLms\Consultations\Models\ConsultationProposedTerm;
 use EscolaLms\Core\Models\User as CoreUser;
 use EscolaLms\Consultations\Events\ReminderAboutTerm;
 use EscolaLms\Consultations\Dto\ConsultationDto;
@@ -235,10 +236,10 @@ class ConsultationService implements ConsultationServiceContract
         }
     }
 
-    public function proposedTerms(int $consultationTermId): ?Collection
+    public function proposedTerms(int $consultationTermId): ?array
     {
         $consultationUserPivot = $this->consultationUserRepositoryContract->find($consultationTermId);
-        return $consultationUserPivot->consultation->proposedTerms ?? null;
+        return $this->filterProposedTerms($consultationUserPivot->consultation_id, $consultationUserPivot->consultation->proposedTerms) ?? null;
     }
 
     public function setFiles(Consultation $consultation, array $files = []): void
@@ -365,6 +366,12 @@ class ConsultationService implements ConsultationServiceContract
         return $this->consultationUserRepositoryContract->getBusyTerms($consultationId)->map(
             fn ($term) => Carbon::make($term->executed_at)
         )->unique()->toArray();
+    }
+
+    public function filterProposedTerms(int $consultationId, Collection $proposedTerms): array
+    {
+        $busyTerms = $this->getBusyTermsFormatDate($consultationId);
+        return $proposedTerms->map(fn(ConsultationProposedTerm $proposedTerm) => Carbon::make($proposedTerm->proposed_at))->filter(fn (Carbon $proposedTerm) => !in_array($proposedTerm, $busyTerms))->toArray();
     }
 
     private function getReminderData(string $reminderStatus): Collection

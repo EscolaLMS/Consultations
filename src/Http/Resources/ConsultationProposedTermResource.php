@@ -12,6 +12,6 @@ class ConsultationProposedTermResource extends JsonResource
 
     public function toArray($request)
     {
-        return is_string($this->proposed_at) ? Carbon::make($this->proposed_at) : $this->proposed_at;
+        return is_string($this->resource) ? Carbon::make($this->resource) : $this->resource;
     }
 }

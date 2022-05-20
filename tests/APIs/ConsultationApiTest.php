@@ -46,7 +46,6 @@ class ConsultationApiTest extends TestCase
             'GET',
             '/api/consultations/'
         );
-        dd($response->getData());
         $response->assertOk();
     }
 
