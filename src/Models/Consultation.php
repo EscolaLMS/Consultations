@@ -138,7 +138,19 @@ use EscolaLms\Core\Models\User as CoreUser;
  *             @OA\Property(
  *                  property="",
  *                  type="string",
- *                  example="12-12-2022 11:30",
+ *                  example="2022-05-20T10:15:20.000000Z",
+ *             ),
+ *          ),
+ *      ),
+ *      @OA\Property(
+ *          property="busy_terms",
+ *          description="busy_terms",
+ *          type="array",
+ *          @OA\Items(
+ *             @OA\Property(
+ *                  property="",
+ *                  type="string",
+ *                  example="2022-05-20T10:15:20.000000Z",
  *             ),
  *          ),
  *      ),

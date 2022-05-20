@@ -6,7 +6,7 @@ use EscolaLms\Auth\Traits\ResourceExtandable;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Carbon;
 
-class ConsultationProposedTermResource extends JsonResource
+class ConsultationTermResource extends JsonResource
 {
     use ResourceExtandable;
 

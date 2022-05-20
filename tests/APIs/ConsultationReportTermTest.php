@@ -13,6 +13,7 @@ use EscolaLms\Consultations\Models\ConsultationUserPivot;
 use EscolaLms\Consultations\Tests\TestCase;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Testing\Fluent\AssertableJson;
 
 class ConsultationReportTermTest extends TestCase
 {
@@ -55,6 +56,30 @@ class ConsultationReportTermTest extends TestCase
         $this->assertTrue($this->consultationUserPivot->executed_at === $now->format('Y-m-d H:i:s'));
         $this->assertTrue($this->consultationUserPivot->executed_status === ConsultationTermStatusEnum::REPORTED);
         $this->response->assertOk();
+    }
+
+    public function testConsultationReportTermMultipleTerm(): void
+    {
+        $this->initVariable();
+        $now = now()->modify('+1 day');
+        ConsultationUserPivot::factory([
+            'executed_at' => $now->format('Y-m-d H:i:s'),
+            'executed_status' => ConsultationTermStatusEnum::APPROVED,
+            'consultation_id' => $this->consultationUserPivot->consultation_id,
+            'user_id' => $this->user->getKey()
+        ])->create();
+        $this->response = $this->actingAs($this->user, 'api')
+            ->json('POST',
+                '/api/consultations/report-term/' . $this->consultationUserPivot->getKey(),
+                [
+                    'term' => $now->format('Y-m-d H:i:s')
+                ]
+            );
+        $this->response->assertJson(fn (AssertableJson $json) => $json->where(
+                'message', fn(string $json) => $json === __('Term is busy, change your term.')
+            )->etc()
+        );
+        $this->response->assertStatus(400);
     }
 
     public function testConsultationReportTermUnauthorized(): void

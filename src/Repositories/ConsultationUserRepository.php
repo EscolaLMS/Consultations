@@ -3,8 +3,7 @@
 namespace EscolaLms\Consultations\Repositories;
 
 use EscolaLms\Consultations\Dto\FilterConsultationTermsListDto;
-use EscolaLms\Consultations\Models\Consultation;
-use EscolaLms\Consultations\Models\ConsultationTerm;
+use EscolaLms\Consultations\Enum\ConsultationTermStatusEnum;
 use EscolaLms\Consultations\Models\ConsultationUserPivot;
 use EscolaLms\Consultations\Repositories\Contracts\ConsultationUserRepositoryContract;
 use EscolaLms\Core\Repositories\BaseRepository;
@@ -60,6 +59,22 @@ class ConsultationUserRepository extends BaseRepository implements ConsultationU
     {
         $query = $this->model->newQuery();
         $query->whereHas('consultation', fn (Builder $query) => $query->whereAuthorId(auth()->user()->getKey()));
+        return $query->get();
+    }
+
+    public function getBusyTerms(int $consultationId, ?string $date = null): Collection
+    {
+        $query = $this->model->newQuery();
+        $query->where([
+            'consultation_id' => $consultationId
+        ]);
+        $query->whereNotNull('executed_at');
+        if ($date) {
+            $query->where([
+                'executed_at' => $date
+            ]);
+        }
+        $query->whereIn('executed_status', [ConsultationTermStatusEnum::APPROVED, ConsultationTermStatusEnum::REPORTED]);
         return $query->get();
     }
 

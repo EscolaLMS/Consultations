@@ -27,7 +27,7 @@ interface ConsultationServiceContract
     public function setStatus(ConsultationUserPivot $consultationTerm, string $status): ConsultationUserPivot;
     public function generateJitsi(int $consultationTermId): array;
     public function canGenerateJitsi(?string $executedAt, ?string $status, ?string $duration): bool;
-    public function proposedTerms(int $consultationTermId): ?Collection;
+    public function proposedTerms(int $consultationTermId): ?array;
     public function setRelations(Consultation $consultation, array $relations = []): void;
     public function setFiles(Consultation $consultation, array $files = []): void;
     public function getConsultationTermsByConsultationId(int $consultationId, array $search = []): Collection;
@@ -94,4 +94,6 @@ interface ConsultationServiceContract
     public function setReminderStatus(ConsultationUserPivot $consultationTerm, string $status): void;
     public function changeTerm(int $consultationTermId, string $executedAt): bool;
     public function getConsultationTermsForTutor(): Collection;
+    public function termIsBusy(int $consultationId, string $date): bool;
+    public function getBusyTermsFormatDate(int $consultationId): array;
 }
