@@ -27,6 +27,7 @@ use EscolaLms\Consultations\Models\ConsultationUserPivot;
 use EscolaLms\Consultations\Repositories\Contracts\ConsultationRepositoryContract;
 use EscolaLms\Consultations\Repositories\Contracts\ConsultationUserRepositoryContract;
 use EscolaLms\Consultations\Services\Contracts\ConsultationServiceContract;
+use EscolaLms\Files\Helpers\FileHelper;
 use EscolaLms\Jitsi\Services\Contracts\JitsiServiceContract;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
@@ -245,7 +246,7 @@ class ConsultationService implements ConsultationServiceContract
     public function setFiles(Consultation $consultation, array $files = []): void
     {
         foreach ($files as $key => $file) {
-            $consultation->$key = $file->storePublicly("consultation/{$consultation->getKey()}/images");
+            $consultation->$key = FileHelper::getFilePath($file, ConstantEnum::DIRECTORY . "/{$consultation->getKey()}/images");
         }
     }
 
