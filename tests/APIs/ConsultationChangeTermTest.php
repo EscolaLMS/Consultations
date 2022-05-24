@@ -3,6 +3,7 @@
 namespace EscolaLms\Consultations\Tests\APIs;
 
 use EscolaLms\Consultations\Database\Seeders\ConsultationsPermissionSeeder;
+use EscolaLms\Consultations\Enum\ConsultationTermStatusEnum;
 use EscolaLms\Consultations\Events\ChangeTerm;
 use EscolaLms\Consultations\Models\Consultation;
 use EscolaLms\Consultations\Tests\TestCase;
@@ -39,6 +40,7 @@ class ConsultationChangeTermTest extends TestCase
         $this->response->assertOk();
         $term->refresh();
         $this->assertTrue($term->executed_at === $newTerm);
+        $this->assertTrue($term->executed_status === ConsultationTermStatusEnum::APPROVED);
         Event::assertDispatched(ChangeTerm::class);
     }
 
