@@ -344,7 +344,10 @@ class ConsultationService implements ConsultationServiceContract
 
     public function changeTerm(int $consultationTermId, string $executedAt): bool
     {
-        if ($consultationUser = $this->consultationUserRepositoryContract->update(['executed_at' => Carbon::make($executedAt)], $consultationTermId)) {
+        if ($consultationUser = $this->consultationUserRepositoryContract->update([
+            'executed_at' => Carbon::make($executedAt),
+            'executed_status' => ConsultationTermStatusEnum::APPROVED
+            ], $consultationTermId)) {
             event(new ChangeTerm($consultationUser->user, $consultationUser));
             return true;
         }
