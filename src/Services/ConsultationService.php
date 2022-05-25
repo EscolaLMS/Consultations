@@ -7,6 +7,7 @@ use EscolaLms\Consultations\Enum\ConsultationStatusEnum;
 use EscolaLms\Consultations\Events\ChangeTerm;
 use EscolaLms\Consultations\Events\RejectTermWithTrainer;
 use EscolaLms\Consultations\Events\ReminderTrainerAboutTerm;
+use EscolaLms\Consultations\Exceptions\ChangeTermException;
 use EscolaLms\Consultations\Models\ConsultationProposedTerm;
 use EscolaLms\Core\Models\User as CoreUser;
 use EscolaLms\Consultations\Events\ReminderAboutTerm;
@@ -344,13 +345,19 @@ class ConsultationService implements ConsultationServiceContract
 
     public function changeTerm(int $consultationTermId, string $executedAt): bool
     {
-        if ($consultationUser = $this->consultationUserRepositoryContract->update([
-            'executed_at' => Carbon::make($executedAt),
-            'executed_status' => ConsultationTermStatusEnum::APPROVED
+        DB::transaction(function () use($consultationTermId, $executedAt) {
+            if ($consultationUser = $this->consultationUserRepositoryContract->update([
+                'executed_at' => Carbon::make($executedAt),
+                'executed_status' => ConsultationTermStatusEnum::APPROVED
             ], $consultationTermId)) {
-            event(new ChangeTerm($consultationUser->user, $consultationUser));
-            return true;
-        }
+                if (!$consultationUser->user || !$consultationUser) {
+                    throw new ChangeTermException(__('Term is changed but not executed event because user or term is no exists'));
+                }
+                event(new ChangeTerm($consultationUser->user, $consultationUser));
+                return true;
+            }
+            throw new ChangeTermException(__('Term is not changed'));
+        });
         return false;
     }
 
