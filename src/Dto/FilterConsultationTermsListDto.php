@@ -4,6 +4,7 @@ namespace EscolaLms\Consultations\Dto;
 
 use EscolaLms\Consultations\Dto\Contracts\ModelDtoContract;
 use EscolaLms\Consultations\Models\ConsultationUserPivot;
+use EscolaLms\Consultations\Repositories\Criteria\UserExistsCriterion;
 use EscolaLms\Core\Repositories\Criteria\Primitives\NotNullCriterion;
 use EscolaLms\Core\Repositories\Criteria\Primitives\WhereCriterion;
 use EscolaLms\Core\Repositories\Criteria\Primitives\WhereNotInOrIsNullCriterion;
@@ -48,6 +49,7 @@ class FilterConsultationTermsListDto extends BaseDto implements ModelDtoContract
         if ($dto->getReminderStatus()) {
             $dto->addToCriteria(new WhereNotInOrIsNullCriterion($dto->model()->getTable() . '.reminder_status', $dto->getReminderStatus()));
         }
+        $dto->addToCriteria(new UserExistsCriterion());
         return $dto;
     }
 
