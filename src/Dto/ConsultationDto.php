@@ -67,12 +67,12 @@ class ConsultationDto extends BaseDto implements ModelDtoContract
         $this->relations['categories'] = $categories;
     }
 
-    protected function setImage(UploadedFile $file): void
+    protected function setImage($file): void
     {
         $this->files['image_path'] = $file;
     }
 
-    protected function setLogotype(UploadedFile $logotype): void
+    protected function setLogotype($logotype): void
     {
         $this->files['logotype_path'] = $logotype;
     }
