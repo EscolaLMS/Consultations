@@ -48,16 +48,6 @@ class EscolaLmsConsultationsServiceProvider extends ServiceProvider
         $this->publishes([
             __DIR__ . '/config.php' => config_path('config.php'),
         ], 'escolalms_consultations');
-
-        $this->app->booted(function () {
-            $schedule = $this->app->make(Schedule::class);
-            $schedule->job(
-                new ReminderAboutConsultationJob(ConsultationTermReminderStatusEnum::REMINDED_HOUR_BEFORE)
-            )->everyFiveMinutes();
-            $schedule->job(
-                new ReminderAboutConsultationJob(ConsultationTermReminderStatusEnum::REMINDED_DAY_BEFORE)
-            )->everySixHours();
-        });
     }
 
     public function register()

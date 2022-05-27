@@ -8,7 +8,6 @@ use EscolaLms\Consultations\Http\Controllers\Swagger\ConsultationSwagger;
 use EscolaLms\Consultations\Http\Requests\ChangeTermConsultationRequest;
 use EscolaLms\Consultations\Http\Requests\ListConsultationsRequest;
 use EscolaLms\Consultations\Http\Requests\ScheduleConsultationRequest;
-use EscolaLms\Consultations\Http\Requests\ShowAPIConsultationRequest;
 use EscolaLms\Consultations\Http\Requests\ShowConsultationRequest;
 use EscolaLms\Consultations\Http\Requests\StoreConsultationRequest;
 use EscolaLms\Consultations\Http\Requests\UpdateConsultationRequest;
@@ -17,7 +16,6 @@ use EscolaLms\Consultations\Http\Resources\ConsultationTermsResource;
 use EscolaLms\Consultations\Services\Contracts\ConsultationServiceContract;
 use EscolaLms\Core\Http\Controllers\EscolaLmsBaseController;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 
 class ConsultationController extends EscolaLmsBaseController implements ConsultationSwagger
 {
