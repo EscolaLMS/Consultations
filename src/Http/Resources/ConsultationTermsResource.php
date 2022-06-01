@@ -53,6 +53,18 @@ class ConsultationTermsResource extends JsonResource
      *          description="consultation_term_id",
      *          type="integer",
      *      ),
+     *      @OA\Property(
+     *          property="busy_terms",
+     *          description="busy_terms",
+     *          type="array",
+     *          @OA\Items(
+     *             @OA\Property(
+     *                  property="",
+     *                  type="string",
+     *                  example="2022-05-20T10:15:20.000000Z",
+     *             ),
+     *          ),
+     *      ),
      * )
      *
      */
@@ -83,6 +95,7 @@ class ConsultationTermsResource extends JsonResource
                 $this->executed_status,
                 $this->consultation->getDuration()
             ),
+            'busy_terms' => ConsultationTermResource::collection($consultationServiceContract->getBusyTermsFormatDate($this->consultation->getKey())),
         ];
     }
 }
