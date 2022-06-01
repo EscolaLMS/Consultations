@@ -3,6 +3,7 @@
 namespace EscolaLms\Consultations\Tests\APIs;
 
 use EscolaLms\Consultations\Http\Resources\ConsultationAuthorResource;
+use EscolaLms\Consultations\Http\Resources\ConsultationTermResource;
 use EscolaLms\Consultations\Services\Contracts\ConsultationServiceContract;
 use EscolaLms\Consultations\Tests\Models\User;
 use EscolaLms\Consultations\Database\Seeders\ConsultationsPermissionSeeder;
@@ -63,21 +64,17 @@ class ConsultationScheduleTermsTest extends TestCase
         $this->initVariable();
         $this->response = $this->actingAs($this->user, 'api')->get($this->apiUrl);
         $this->response->assertOk();
-        $consultationTerms = collect([$this->consultationUserPivot])->map(function (ConsultationUserPivot $element) {
-            return [
-                'consultation_term_id' => $element->getKey(),
-                'date' => isset($element->executed_at) ? Carbon::make($element->executed_at) : '',
-                'status' => $element->executed_status ?? '',
-                'duration' => $element->consultation->getDuration() ?? '',
-                'user' => $element->user ?
-                    ConsultationAuthorResource::make($element->user)->toArray(request()) :
-                    null,
-                'is_started' => true,
-                'is_ended' => false,
-                'in_coming' => false,
-            ];
-        })->toArray();
-        $this->response->assertJsonFragment($consultationTerms);
+        $this->response->assertJson(fn (AssertableJson $json) =>
+            $json->has('data', fn (AssertableJson $json) =>
+                $json->first(fn (AssertableJson $json) =>
+                    $json->where('consultation_term_id', fn ($json) => $json === $this->consultationUserPivot->getKey())
+                    ->where('is_started', fn ($json) => $json === true)
+                    ->where('is_ended', fn ($json) => $json === false)
+                    ->where('in_coming', fn ($json) => $json === false)
+                    ->etc()
+                )
+            )->etc()
+        );
     }
 
     public function testConsultationScheduleForTutor(): void
