@@ -878,6 +878,19 @@
                     "consultation_term_id": {
                         "description": "consultation_term_id",
                         "type": "integer"
+                    },
+                    "busy_terms": {
+                        "description": "busy_terms",
+                        "type": "array",
+                        "items": {
+                            "properties": {
+                                "": {
+                                    "type": "string",
+                                    "example": "2022-05-20T10:15:20.000000Z"
+                                }
+                            },
+                            "type": "object"
+                        }
                     }
                 },
                 "type": "object"
