@@ -4,6 +4,7 @@ namespace EscolaLms\Consultations\Http\Controllers;
 
 use EscolaLms\Consultations\Enum\ConstantEnum;
 use EscolaLms\Consultations\Http\Controllers\Swagger\ConsultationAPISwagger;
+use EscolaLms\Consultations\Http\Requests\ChangeTermConsultationRequest;
 use EscolaLms\Consultations\Http\Requests\ListAPIConsultationsRequest;
 use EscolaLms\Consultations\Http\Requests\ListConsultationsRequest;
 use EscolaLms\Consultations\Http\Requests\ReportTermConsultationRequest;
