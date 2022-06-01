@@ -365,10 +365,60 @@ interface ConsultationSwagger
 
     /**
      * @OA\Post(
-     *      path="/api/admin/consultations/change-term/{termId}",
+     *      path="/api/admin/consultations/change-term/{consultationTermId}",
      *      summary="Change term in consultation ",
      *      tags={"Admin Consultations"},
      *      description="Change term consultation",
+     *      security={
+     *          {"passport": {}},
+     *      },
+     *      @OA\Parameter(
+     *          name="termId",
+     *          description="id of Consultation Term",
+     *          required=true,
+     *          in="path",
+     *          @OA\Schema(
+     *              type="integer",
+     *          ),
+     *          name="id",
+     *      ),
+     *      @OA\RequestBody(
+     *          required=true,
+     *          @OA\JsonContent(
+     *              @OA\Property(
+     *                  property="executed_at",
+     *                  type="string",
+     *                  example="New term consultation",
+     *              ),
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=201,
+     *          description="successful operation",
+     *          @OA\MediaType(
+     *              mediaType="application/json"
+     *          ),
+     *          @OA\Schema(
+     *              type="object",
+     *              @OA\Property(
+     *                  property="success",
+     *                  type="boolean"
+     *              ),
+     *              @OA\Property(
+     *                  property="message",
+     *                  type="string"
+     *              )
+     *          )
+     *      )
+     * )
+     */
+
+    /**
+     * @OA\Post(
+     *      path="/api/consultations/change-term/{consultationTermId}",
+     *      summary="Change term in consultation with tutor",
+     *      tags={"Consultations"},
+     *      description="Change term consultation with tutor",
      *      security={
      *          {"passport": {}},
      *      },

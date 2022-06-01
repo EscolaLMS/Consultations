@@ -21,6 +21,7 @@ Route::group(['middleware' => ['auth:api'], 'prefix' => 'api/consultations'], fu
     Route::get('/approve-term/{consultationTermId}', [ConsultationAPIController::class, 'approveTerm']);
     Route::get('/reject-term/{consultationTermId}', [ConsultationAPIController::class, 'rejectTerm']);
     Route::get('/generate-jitsi/{consultationTermId}', [ConsultationAPIController::class, 'generateJitsi']);
+    Route::post('/change-term/{consultationTermId}', [ConsultationController::class, 'changeTerm']);
 });
 
 Route::group(['prefix' => 'api/consultations'], function () {
