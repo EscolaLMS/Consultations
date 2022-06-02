@@ -15,7 +15,9 @@ class AddProductColumnInConsultationUserTable extends Migration
     {
         Schema::table('consultation_user', function (Blueprint $table) {
             $table->bigInteger('product_id')->unsigned()->nullable();
-            $table->foreign('product_id')->on('products')->references('id')->nullOnDelete();
+            if (Schema::hasTable('products')) {
+                $table->foreign('product_id')->on('products')->references('id')->nullOnDelete();
+            }
         });
     }
 
