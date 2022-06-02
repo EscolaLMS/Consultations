@@ -227,7 +227,7 @@ class Consultation extends Model
         return '';
     }
 
-    public function attachToUser(array $data): void
+    public function attachToConsultationPivot(array $data): void
     {
         $consultationServiceContract = app(ConsultationServiceContract::class);
         $consultationServiceContract->attachToUser($data);
