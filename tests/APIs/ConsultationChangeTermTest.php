@@ -30,7 +30,7 @@ class ConsultationChangeTermTest extends TestCase
             'user_id' => $this->user->getKey(),
             'executed_status' => ConsultationTermStatusEnum::NOT_REPORTED
         ];
-        $this->consultation->attachToUser($data);
+        $this->consultation->attachToConsultationPivot($data);
     }
 
     public function testChangeTermWithAdmin()
