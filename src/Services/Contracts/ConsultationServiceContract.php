@@ -20,7 +20,7 @@ interface ConsultationServiceContract
     public function update(int $id, ConsultationDto $consultationDto): Consultation;
     public function show(int $id): Consultation;
     public function delete(int $id): ?bool;
-    public function attachToUser(Consultation $consultation, CoreUser $user): void;
+    public function attachToUser(array $data): void;
     public function reportTerm(int $orderItemId, string $executedAt): bool;
     public function approveTerm(int $consultationTermId): bool;
     public function rejectTerm(int $consultationTermId): bool;

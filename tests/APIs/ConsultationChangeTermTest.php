@@ -25,7 +25,12 @@ class ConsultationChangeTermTest extends TestCase
         $this->user->assignRole('tutor');
         $this->consultation = Consultation::factory()->create();
         $this->consultation->author()->associate($this->user);
-        $this->consultation->attachToUser($this->user);
+        $data = [
+            'consultation_id' => $this->consultation->getKey(),
+            'user_id' => $this->user->getKey(),
+            'executed_status' => ConsultationTermStatusEnum::NOT_REPORTED
+        ];
+        $this->consultation->attachToUser($data);
     }
 
     public function testChangeTermWithAdmin()

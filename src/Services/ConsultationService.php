@@ -293,13 +293,8 @@ class ConsultationService implements ConsultationServiceContract
         return $consultationsCollection;
     }
 
-    public function attachToUser(Consultation $consultation, CoreUser $user): void
+    public function attachToUser(array $data): void
     {
-        $data = [
-            'consultation_id' => $consultation->getKey(),
-            'user_id' => $user->getKey(),
-            'executed_status' => ConsultationTermStatusEnum::NOT_REPORTED
-        ];
         $this->consultationUserRepositoryContract->create($data);
     }
 

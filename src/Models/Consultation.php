@@ -227,10 +227,10 @@ class Consultation extends Model
         return '';
     }
 
-    public function attachToUser(CoreUser $user): void
+    public function attachToUser(array $data): void
     {
         $consultationServiceContract = app(ConsultationServiceContract::class);
-        $consultationServiceContract->attachToUser($this, $user);
+        $consultationServiceContract->attachToUser($data);
     }
 
     public function getDuration(): string
