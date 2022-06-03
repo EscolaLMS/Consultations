@@ -73,7 +73,7 @@ class ConsultationTermsResource extends JsonResource
     public function toArray($request)
     {
         $consultationServiceContract = app(ConsultationServiceContract::class);
-        return [
+        $fields = [
             'consultation_term_id' => $this->getKey(),
             'date' => Carbon::make($this->executed_at) ?? '',
             'status' => $this->executed_status ?? '',
@@ -98,5 +98,6 @@ class ConsultationTermsResource extends JsonResource
             'busy_terms' => ConsultationTermResource::collection($consultationServiceContract->getBusyTermsFormatDate($this->consultation->getKey())),
             'author' =>  $this->consultation->author ? ConsultationAuthorResource::make( $this->consultation->author) : null,
         ];
+        return self::apply($fields, $this);
     }
 }
