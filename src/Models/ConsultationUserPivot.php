@@ -19,6 +19,7 @@ class ConsultationUserPivot extends Model
         'executed_at',
         'executed_status',
         'consultation_id',
+        'product_id',
         'reminder_status',
     ];
 
