@@ -4,11 +4,13 @@ namespace EscolaLms\Consultations\Tests\APIs;
 
 use EscolaLms\Categories\Models\Category;
 use EscolaLms\Consultations\Database\Seeders\ConsultationsPermissionSeeder;
+use EscolaLms\Consultations\Enum\ConstantEnum;
 use EscolaLms\Consultations\Models\Consultation;
 use EscolaLms\Consultations\Tests\TestCase;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use EscolaLms\Consultations\Tests\Models\User;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Testing\Fluent\AssertableJson;
 
 class ConsultationUpdateApiTest extends TestCase
@@ -131,4 +133,23 @@ class ConsultationUpdateApiTest extends TestCase
         $response->assertNotFound();
     }
 
+    public function testConsultationUpdateImageAndLogotypeFromExistingFiles(): void
+    {
+        Storage::fake();
+        $directoryPath = ConstantEnum::DIRECTORY . "/{$this->consultation->getKey()}/images";
+        UploadedFile::fake()->image('image.jpg')->storeAs($directoryPath, 'image-test.jpg');
+        UploadedFile::fake()->image('logotype.jpg')->storeAs($directoryPath, 'logotype-test.jpg');
+
+        $imagePath = "{$directoryPath}/image-test.jpg";
+        $logotypePath = "{$directoryPath}/logotype-test.jpg";
+
+        $response = $this->actingAs($this->user, 'api')->postJson($this->apiUrl, [
+            'image' => $imagePath,
+            'logotype' => $logotypePath,
+        ])->assertOk();
+
+        $data = $response->getData()->data;
+        Storage::assertExists($data->image_path);
+        Storage::assertExists($data->logotype_path);
+    }
 }
