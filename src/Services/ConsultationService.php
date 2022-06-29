@@ -266,10 +266,7 @@ class ConsultationService implements ConsultationServiceContract
     {
         $search = $listConsultationsRequest->except(['limit', 'skip', 'order', 'order_by']);
         $consultations = $this->getConsultationsListForCurrentUser($search);
-        $consultationsCollection = ConsultationSimpleResource::collection($consultations->paginate(
-            $listConsultationsRequest->get('per_page') ??
-            config('escolalms_consultations.perPage', ConstantEnum::PER_PAGE)
-        ));
+        $consultationsCollection = ConsultationSimpleResource::collection($consultations->get());
         ConsultationSimpleResource::extend(function (ConsultationSimpleResource $consultation) {
             return [
                 'consultation_term_id' => $consultation->consultation_user_id,

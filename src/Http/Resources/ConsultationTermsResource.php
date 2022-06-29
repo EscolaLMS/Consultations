@@ -96,7 +96,7 @@ class ConsultationTermsResource extends JsonResource
                 $this->consultation->getDuration()
             ),
             'busy_terms' => ConsultationTermResource::collection($consultationServiceContract->getBusyTermsFormatDate($this->consultation->getKey())),
-            'author' =>  $this->consultation->author ? ConsultationAuthorResource::make( $this->consultation->author) : null,
+            'author' =>  $this->consultation->author ? ConsultationAuthorResource::make($this->consultation->author) : null,
         ];
         return self::apply($fields, $this);
     }
