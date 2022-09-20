@@ -8,6 +8,7 @@ use EscolaLms\Consultations\Events\ChangeTerm;
 use EscolaLms\Consultations\Events\RejectTermWithTrainer;
 use EscolaLms\Consultations\Events\ReminderTrainerAboutTerm;
 use EscolaLms\Consultations\Exceptions\ChangeTermException;
+use EscolaLms\Jitsi\Helpers\StringHelper;
 use EscolaLms\Consultations\Models\ConsultationProposedTerm;
 use EscolaLms\Core\Models\User as CoreUser;
 use EscolaLms\Consultations\Events\ReminderAboutTerm;
@@ -190,10 +191,9 @@ class ConsultationService implements ConsultationServiceContract
                 'HIDE_INVITE_MORE_HEADER' => true
             ];
         }
-
         return $this->jitsiServiceContract->getChannelData(
             auth()->user(),
-            Str::studly($consultationTerm->consultation->name),
+            StringHelper::convertToJitsiSlug($consultationTerm->consultation->name),
             $isModerator,
             $configOverwrite,
             $configInterface
