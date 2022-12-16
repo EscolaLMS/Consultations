@@ -314,6 +314,16 @@
                         }
                     },
                     {
+                        "name": "paginate",
+                        "in": "query",
+                        "description": "If true, list convert to paginate",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean",
+                            "default": false
+                        }
+                    },
+                    {
                         "name": "per_page",
                         "in": "query",
                         "description": "Pagination Per Page",
