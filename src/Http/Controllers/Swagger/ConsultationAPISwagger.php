@@ -354,6 +354,16 @@ interface ConsultationAPISwagger
      *          ),
      *      ),
      *      @OA\Parameter(
+     *          name="paginate",
+     *          description="If true, list convert to paginate",
+     *          required=false,
+     *          in="query",
+     *          @OA\Schema(
+     *              type="boolean",
+     *              default=false,
+     *          ),
+     *      ),
+     *      @OA\Parameter(
      *          name="per_page",
      *          description="Pagination Per Page",
      *          required=false,

@@ -262,11 +262,19 @@ class ConsultationService implements ConsultationServiceContract
         )->get();
     }
 
-    public function forCurrentUserResponse(ListConsultationsRequest $listConsultationsRequest): AnonymousResourceCollection
-    {
-        $search = $listConsultationsRequest->except(['limit', 'skip', 'order', 'order_by']);
+    public function forCurrentUserResponse(
+        ListConsultationsRequest $listConsultationsRequest
+    ): AnonymousResourceCollection {
+        $search = $listConsultationsRequest->except(['limit', 'skip', 'order', 'order_by', 'paginate']);
         $consultations = $this->getConsultationsListForCurrentUser($search);
-        $consultationsCollection = ConsultationSimpleResource::collection($consultations->get());
+        if ($listConsultationsRequest->input('paginate', false)) {
+            $consultationsCollection = ConsultationSimpleResource::collection($consultations->paginate(
+                $listConsultationsRequest->get('per_page') ??
+                config('escolalms_consultations.perPage', ConstantEnum::PER_PAGE)
+            ));
+        } else {
+            $consultationsCollection = ConsultationSimpleResource::collection($consultations->get());
+        }
         ConsultationSimpleResource::extend(function (ConsultationSimpleResource $consultation) {
             return [
                 'consultation_term_id' => $consultation->consultation_user_id,
@@ -338,7 +346,7 @@ class ConsultationService implements ConsultationServiceContract
 
     public function changeTerm(int $consultationTermId, string $executedAt): bool
     {
-        DB::transaction(function () use($consultationTermId, $executedAt) {
+        DB::transaction(function () use ($consultationTermId, $executedAt) {
             if ($consultationUser = $this->consultationUserRepositoryContract->update([
                 'executed_at' => Carbon::make($executedAt),
                 'executed_status' => ConsultationTermStatusEnum::APPROVED
