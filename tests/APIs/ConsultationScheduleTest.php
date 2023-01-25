@@ -156,4 +156,28 @@ class ConsultationScheduleTest extends TestCase
             $this->consultationUserPivot->reminder_status === ConsultationTermReminderStatusEnum::REMINDED_HOUR_BEFORE
         );
     }
+
+    public function testFailReminderAboutConsultationBeforeDayWhenLessThanDay()
+    {
+        Event::fake();
+        $this->initVariable();
+        $this->consultationUserPivot = ConsultationUserPivot::factory([
+            'consultation_id' => $this->consultation->getKey(),
+            'user_id' => $this->user->getKey(),
+            'executed_at' => now()->modify(
+                config('escolalms_consultations.modifier_date.' .
+                    ConsultationTermReminderStatusEnum::REMINDED_DAY_BEFORE, '+1 day')
+            )->subHour()->format('Y-m-d H:i:s'),
+            'executed_status' => ConsultationTermStatusEnum::APPROVED,
+        ])->create();
+        $this->assertTrue($this->consultationUserPivot->reminder_status === null);
+        $job = new ReminderAboutConsultationJob(ConsultationTermReminderStatusEnum::REMINDED_DAY_BEFORE);
+        $job->handle();
+        $this->consultationUserPivot->refresh();
+        Event::assertNotDispatched(ReminderAboutTerm::class);
+        Event::assertNotDispatched(ReminderTrainerAboutTerm::class);
+        $this->assertTrue(
+            $this->consultationUserPivot->reminder_status === null
+        );
+    }
 }
