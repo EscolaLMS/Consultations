@@ -387,12 +387,16 @@ class ConsultationService implements ConsultationServiceContract
 
     private function getReminderData(string $reminderStatus): Collection
     {
-        $now = now();
-        $reminderDate = now()->modify(config('escolalms_consultations.modifier_date.' . $reminderStatus, '+1 hour'));
+        $dateTimeFrom = now()
+            ->modify(config('escolalms_consultations.modifier_date.' . $reminderStatus, '+1 hour'))
+            ->subMinutes(30);
+        $dateTimeTo = now()
+            ->modify(config('escolalms_consultations.modifier_date.' . $reminderStatus, '+1 hour'))
+            ->addMinutes(30);
         $exclusionStatuses = config('escolalms_consultations.exclusion_reminder_status.' . $reminderStatus, []);
         $data = [
-            'date_time_to' => $reminderDate,
-            'date_time_from' => $now,
+            'date_time_to' => $dateTimeTo,
+            'date_time_from' => $dateTimeFrom,
             'reminder_status' => $exclusionStatuses,
             'status' => [ConsultationTermStatusEnum::APPROVED]
         ];
