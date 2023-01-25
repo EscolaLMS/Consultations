@@ -5,6 +5,7 @@ namespace EscolaLms\Consultations\Dto;
 use EscolaLms\Consultations\Repositories\Criteria\CategoriesCriterion;
 use EscolaLms\Consultations\Repositories\Criteria\ConsultationSearch;
 use EscolaLms\Consultations\Repositories\Criteria\ConsultationTermEqualCriterion;
+use EscolaLms\Consultations\Repositories\Criteria\Primitives\OrderCriterion;
 use EscolaLms\Core\Repositories\Criteria\Primitives\DateCriterion;
 use EscolaLms\Core\Repositories\Criteria\Primitives\HasCriterion;
 use EscolaLms\Core\Repositories\Criteria\Primitives\InCriterion;
@@ -18,6 +19,9 @@ class FilterListDto extends BaseDto
     private string $dateFrom;
     private array $categories;
     private bool $onlyWithCategories;
+
+    private string $orderBy;
+    private string $order;
 
     private array $criteria = [];
 
@@ -44,6 +48,9 @@ class FilterListDto extends BaseDto
         }
         if ($dto->getOnlyWithCategories()) {
             $dto->addToCriteria(new HasCriterion('categories', null));
+        }
+        if ($dto->getOrderBy()) {
+            $dto->addToCriteria(new OrderCriterion($dto->getOrderBy(), $dto->getOrder() ?? 'ASC'));
         }
         return $dto->criteria;
     }
@@ -116,6 +123,26 @@ class FilterListDto extends BaseDto
     protected function setCategories(array $categories): void
     {
         $this->categories = $categories;
+    }
+
+    public function getOrderBy(): ?string
+    {
+        return $this->orderBy ?? null;
+    }
+
+    public function setOrderBy(string $orderBy): void
+    {
+        $this->orderBy = $orderBy;
+    }
+
+    public function getOrder(): ?string
+    {
+        return $this->order ?? null;
+    }
+
+    public function setOrder(string $order): void
+    {
+        $this->order = $order;
     }
 
     private function addToCriteria($value): void

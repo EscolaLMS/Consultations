@@ -30,7 +30,7 @@ class ConsultationAPIController extends EscolaLmsBaseController implements Consu
 
     public function index(ListAPIConsultationsRequest $listConsultationsRequest): JsonResponse
     {
-        $search = $listConsultationsRequest->except(['limit', 'skip', 'order', 'order_by']);
+        $search = $listConsultationsRequest->except(['limit', 'skip']);
         $consultations = $this->consultationServiceContract
             ->getConsultationsList($search, true)
             ->paginate(

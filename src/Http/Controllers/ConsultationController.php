@@ -29,7 +29,7 @@ class ConsultationController extends EscolaLmsBaseController implements Consulta
 
     public function index(ListConsultationsRequest $listConsultationsRequest): JsonResponse
     {
-        $search = $listConsultationsRequest->except(['limit', 'skip', 'order', 'order_by']);
+        $search = $listConsultationsRequest->except(['limit', 'skip']);
         $consultations = $this->consultationServiceContract
             ->getConsultationsList($search)
             ->paginate(
