@@ -27,6 +27,7 @@ interface ConsultationServiceContract
     public function setStatus(ConsultationUserPivot $consultationTerm, string $status): ConsultationUserPivot;
     public function generateJitsi(int $consultationTermId): array;
     public function canGenerateJitsi(?string $executedAt, ?string $status, ?string $duration): bool;
+    public function generateJitsiUrlForEmail(int $consultationTermId, int $userId): ?string;
     public function proposedTerms(int $consultationTermId): ?array;
     public function setRelations(Consultation $consultation, array $relations = []): void;
     public function setFiles(Consultation $consultation, array $files = []): void;
