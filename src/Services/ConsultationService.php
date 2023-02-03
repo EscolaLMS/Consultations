@@ -8,6 +8,7 @@ use EscolaLms\Consultations\Events\ChangeTerm;
 use EscolaLms\Consultations\Events\RejectTermWithTrainer;
 use EscolaLms\Consultations\Events\ReminderTrainerAboutTerm;
 use EscolaLms\Consultations\Exceptions\ChangeTermException;
+use EscolaLms\Consultations\Models\User;
 use EscolaLms\Jitsi\Helpers\StringHelper;
 use EscolaLms\Consultations\Models\ConsultationProposedTerm;
 use EscolaLms\Core\Models\User as CoreUser;
@@ -210,6 +211,39 @@ class ConsultationService implements ConsultationServiceContract
                 !$this->isEnded($executedAt, $duration);
         }
         return false;
+    }
+
+    public function generateJitsiUrlForEmail(int $consultationTermId, int $userId): ?string
+    {
+        $consultationTerm = $this->consultationUserRepositoryContract->find($consultationTermId);
+        $isModerator = false;
+        $configOverwrite = [];
+        $configInterface = [];
+        if ($consultationTerm->consultation->author === $userId) {
+            $configOverwrite = [
+                "disableModeratorIndicator" => true,
+                "startScreenSharing" => false,
+                "enableEmailInStats" => false,
+            ];
+            $isModerator = true;
+        }
+        if ($consultationTerm->consultation->logotype_path) {
+            $configInterface = [
+                'BRAND_WATERMARK_LINK' => '',
+                'DEFAULT_LOGO_URL' => $consultationTerm->consultation->logotype_url,
+                'DEFAULT_WELCOME_PAGE_LOGO_URL' => $consultationTerm->consultation->logotype_url,
+                'HIDE_INVITE_MORE_HEADER' => true
+            ];
+        }
+        $user = User::find($userId);
+        $result = $this->jitsiServiceContract->getChannelData(
+            $user,
+            StringHelper::convertToJitsiSlug($consultationTerm->consultation->name),
+            $isModerator,
+            $configOverwrite,
+            $configInterface
+        );
+        return key_exists('url', $result) ? $result['url'] : null;
     }
 
     public function generateDateTo(string $dateTo, string $duration): ?Carbon
