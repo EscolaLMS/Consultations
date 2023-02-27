@@ -2,6 +2,7 @@
 
 namespace EscolaLms\Consultations\Tests\APIs;
 
+use EscolaLms\Consultations\Database\Seeders\ConsultationsPermissionSeeder;
 use EscolaLms\Consultations\Events\ApprovedTermWithTrainer;
 use EscolaLms\Consultations\Events\RejectTermWithTrainer;
 use EscolaLms\Consultations\Tests\Models\User;
@@ -25,6 +26,7 @@ class ConsultationReportTermTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+        $this->seed(ConsultationsPermissionSeeder::class);
         $this->user = User::factory()->create();
         $this->user->guard_name = 'api';
         $this->user->assignRole('tutor');
