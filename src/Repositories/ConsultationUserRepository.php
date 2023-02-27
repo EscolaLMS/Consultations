@@ -64,17 +64,17 @@ class ConsultationUserRepository extends BaseRepository implements ConsultationU
 
     public function getBusyTerms(int $consultationId, ?string $date = null): Collection
     {
-        $query = $this->model->newQuery();
-        $query->where([
-            'consultation_id' => $consultationId
-        ]);
-        $query->whereNotNull('executed_at');
+        $query = $this->model->newQuery()
+            ->where('consultation_id', $consultationId)
+            ->whereIn('executed_status', [ConsultationTermStatusEnum::APPROVED, ConsultationTermStatusEnum::REPORTED]);
+
         if ($date) {
-            $query->where([
-                'executed_at' => $date
-            ]);
+            $query->where(function (Builder $q) use ($date) {
+                $q->where('executed_at', $date)
+                    ->orWhereRelation('consultationUserProposedTerms', 'proposed_at', $date);
+            });
         }
-        $query->whereIn('executed_status', [ConsultationTermStatusEnum::APPROVED, ConsultationTermStatusEnum::REPORTED]);
+
         return $query->get();
     }
 

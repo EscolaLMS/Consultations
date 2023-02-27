@@ -7,6 +7,7 @@ use EscolaLms\Consultations\Enum\ConsultationTermStatusEnum;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class ConsultationUserPivot extends Model
 {
@@ -31,6 +32,11 @@ class ConsultationUserPivot extends Model
     public function consultation(): BelongsTo
     {
         return $this->belongsTo(Consultation::class);
+    }
+
+    public function consultationUserProposedTerms(): HasMany
+    {
+        return $this->hasMany(ConsultationUserProposedTerm::class, 'consultation_user_id');
     }
 
     public function isApproved(): bool

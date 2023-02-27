@@ -21,9 +21,9 @@ interface ConsultationServiceContract
     public function show(int $id): Consultation;
     public function delete(int $id): ?bool;
     public function attachToUser(array $data): void;
-    public function reportTerm(int $orderItemId, string $executedAt): bool;
-    public function approveTerm(int $consultationTermId): bool;
-    public function rejectTerm(int $consultationTermId): bool;
+    public function reportTerms(int $orderItemId, array $proposedDates): bool;
+    public function approveTerm(int $consultationUserProposedTermId): bool;
+    public function rejectTerm(int $consultationTermId, ?string $message): bool;
     public function setStatus(ConsultationUserPivot $consultationTerm, string $status): ConsultationUserPivot;
     public function generateJitsi(int $consultationTermId): array;
     public function canGenerateJitsi(?string $executedAt, ?string $status, ?string $duration): bool;

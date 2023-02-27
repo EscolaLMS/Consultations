@@ -4,9 +4,10 @@ namespace EscolaLms\Consultations\Http\Controllers;
 
 use EscolaLms\Consultations\Enum\ConstantEnum;
 use EscolaLms\Consultations\Http\Controllers\Swagger\ConsultationAPISwagger;
-use EscolaLms\Consultations\Http\Requests\ChangeTermConsultationRequest;
+use EscolaLms\Consultations\Http\Requests\ApproveTermConsultationRequest;
 use EscolaLms\Consultations\Http\Requests\ListAPIConsultationsRequest;
 use EscolaLms\Consultations\Http\Requests\ListConsultationsRequest;
+use EscolaLms\Consultations\Http\Requests\RejectTermConsultationRequest;
 use EscolaLms\Consultations\Http\Requests\ReportTermConsultationRequest;
 use EscolaLms\Consultations\Http\Requests\ScheduleConsultationAPIRequest;
 use EscolaLms\Consultations\Http\Requests\ShowAPIConsultationRequest;
@@ -14,7 +15,6 @@ use EscolaLms\Consultations\Http\Resources\ConsultationProposedTermResource;
 use EscolaLms\Consultations\Http\Resources\ConsultationSimpleResource;
 use EscolaLms\Consultations\Http\Resources\ConsultationTermsResource;
 use EscolaLms\Consultations\Services\Contracts\ConsultationServiceContract;
-use EscolaLms\Consultations\Tests\APIs\ConsultationShowApiTest;
 use EscolaLms\Core\Http\Controllers\EscolaLmsBaseController;
 use Illuminate\Http\JsonResponse;
 
@@ -62,13 +62,13 @@ class ConsultationAPIController extends EscolaLmsBaseController implements Consu
 
     public function reportTerm(int $consultationTermId, ReportTermConsultationRequest $request): JsonResponse
     {
-        $this->consultationServiceContract->reportTerm($consultationTermId, $request->input('term'));
+        $this->consultationServiceContract->reportTerms($consultationTermId, $request->input('proposed_dates'));
         return $this->sendSuccess(__('Consultation reserved term successfully'));
     }
 
-    public function approveTerm(int $consultationTermId): JsonResponse
+    public function approveTerm(int $consultationUserProposedTermId, ApproveTermConsultationRequest $request): JsonResponse
     {
-        $this->consultationServiceContract->approveTerm($consultationTermId);
+        $this->consultationServiceContract->approveTerm($consultationUserProposedTermId);
         $consultationTerms = $this->consultationServiceContract->getConsultationTermsForTutor();
         return $this->sendResponse(
             ConsultationTermsResource::collection($consultationTerms),
@@ -76,9 +76,9 @@ class ConsultationAPIController extends EscolaLmsBaseController implements Consu
         );
     }
 
-    public function rejectTerm(int $consultationTermId): JsonResponse
+    public function rejectTerm(int $consultationTermId, RejectTermConsultationRequest $request): JsonResponse
     {
-        $this->consultationServiceContract->rejectTerm($consultationTermId);
+        $this->consultationServiceContract->rejectTerm($consultationTermId, $request->get('message'));
         $consultationTerms = $this->consultationServiceContract->getConsultationTermsForTutor();
         return $this->sendResponse(
             ConsultationTermsResource::collection($consultationTerms),

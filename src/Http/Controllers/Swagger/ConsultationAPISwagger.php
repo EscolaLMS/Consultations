@@ -1,8 +1,10 @@
 <?php
 namespace EscolaLms\Consultations\Http\Controllers\Swagger;
 
+use EscolaLms\Consultations\Http\Requests\ApproveTermConsultationRequest;
 use EscolaLms\Consultations\Http\Requests\ListAPIConsultationsRequest;
 use EscolaLms\Consultations\Http\Requests\ListConsultationsRequest;
+use EscolaLms\Consultations\Http\Requests\RejectTermConsultationRequest;
 use EscolaLms\Consultations\Http\Requests\ReportTermConsultationRequest;
 use EscolaLms\Consultations\Http\Requests\ScheduleConsultationAPIRequest;
 use EscolaLms\Consultations\Http\Requests\ShowAPIConsultationRequest;
@@ -34,9 +36,12 @@ interface ConsultationAPISwagger
      *          required=true,
      *          @OA\JsonContent(
      *              @OA\Property(
-     *                  property="term",
-     *                  type="string",
-     *                  example="2022-10-12 10:45",
+     *                  property="proposed_dates",
+     *                  type="array",
+     *                  @OA\Items(
+     *                      type="string",
+     *                      format="date-time"
+     *                  )
      *              ),
      *          )
      *      ),
@@ -75,10 +80,10 @@ interface ConsultationAPISwagger
      *      security={
      *          {"passport": {}},
      *      },
-     *      path="/api/consultations/approve-term/{consultationTermId}",
+     *      path="/api/consultations/approve-term/{consultationUserProposedTermId}",
      *      description="Approve reported term with consultation author",
      *      @OA\Parameter(
-     *          name="consultationTermId",
+     *          name="consultationUserProposedTermId",
      *          required=true,
      *          in="path",
      *          @OA\Schema(
@@ -117,10 +122,10 @@ interface ConsultationAPISwagger
      *      )
      *   )
      */
-    public function approveTerm(int $consultationTermId): JsonResponse;
+    public function approveTerm(int $consultationUserProposedTermId, ApproveTermConsultationRequest $request): JsonResponse;
 
     /**
-     * @OA\Get(
+     * @OA\Post(
      *      tags={"Consultations"},
      *      path="/api/consultations/reject-term/{consultationTermId}",
      *      security={
@@ -167,7 +172,7 @@ interface ConsultationAPISwagger
      *      )
      *   )
      */
-    public function rejectTerm(int $consultationTermId): JsonResponse;
+    public function rejectTerm(int $consultationTermId, RejectTermConsultationRequest $request): JsonResponse;
 
     /**
      * @OA\Get(

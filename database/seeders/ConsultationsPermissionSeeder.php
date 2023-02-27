@@ -17,28 +17,11 @@ class ConsultationsPermissionSeeder extends Seeder
         $admin = Role::findOrCreate(UserRole::ADMIN, 'api');
         $tutor = Role::findOrCreate(UserRole::TUTOR, 'api');
 
-        Permission::findOrCreate(ConsultationsPermissionsEnum::CONSULTATION_LIST, 'api');
-        Permission::findOrCreate(ConsultationsPermissionsEnum::CONSULTATION_UPDATE, 'api');
-        Permission::findOrCreate(ConsultationsPermissionsEnum::CONSULTATION_DELETE, 'api');
-        Permission::findOrCreate(ConsultationsPermissionsEnum::CONSULTATION_CREATE, 'api');
-        Permission::findOrCreate(ConsultationsPermissionsEnum::CONSULTATION_READ, 'api');
-        Permission::findOrCreate(ConsultationsPermissionsEnum::CONSULTATION_CHANGE_TERM, 'api');
+        foreach (ConsultationsPermissionsEnum::getValues() as $permission) {
+            Permission::findOrCreate($permission, 'api');
+        }
 
-        $admin->givePermissionTo([
-            ConsultationsPermissionsEnum::CONSULTATION_LIST,
-            ConsultationsPermissionsEnum::CONSULTATION_UPDATE,
-            ConsultationsPermissionsEnum::CONSULTATION_DELETE,
-            ConsultationsPermissionsEnum::CONSULTATION_CREATE,
-            ConsultationsPermissionsEnum::CONSULTATION_READ,
-            ConsultationsPermissionsEnum::CONSULTATION_CHANGE_TERM,
-        ]);
-        $tutor->givePermissionTo([
-            ConsultationsPermissionsEnum::CONSULTATION_LIST,
-            ConsultationsPermissionsEnum::CONSULTATION_UPDATE,
-            ConsultationsPermissionsEnum::CONSULTATION_DELETE,
-            ConsultationsPermissionsEnum::CONSULTATION_CREATE,
-            ConsultationsPermissionsEnum::CONSULTATION_READ,
-            ConsultationsPermissionsEnum::CONSULTATION_CHANGE_TERM,
-        ]);
+        $admin->givePermissionTo(ConsultationsPermissionsEnum::getValues());
+        $tutor->givePermissionTo(ConsultationsPermissionsEnum::getValues());
     }
 }

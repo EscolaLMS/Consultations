@@ -7,11 +7,13 @@ use EscolaLms\Consultations\Enum\ConsultationStatusEnum;
 use EscolaLms\Consultations\Events\ChangeTerm;
 use EscolaLms\Consultations\Events\RejectTermWithTrainer;
 use EscolaLms\Consultations\Events\ReminderTrainerAboutTerm;
+use EscolaLms\Consultations\Events\ReportTerm;
 use EscolaLms\Consultations\Exceptions\ChangeTermException;
+use EscolaLms\Consultations\Models\ConsultationUserProposedTerm;
 use EscolaLms\Consultations\Models\User;
+use EscolaLms\Consultations\Repositories\Contracts\ConsultationUserProposedTermRepositoryContract;
 use EscolaLms\Jitsi\Helpers\StringHelper;
 use EscolaLms\Consultations\Models\ConsultationProposedTerm;
-use EscolaLms\Core\Models\User as CoreUser;
 use EscolaLms\Consultations\Events\ReminderAboutTerm;
 use EscolaLms\Consultations\Dto\ConsultationDto;
 use EscolaLms\Consultations\Dto\FilterConsultationTermsListDto;
@@ -21,7 +23,6 @@ use EscolaLms\Consultations\Enum\ConsultationTermStatusEnum;
 use EscolaLms\Consultations\Events\ApprovedTerm;
 use EscolaLms\Consultations\Events\ApprovedTermWithTrainer;
 use EscolaLms\Consultations\Events\RejectTerm;
-use EscolaLms\Consultations\Events\ReportTerm;
 use EscolaLms\Consultations\Helpers\StrategyHelper;
 use EscolaLms\Consultations\Http\Requests\ListConsultationsRequest;
 use EscolaLms\Consultations\Http\Resources\ConsultationSimpleResource;
@@ -36,22 +37,24 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class ConsultationService implements ConsultationServiceContract
 {
     private ConsultationRepositoryContract $consultationRepositoryContract;
     private ConsultationUserRepositoryContract $consultationUserRepositoryContract;
+    private ConsultationUserProposedTermRepositoryContract $consultationUserProposedTermRepository;
     private JitsiServiceContract $jitsiServiceContract;
 
     public function __construct(
         ConsultationRepositoryContract $consultationRepositoryContract,
         ConsultationUserRepositoryContract $consultationUserRepositoryContract,
+        ConsultationUserProposedTermRepositoryContract $consultationUserProposedTermRepository,
         JitsiServiceContract $jitsiServiceContract
     ) {
         $this->consultationRepositoryContract = $consultationRepositoryContract;
         $this->consultationUserRepositoryContract = $consultationUserRepositoryContract;
+        $this->consultationUserProposedTermRepository = $consultationUserProposedTermRepository;
         $this->jitsiServiceContract = $jitsiServiceContract;
     }
 
@@ -84,7 +87,7 @@ class ConsultationService implements ConsultationServiceContract
 
     public function store(ConsultationDto $consultationDto): Consultation
     {
-        return DB::transaction(function () use($consultationDto) {
+        return DB::transaction(function () use ($consultationDto) {
             $consultation = $this->consultationRepositoryContract->create($consultationDto->toArray());
             $this->setRelations($consultation, $consultationDto->getRelations());
             $this->setFiles($consultation, $consultationDto->getFiles());
@@ -96,7 +99,7 @@ class ConsultationService implements ConsultationServiceContract
     public function update(int $id, ConsultationDto $consultationDto): Consultation
     {
         $consultation = $this->show($id);
-        return DB::transaction(function () use($consultation, $consultationDto) {
+        return DB::transaction(function () use ($consultation, $consultationDto) {
             $this->setFiles($consultation, $consultationDto->getFiles());
             $consultation = $this->consultationRepositoryContract->updateModel($consultation, $consultationDto->toArray());
             $this->setRelations($consultation, $consultationDto->getRelations());
@@ -115,43 +118,59 @@ class ConsultationService implements ConsultationServiceContract
 
     public function delete(int $id): ?bool
     {
-        return DB::transaction(function () use($id) {
+        return DB::transaction(function () use ($id) {
             return $this->consultationRepositoryContract->delete($id);
         });
     }
 
-    public function reportTerm(int $consultationTermId, string $executedAt): bool
+    public function reportTerms(int $consultationTermId, array $proposedDates): bool
     {
-        return DB::transaction(function () use ($consultationTermId, $executedAt) {
+        return DB::transaction(function () use ($consultationTermId, $proposedDates) {
             $consultationTerm = $this->consultationUserRepositoryContract->find($consultationTermId);
-            if ($this->termIsBusy($consultationTerm->consultation_id, $executedAt)) {
-                abort(400, __('Term is busy, change your term.'));
+
+            foreach ($proposedDates as $date) {
+                if ($this->termIsBusy($consultationTerm->consultation_id, Carbon::make($date))) {
+                    abort(400, __('Term is busy, change your term.'));
+                }
+
+                $this->consultationUserProposedTermRepository->create([
+                    'consultation_user_id' => $consultationTermId,
+                    'proposed_at' => $date,
+                ]);
             }
-            $data = [
+
+            $this->consultationUserRepositoryContract->updateModel($consultationTerm, [
                 'executed_status' => ConsultationTermStatusEnum::REPORTED,
-                'executed_at' => Carbon::make($executedAt)
-            ];
-            $this->consultationUserRepositoryContract->updateModel($consultationTerm, $data);
+            ]);
             $author = $consultationTerm->consultation->author;
             event(new ReportTerm($author, $consultationTerm));
             return true;
         });
     }
 
-    public function approveTerm(int $consultationTermId): bool
+    public function approveTerm(int $consultationUserProposedTermId): bool
     {
-        $consultationTerm = $this->consultationUserRepositoryContract->find($consultationTermId);
-        $this->setStatus($consultationTerm, ConsultationTermStatusEnum::APPROVED);
-        event(new ApprovedTerm($consultationTerm->user, $consultationTerm));
-        event(new ApprovedTermWithTrainer(auth()->user(), $consultationTerm));
+        /** @var ConsultationUserProposedTerm $userProposedTerm */
+        $userProposedTerm = $this->consultationUserProposedTermRepository->find($consultationUserProposedTermId);
+        $consultationUser = $userProposedTerm->consultationUser;
+
+        $this->consultationUserRepositoryContract->updateModel($consultationUser, [
+            'executed_at' => $userProposedTerm->proposed_at,
+            'executed_status' => ConsultationTermStatusEnum::APPROVED,
+        ]);
+        $consultationUser->consultationUserProposedTerms()->delete();
+
+        event(new ApprovedTerm($consultationUser->user, $consultationUser));
+        event(new ApprovedTermWithTrainer(auth()->user(), $consultationUser));
         return true;
     }
 
-    public function rejectTerm(int $consultationTermId): bool
+    public function rejectTerm(int $consultationTermId, ?string $message): bool
     {
         $consultationTerm = $this->consultationUserRepositoryContract->find($consultationTermId);
+        $consultationTerm->consultationUserProposedTerms()->delete();
         $this->setStatus($consultationTerm, ConsultationTermStatusEnum::REJECT);
-        event(new RejectTerm($consultationTerm->user, $consultationTerm));
+        event(new RejectTerm($consultationTerm->user, $consultationTerm, $message));
         event(new RejectTermWithTrainer(auth()->user(), $consultationTerm));
         return true;
     }
@@ -408,15 +427,25 @@ class ConsultationService implements ConsultationServiceContract
 
     public function getBusyTermsFormatDate(int $consultationId): array
     {
-        return $this->consultationUserRepositoryContract->getBusyTerms($consultationId)->map(
-            fn ($term) => Carbon::make($term->executed_at)
-        )->unique()->toArray();
+        return $this->consultationUserRepositoryContract->getBusyTerms($consultationId)
+            ->flatMap(function ($term) {
+                $busyTerms = [];
+
+                if ($term->executed_at) {
+                    $busyTerms[] = Carbon::make($term->executed_at);
+                }
+
+                return array_merge($busyTerms, $term->consultationUserProposedTerms->pluck('proposed_at')->toArray());
+            })
+            ->unique()
+            ->values()
+            ->toArray();
     }
 
     public function filterProposedTerms(int $consultationId, Collection $proposedTerms): array
     {
         $busyTerms = $this->getBusyTermsFormatDate($consultationId);
-        return $proposedTerms->map(fn(ConsultationProposedTerm $proposedTerm) => Carbon::make($proposedTerm->proposed_at))->filter(fn (Carbon $proposedTerm) => !in_array($proposedTerm, $busyTerms))->toArray();
+        return $proposedTerms->map(fn(ConsultationProposedTerm $proposedTerm) => Carbon::make($proposedTerm->proposed_at))->filter(fn(Carbon $proposedTerm) => !in_array($proposedTerm, $busyTerms))->toArray();
     }
 
     private function getReminderData(string $reminderStatus): Collection

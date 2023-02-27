@@ -8,8 +8,10 @@ use EscolaLms\Consultations\Enum\ConsultationTermReminderStatusEnum;
 use EscolaLms\Consultations\Jobs\ReminderAboutConsultationJob;
 use EscolaLms\Consultations\Providers\EventServiceProvider;
 use EscolaLms\Consultations\Repositories\ConsultationRepository;
+use EscolaLms\Consultations\Repositories\ConsultationUserProposedTermRepository;
 use EscolaLms\Consultations\Repositories\ConsultationUserRepository;
 use EscolaLms\Consultations\Repositories\Contracts\ConsultationRepositoryContract;
+use EscolaLms\Consultations\Repositories\Contracts\ConsultationUserProposedTermRepositoryContract;
 use EscolaLms\Consultations\Repositories\Contracts\ConsultationUserRepositoryContract;
 use EscolaLms\Consultations\Services\ConsultationService;
 use EscolaLms\Consultations\Services\Contracts\ConsultationServiceContract;
@@ -28,7 +30,8 @@ class EscolaLmsConsultationsServiceProvider extends ServiceProvider
     ];
     public const REPOSITORIES = [
         ConsultationRepositoryContract::class => ConsultationRepository::class,
-        ConsultationUserRepositoryContract::class => ConsultationUserRepository::class
+        ConsultationUserRepositoryContract::class => ConsultationUserRepository::class,
+        ConsultationUserProposedTermRepositoryContract::class => ConsultationUserProposedTermRepository::class,
     ];
 
     public $singletons = self::SERVICES + self::REPOSITORIES;

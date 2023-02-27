@@ -65,6 +65,12 @@ class ConsultationTermsResource extends JsonResource
      *             ),
      *          ),
      *      ),
+     *      @OA\Property(
+     *          property="user_proposed_terms",
+     *          description="user_proposed_terms",
+     *          type="array",
+     *          @OA\Items(ref="#/components/schemas/ConsultationUserProposedTerm"),
+     *      ),
      * )
      *
      */
@@ -97,6 +103,7 @@ class ConsultationTermsResource extends JsonResource
             ),
             'busy_terms' => ConsultationTermResource::collection($consultationServiceContract->getBusyTermsFormatDate($this->consultation->getKey())),
             'author' =>  $this->consultation->author ? ConsultationAuthorResource::make($this->consultation->author) : null,
+            'user_proposed_terms' => ConsultationUserProposedTermResource::collection($this->consultationUserProposedTerms),
         ];
         return self::apply($fields, $this);
     }

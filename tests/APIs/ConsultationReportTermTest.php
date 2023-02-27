@@ -47,15 +47,17 @@ class ConsultationReportTermTest extends TestCase
         $now = now()->modify('+1 day');
         $this->response = $this->actingAs($this->user, 'api')
             ->json('POST',
-                '/api/consultations/report-term/' . $this->consultationUserPivot->getKey(),
-                [
-                    'term' => $now->format('Y-m-d H:i:s')
+                '/api/consultations/report-term/' . $this->consultationUserPivot->getKey(), [
+                    'proposed_dates' => [
+                        $now->format('Y-m-d H:i:s')
+                    ],
                 ]
-            );
+            )->assertOk();
+
         $this->consultationUserPivot->refresh();
-        $this->assertTrue($this->consultationUserPivot->executed_at === $now->format('Y-m-d H:i:s'));
         $this->assertTrue($this->consultationUserPivot->executed_status === ConsultationTermStatusEnum::REPORTED);
-        $this->response->assertOk();
+        $this->assertCount(1, $this->consultationUserPivot->consultationUserProposedTerms);
+        $this->assertEquals($now->format('Y-m-d H:i:s'), $this->consultationUserPivot->consultationUserProposedTerms->first()->proposed_at);
     }
 
     public function testConsultationReportTermMultipleTerm(): void
@@ -70,9 +72,10 @@ class ConsultationReportTermTest extends TestCase
         ])->create();
         $this->response = $this->actingAs($this->user, 'api')
             ->json('POST',
-                '/api/consultations/report-term/' . $this->consultationUserPivot->getKey(),
-                [
-                    'term' => $now->format('Y-m-d H:i:s')
+                '/api/consultations/report-term/' . $this->consultationUserPivot->getKey(), [
+                    'proposed_dates' => [
+                        $now->format('Y-m-d H:i:s')
+                    ],
                 ]
             );
         $this->response->assertJson(fn (AssertableJson $json) => $json->where(
@@ -89,7 +92,9 @@ class ConsultationReportTermTest extends TestCase
         $this->response = $this->json('POST',
                 '/api/consultations/report-term/' . $this->consultationUserPivot->getKey(),
                 [
-                    'term' => $now->format('Y-m-d H:i:s')
+                    'proposed_dates' => [
+                        $now->format('Y-m-d H:i:s')
+                    ],
                 ]
             );
         $this->response->assertUnauthorized();
@@ -106,13 +111,18 @@ class ConsultationReportTermTest extends TestCase
         $this->response = $this->actingAs($this->user, 'api')->json('POST',
             '/api/consultations/report-term/' . $this->consultationUserPivot->getKey(),
             [
-                'term' => $now->format('Y-m-d H:i:s')
+                'proposed_dates' => [
+                    $now->format('Y-m-d H:i:s')
+                ],
             ]
         );
         $this->consultationUserPivot->refresh();
+        $this->assertCount(1, $this->consultationUserPivot->consultationUserProposedTerms);
+        $consultationUserProposedTerm = $this->consultationUserPivot->consultationUserProposedTerms->first();
+        $this->assertEquals($now->format('Y-m-d H:i:s'), $consultationUserProposedTerm->proposed_at);
         $this->response = $this->actingAs($this->user, 'api')->json(
             'GET',
-            '/api/consultations/approve-term/' . $this->consultationUserPivot->getKey()
+            '/api/consultations/approve-term/' . $consultationUserProposedTerm->getKey()
         );
         $this->consultationUserPivot->refresh();
         $userId = $this->user->getKey();
@@ -149,34 +159,34 @@ class ConsultationReportTermTest extends TestCase
         $this->response = $this->actingAs($this->user, 'api')->json('POST',
             '/api/consultations/report-term/' . $this->consultationUserPivot->getKey(),
             [
-                'term' => $now->format('Y-m-d H:i:s')
+                'proposed_dates' => [
+                    $now->format('Y-m-d H:i:s')
+                ],
             ]
         );
         $this->consultationUserPivot->refresh();
-        $this->response = $this->actingAs($this->user, 'api')->json(
-            'GET',
-            '/api/consultations/reject-term/' . $this->consultationUserPivot->getKey()
-        );
+        $this->response = $this->actingAs($this->user, 'api')->postJson(
+            '/api/consultations/reject-term/' . $this->consultationUserPivot->getKey(), [
+                'message' => 'Reject message',
+            ])
+            ->assertOk();
         $userId = $this->user->getKey();
         Event::assertDispatched(RejectTerm::class, fn (RejectTerm $event) =>
             $event->getUser()->getKey() === $userId &&
-            $event->getConsultationTerm()->getKey() === $this->consultationUserPivot->getKey()
+            $event->getConsultationTerm()->getKey() === $this->consultationUserPivot->getKey() &&
+            $event->getMessage() === 'Reject message'
         );
         Event::assertDispatched(RejectTermWithTrainer::class, fn (RejectTermWithTrainer $event) =>
             $event->getUser()->getKey() === $this->user->getKey() &&
             $event->getConsultationTerm()->getKey() === $this->consultationUserPivot->getKey()
         );
         $this->consultationUserPivot->refresh();
-        $this->response->assertOk();
-        $this->assertTrue($this->consultationUserPivot->executed_status === ConsultationTermStatusEnum::REJECT);
+        $this->assertCount(0, $this->consultationUserPivot->consultationUserProposedTerms);
     }
 
     public function testConsultationTermRejectUnauthorized(): void
     {
-        $this->response = $this->json(
-            'GET',
-            '/api/consultations/reject-term/1'
-        );
+        $this->response = $this->postJson('/api/consultations/reject-term/1');
         $this->response->assertUnauthorized();
     }
 }
