@@ -68,6 +68,144 @@ class ConsultationApiTest extends TestCase
         $this->assertTrue(in_array($consultation->getKey(), $responseConsultationId));
     }
 
+    public function testConsultationListWithSorts(): void
+    {
+        Consultation::truncate();
+
+        $consultationOne = Consultation::factory()->create([
+            'name' => 'A',
+            'status' => ConsultationStatusEnum::PUBLISHED,
+            'duration' => 10,
+            'active_from' => now()->subDays(2),
+            'active_to' => now()->addDays(1),
+        ]);
+        $consultationTwo = Consultation::factory()->create([
+            'name' => 'B',
+            'status' => ConsultationStatusEnum::DRAFT,
+            'duration' => 20,
+            'active_from' => now()->subDays(1),
+            'active_to' => now()->addDays(2),
+        ]);
+
+        $response = $this->actingAs($this->user, 'api')->json('GET','/api/admin/consultations', [
+            'order_by' => 'id',
+            'order' => 'ASC'
+        ]);
+
+        $response->assertOk();
+
+        $this->assertTrue($response->json('data.0.id') === $consultationOne->getKey());
+        $this->assertTrue($response->json('data.1.id') === $consultationTwo->getKey());
+
+        $response = $this->actingAs($this->user, 'api')->json('GET','/api/admin/consultations', [
+            'order_by' => 'id',
+            'order' => 'DESC'
+        ]);
+
+        $response->assertOk();
+
+        $this->assertTrue($response->json('data.0.id') === $consultationTwo->getKey());
+        $this->assertTrue($response->json('data.1.id') === $consultationOne->getKey());
+
+        $response = $this->actingAs($this->user, 'api')->json('GET','/api/admin/consultations', [
+            'order_by' => 'name',
+            'order' => 'ASC'
+        ]);
+
+        $response->assertOk();
+
+        $this->assertTrue($response->json('data.0.id') === $consultationOne->getKey());
+        $this->assertTrue($response->json('data.1.id') === $consultationTwo->getKey());
+
+        $response = $this->actingAs($this->user, 'api')->json('GET','/api/admin/consultations', [
+            'order_by' => 'name',
+            'order' => 'DESC'
+        ]);
+        $response->assertOk();
+
+        $this->assertTrue($response->json('data.0.id') === $consultationTwo->getKey());
+        $this->assertTrue($response->json('data.1.id') === $consultationOne->getKey());
+
+        $response = $this->actingAs($this->user, 'api')->json('GET','/api/admin/consultations', [
+            'order_by' => 'status',
+            'order' => 'DESC'
+        ]);
+
+        $response->assertOk();
+
+        $this->assertTrue($response->json('data.0.id') === $consultationOne->getKey());
+        $this->assertTrue($response->json('data.1.id') === $consultationTwo->getKey());
+
+        $response = $this->actingAs($this->user, 'api')->json('GET','/api/admin/consultations', [
+            'order_by' => 'status',
+            'order' => 'ASC'
+        ]);
+        $response->assertOk();
+
+        $this->assertTrue($response->json('data.0.id') === $consultationTwo->getKey());
+        $this->assertTrue($response->json('data.1.id') === $consultationOne->getKey());
+
+        $response = $this->actingAs($this->user, 'api')->json('GET','/api/admin/consultations', [
+            'order_by' => 'duration',
+            'order' => 'ASC'
+        ]);
+
+        $response->assertOk();
+
+        $this->assertTrue($response->json('data.0.id') === $consultationOne->getKey());
+        $this->assertTrue($response->json('data.1.id') === $consultationTwo->getKey());
+
+        $response = $this->actingAs($this->user, 'api')->json('GET','/api/admin/consultations', [
+            'order_by' => 'duration',
+            'order' => 'DESC'
+        ]);
+
+        $response->assertOk();
+
+        $this->assertTrue($response->json('data.0.id') === $consultationTwo->getKey());
+        $this->assertTrue($response->json('data.1.id') === $consultationOne->getKey());
+
+        $response = $this->actingAs($this->user, 'api')->json('GET','/api/admin/consultations', [
+            'order_by' => 'active_from',
+            'order' => 'ASC'
+        ]);
+
+        $response->assertOk();
+
+        $this->assertTrue($response->json('data.0.id') === $consultationOne->getKey());
+        $this->assertTrue($response->json('data.1.id') === $consultationTwo->getKey());
+
+        $response = $this->actingAs($this->user, 'api')->json('GET','/api/admin/consultations', [
+            'order_by' => 'active_from',
+            'order' => 'DESC'
+        ]);
+
+        $response->assertOk();
+
+        $this->assertTrue($response->json('data.0.id') === $consultationTwo->getKey());
+        $this->assertTrue($response->json('data.1.id') === $consultationOne->getKey());
+
+        $response = $this->actingAs($this->user, 'api')->json('GET','/api/admin/consultations', [
+            'order_by' => 'active_to',
+            'order' => 'ASC'
+        ]);
+
+        $response->assertOk();
+
+        $this->assertTrue($response->json('data.0.id') === $consultationOne->getKey());
+        $this->assertTrue($response->json('data.1.id') === $consultationTwo->getKey());
+
+        $response = $this->actingAs($this->user, 'api')->json('GET','/api/admin/consultations', [
+            'order_by' => 'active_to',
+            'order' => 'DESC'
+        ]);
+
+        $response->assertOk();
+
+        $this->assertTrue($response->json('data.0.id') === $consultationTwo->getKey());
+        $this->assertTrue($response->json('data.1.id') === $consultationOne->getKey());
+    }
+
     public function testConsultationListAPIFilterOnlyWithCategories(): void
     {
         $consultation = Consultation::factory([

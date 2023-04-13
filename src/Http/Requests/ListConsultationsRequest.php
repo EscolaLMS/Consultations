@@ -2,10 +2,7 @@
 
 namespace EscolaLms\Consultations\Http\Requests;
 
-use EscolaLms\Consultations\Enum\ConsultationsPermissionsEnum;
-use EscolaLms\Consultations\Models\Consultation;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Support\Facades\Gate;
 
 class ListConsultationsRequest extends FormRequest
 {
@@ -21,6 +18,7 @@ class ListConsultationsRequest extends FormRequest
             'name' => ['string'],
             'status' => ['array'],
             'status.*' => ['string'],
+            'order_by' => ['sometimes', 'string', 'in:id,name,status,duration,active_from,active_to'],
         ];
     }
 }

@@ -3,19 +3,18 @@
 namespace EscolaLms\Consultations\Services\Contracts;
 
 use Carbon\Carbon;
-use EscolaLms\Consultations\Models\User;
 use EscolaLms\Consultations\Dto\ConsultationDto;
 use EscolaLms\Consultations\Http\Requests\ListConsultationsRequest;
 use EscolaLms\Consultations\Models\Consultation;
 use EscolaLms\Consultations\Models\ConsultationUserPivot;
-use EscolaLms\Core\Models\User as CoreUser;
+use EscolaLms\Core\Dtos\OrderDto;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Collection;
 
 interface ConsultationServiceContract
 {
-    public function getConsultationsList(array $search = [], bool $onlyActive = false): Builder;
+    public function getConsultationsList(array $search = [], OrderDto $orderDto = null, bool $onlyActive = false): Builder;
     public function store(ConsultationDto $consultationDto): Consultation;
     public function update(int $id, ConsultationDto $consultationDto): Consultation;
     public function show(int $id): Consultation;

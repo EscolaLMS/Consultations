@@ -14,6 +14,7 @@ use EscolaLms\Consultations\Http\Requests\UpdateConsultationRequest;
 use EscolaLms\Consultations\Http\Resources\ConsultationSimpleResource;
 use EscolaLms\Consultations\Http\Resources\ConsultationTermsResource;
 use EscolaLms\Consultations\Services\Contracts\ConsultationServiceContract;
+use EscolaLms\Core\Dtos\OrderDto;
 use EscolaLms\Core\Http\Controllers\EscolaLmsBaseController;
 use Illuminate\Http\JsonResponse;
 
@@ -31,7 +32,7 @@ class ConsultationController extends EscolaLmsBaseController implements Consulta
     {
         $search = $listConsultationsRequest->except(['limit', 'skip']);
         $consultations = $this->consultationServiceContract
-            ->getConsultationsList($search)
+            ->getConsultationsList($search, OrderDto::instantiateFromRequest($listConsultationsRequest))
             ->paginate(
                 $listConsultationsRequest->get('per_page') ??
                 config('escolalms_consultations.perPage', ConstantEnum::PER_PAGE)
