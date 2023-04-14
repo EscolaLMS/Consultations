@@ -31,7 +31,7 @@ class ConsultationAPIController extends EscolaLmsBaseController implements Consu
     {
         $search = $listConsultationsRequest->except(['limit', 'skip']);
         $consultations = $this->consultationServiceContract
-            ->getConsultationsList($search, OrderDto::instantiateFromRequest($listConsultationsRequest), true)
+            ->getConsultationsList($search, true, OrderDto::instantiateFromRequest($listConsultationsRequest))
             ->paginate(
                 $listConsultationsRequest->get('per_page') ??
                 config('escolalms_consultations.perPage', ConstantEnum::PER_PAGE)
