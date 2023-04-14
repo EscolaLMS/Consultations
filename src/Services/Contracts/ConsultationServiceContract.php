@@ -14,7 +14,7 @@ use Illuminate\Support\Collection;
 
 interface ConsultationServiceContract
 {
-    public function getConsultationsList(array $search = [], OrderDto $orderDto = null, bool $onlyActive = false): Builder;
+    public function getConsultationsList(array $search = [], bool $onlyActive = false, OrderDto $orderDto = null): Builder;
     public function store(ConsultationDto $consultationDto): Consultation;
     public function update(int $id, ConsultationDto $consultationDto): Consultation;
     public function show(int $id): Consultation;
