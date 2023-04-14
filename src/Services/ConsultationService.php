@@ -54,7 +54,7 @@ class ConsultationService implements ConsultationServiceContract
         $this->jitsiServiceContract = $jitsiServiceContract;
     }
 
-    public function getConsultationsList(array $search = [], OrderDto $orderDto = null, bool $onlyActive = false): Builder
+    public function getConsultationsList(array $search = [], bool $onlyActive = false, OrderDto $orderDto = null): Builder
     {
         if ($onlyActive) {
             $now = now()->format('Y-m-d');
