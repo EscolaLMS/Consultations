@@ -2,11 +2,11 @@
 
 namespace EscolaLms\Consultations\Tests\APIs;
 
-use EscolaLms\Consultations\Enum\ConsultationStatusEnum;
-use EscolaLms\Consultations\Tests\Models\User;
 use EscolaLms\Categories\Models\Category;
 use EscolaLms\Consultations\Database\Seeders\ConsultationsPermissionSeeder;
+use EscolaLms\Consultations\Enum\ConsultationStatusEnum;
 use EscolaLms\Consultations\Models\Consultation;
+use EscolaLms\Consultations\Tests\Models\User;
 use EscolaLms\Consultations\Tests\TestCase;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Collection;
@@ -15,6 +15,7 @@ use Illuminate\Testing\Fluent\AssertableJson;
 class ConsultationApiTest extends TestCase
 {
     use DatabaseTransactions;
+
     private Consultation $consultation;
     private Collection $categories;
 
@@ -119,16 +120,14 @@ class ConsultationApiTest extends TestCase
             'created_at' => $this->consultation->created_at,
             'categories' => $this->consultation->categories->toArray()
         ]);
-        $this->response->assertJson(fn (AssertableJson $json) =>
-            $json->has('data', fn (AssertableJson $json) =>
-                $json->each(fn (AssertableJson $json) => $json->has('author')->etc())->etc()
-            )->etc()
+        $this->response->assertJson(fn(AssertableJson $json) => $json->has('data', fn(AssertableJson $json) => $json->each(fn(AssertableJson $json) => $json->has('author')->etc())->etc()
+        )->etc()
         );
     }
 
     public function testConsultationsListUnauthorized(): void
     {
-        $this->response = $this->json('GET','/api/admin/consultations');
+        $this->response = $this->json('GET', '/api/admin/consultations');
 
         $this->response->assertUnauthorized();
     }

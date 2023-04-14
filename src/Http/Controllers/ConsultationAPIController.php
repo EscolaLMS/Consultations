@@ -4,7 +4,6 @@ namespace EscolaLms\Consultations\Http\Controllers;
 
 use EscolaLms\Consultations\Enum\ConstantEnum;
 use EscolaLms\Consultations\Http\Controllers\Swagger\ConsultationAPISwagger;
-use EscolaLms\Consultations\Http\Requests\ChangeTermConsultationRequest;
 use EscolaLms\Consultations\Http\Requests\ListAPIConsultationsRequest;
 use EscolaLms\Consultations\Http\Requests\ListConsultationsRequest;
 use EscolaLms\Consultations\Http\Requests\ReportTermConsultationRequest;
@@ -14,7 +13,7 @@ use EscolaLms\Consultations\Http\Resources\ConsultationProposedTermResource;
 use EscolaLms\Consultations\Http\Resources\ConsultationSimpleResource;
 use EscolaLms\Consultations\Http\Resources\ConsultationTermsResource;
 use EscolaLms\Consultations\Services\Contracts\ConsultationServiceContract;
-use EscolaLms\Consultations\Tests\APIs\ConsultationShowApiTest;
+use EscolaLms\Core\Dtos\OrderDto;
 use EscolaLms\Core\Http\Controllers\EscolaLmsBaseController;
 use Illuminate\Http\JsonResponse;
 
@@ -32,7 +31,7 @@ class ConsultationAPIController extends EscolaLmsBaseController implements Consu
     {
         $search = $listConsultationsRequest->except(['limit', 'skip']);
         $consultations = $this->consultationServiceContract
-            ->getConsultationsList($search, true)
+            ->getConsultationsList($search, true, OrderDto::instantiateFromRequest($listConsultationsRequest))
             ->paginate(
                 $listConsultationsRequest->get('per_page') ??
                 config('escolalms_consultations.perPage', ConstantEnum::PER_PAGE)

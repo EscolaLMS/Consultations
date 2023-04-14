@@ -3,40 +3,39 @@
 namespace EscolaLms\Consultations\Services;
 
 use Carbon\Carbon;
-use EscolaLms\Consultations\Enum\ConsultationStatusEnum;
-use EscolaLms\Consultations\Events\ChangeTerm;
-use EscolaLms\Consultations\Events\RejectTermWithTrainer;
-use EscolaLms\Consultations\Events\ReminderTrainerAboutTerm;
-use EscolaLms\Consultations\Exceptions\ChangeTermException;
-use EscolaLms\Consultations\Models\User;
-use EscolaLms\Jitsi\Helpers\StringHelper;
-use EscolaLms\Consultations\Models\ConsultationProposedTerm;
-use EscolaLms\Core\Models\User as CoreUser;
-use EscolaLms\Consultations\Events\ReminderAboutTerm;
 use EscolaLms\Consultations\Dto\ConsultationDto;
 use EscolaLms\Consultations\Dto\FilterConsultationTermsListDto;
 use EscolaLms\Consultations\Dto\FilterListDto;
 use EscolaLms\Consultations\Enum\ConstantEnum;
+use EscolaLms\Consultations\Enum\ConsultationStatusEnum;
 use EscolaLms\Consultations\Enum\ConsultationTermStatusEnum;
 use EscolaLms\Consultations\Events\ApprovedTerm;
 use EscolaLms\Consultations\Events\ApprovedTermWithTrainer;
+use EscolaLms\Consultations\Events\ChangeTerm;
 use EscolaLms\Consultations\Events\RejectTerm;
+use EscolaLms\Consultations\Events\RejectTermWithTrainer;
+use EscolaLms\Consultations\Events\ReminderAboutTerm;
+use EscolaLms\Consultations\Events\ReminderTrainerAboutTerm;
 use EscolaLms\Consultations\Events\ReportTerm;
+use EscolaLms\Consultations\Exceptions\ChangeTermException;
 use EscolaLms\Consultations\Helpers\StrategyHelper;
 use EscolaLms\Consultations\Http\Requests\ListConsultationsRequest;
 use EscolaLms\Consultations\Http\Resources\ConsultationSimpleResource;
 use EscolaLms\Consultations\Models\Consultation;
+use EscolaLms\Consultations\Models\ConsultationProposedTerm;
 use EscolaLms\Consultations\Models\ConsultationUserPivot;
+use EscolaLms\Consultations\Models\User;
 use EscolaLms\Consultations\Repositories\Contracts\ConsultationRepositoryContract;
 use EscolaLms\Consultations\Repositories\Contracts\ConsultationUserRepositoryContract;
 use EscolaLms\Consultations\Services\Contracts\ConsultationServiceContract;
+use EscolaLms\Core\Dtos\OrderDto;
 use EscolaLms\Files\Helpers\FileHelper;
+use EscolaLms\Jitsi\Helpers\StringHelper;
 use EscolaLms\Jitsi\Services\Contracts\JitsiServiceContract;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class ConsultationService implements ConsultationServiceContract
@@ -55,7 +54,7 @@ class ConsultationService implements ConsultationServiceContract
         $this->jitsiServiceContract = $jitsiServiceContract;
     }
 
-    public function getConsultationsList(array $search = [], bool $onlyActive = false): Builder
+    public function getConsultationsList(array $search = [], bool $onlyActive = false, OrderDto $orderDto = null): Builder
     {
         if ($onlyActive) {
             $now = now()->format('Y-m-d');
@@ -67,7 +66,7 @@ class ConsultationService implements ConsultationServiceContract
         return $this->consultationRepositoryContract->allQueryBuilder(
             $search,
             $criteria
-        );
+        )->orderBy($orderDto->getOrderBy() ?? 'created_at', $orderDto->getOrder() ?? 'desc');
     }
 
     public function getConsultationsListForCurrentUser(array $search = []): Builder
