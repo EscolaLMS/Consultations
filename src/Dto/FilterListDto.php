@@ -3,6 +3,7 @@
 namespace EscolaLms\Consultations\Dto;
 
 use EscolaLms\Consultations\Repositories\Criteria\CategoriesCriterion;
+use EscolaLms\Consultations\Repositories\Criteria\CategoryNameCriterion;
 use EscolaLms\Consultations\Repositories\Criteria\ConsultationSearch;
 use EscolaLms\Consultations\Repositories\Criteria\ConsultationTermEqualCriterion;
 use EscolaLms\Consultations\Repositories\Criteria\Primitives\OrderCriterion;
@@ -18,6 +19,7 @@ class FilterListDto extends BaseDto
     private string $dateTo;
     private string $dateFrom;
     private array $categories;
+    private string $categoryName;
     private bool $onlyWithCategories;
 
     private string $orderBy;
@@ -42,6 +44,9 @@ class FilterListDto extends BaseDto
         }
         if ($dto->getCategories()) {
             $dto->addToCriteria(new CategoriesCriterion($dto->getCategories()));
+        }
+        if ($dto->getCategoryName()) {
+            $dto->addToCriteria(new CategoryNameCriterion($dto->getCategoryName()));
         }
         if ($dto->getConsultationTermId()) {
             $dto->addToCriteria(new ConsultationTermEqualCriterion($dto->getConsultationTermId()));
@@ -145,6 +150,15 @@ class FilterListDto extends BaseDto
         $this->order = $order;
     }
 
+    public function getCategoryName(): ?string
+    {
+        return $this->categoryName ?? null;
+    }
+
+    public function setCategoryName(string $categoryName): void
+    {
+        $this->categoryName = $categoryName;
+    }
     private function addToCriteria($value): void
     {
         $this->criteria[] = $value;

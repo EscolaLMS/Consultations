@@ -32,6 +32,7 @@ class ConsultationListTest extends TestCase
     public function testConsultationListWithSorts(): void
     {
         $category = Category::factory()->create();
+        $categoryTwo = Category::factory()->create();
 
         /** @var Consultation $consultationOne */
         $consultationOne = Consultation::factory()->create([
@@ -216,6 +217,44 @@ class ConsultationListTest extends TestCase
 
         $this->assertTrue($response->json('data.0.id') === $consultationTwo->getKey());
         $this->assertTrue($response->json('data.1.id') === $consultationOne->getKey());
+    }
+
+    public function testFilterConsultationsByCategoryName()
+    {
+        $categoryOne = Category::factory()->create();
+        $categoryTwo = Category::factory()->create();
+
+        /** @var Consultation $consultationOne */
+        $consultationOne = Consultation::factory()->create([
+            'name' => 'A One',
+            'status' => ConsultationStatusEnum::PUBLISHED,
+            'duration' => 10,
+            'active_from' => now()->subDays(5),
+            'active_to' => now()->addDays(2),
+        ]);
+
+        $consultationTwo = Consultation::factory()->create([
+            'name' => 'C One',
+            'status' => ConsultationStatusEnum::PUBLISHED,
+            'duration' => 10,
+            'active_from' => now()->subDays(5),
+            'active_to' => now()->addDays(2),
+        ]);
+
+        $consultationOne->categories()->save($categoryOne);
+        $consultationTwo->categories()->save($categoryTwo);
+
+        $response = $this->actingAs($this->user, 'api')->json('GET', '/api/consultations', [
+            'category_name' => $categoryOne->name,
+        ]);
+
+        $this->assertTrue($response->json('data.0.id') === $consultationOne->getKey());
+
+        $response = $this->actingAs($this->user, 'api')->json('GET', '/api/consultations', [
+            'category_name' => $categoryTwo->name,
+        ]);
+
+        $this->assertTrue($response->json('data.0.id') === $consultationTwo->getKey());
     }
 
 }
