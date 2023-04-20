@@ -130,7 +130,7 @@ class ConsultationUpdateApiTest extends TestCase
             '/api/admin/consultations/' . $id,
             $consultationUpdate->toArray()
         );
-        $response->assertNotFound();
+        $response->assertStatus(422);
     }
 
     public function testConsultationUpdateImageAndLogotypeFromExistingFiles(): void
