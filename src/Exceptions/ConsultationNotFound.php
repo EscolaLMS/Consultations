@@ -12,5 +12,3 @@ class ConsultationNotFound extends UnprocessableEntityHttpException
         parent::__construct($message, $previous, $code);
     }
 }
-
-
