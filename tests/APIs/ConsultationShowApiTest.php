@@ -65,7 +65,7 @@ class ConsultationShowApiTest extends TestCase
             '/api/admin/consultations/' . $id,
             $consultationUpdate->toArray()
         );
-        $response->assertNotFound();
+        $response->assertStatus(422);
     }
 
     public function testConsultationShowAPI()
