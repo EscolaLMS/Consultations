@@ -18,6 +18,7 @@ use EscolaLms\Consultations\Events\ReminderAboutTerm;
 use EscolaLms\Consultations\Events\ReminderTrainerAboutTerm;
 use EscolaLms\Consultations\Events\ReportTerm;
 use EscolaLms\Consultations\Exceptions\ChangeTermException;
+use EscolaLms\Consultations\Exceptions\ConsultationNotFound;
 use EscolaLms\Consultations\Helpers\StrategyHelper;
 use EscolaLms\Consultations\Http\Requests\ListConsultationsRequest;
 use EscolaLms\Consultations\Http\Resources\ConsultationSimpleResource;
@@ -107,7 +108,7 @@ class ConsultationService implements ConsultationServiceContract
     {
         $consultation = $this->consultationRepositoryContract->find($id);
         if (!$consultation) {
-            throw new NotFoundHttpException(__('Consultation not found'));
+            throw new ConsultationNotFound();
         }
         return $consultation;
     }
