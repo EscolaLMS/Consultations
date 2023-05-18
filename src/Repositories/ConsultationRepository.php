@@ -35,6 +35,7 @@ class ConsultationRepository extends BaseRepository implements ConsultationRepos
     {
         $q = $this->allQuery($search);
         $this->getBoughtConsultationsByQuery($q);
+        $q->orderBy('consultation_user.created_at', 'desc');
         if (!empty($criteria)) {
             $q = $this->applyCriteria($q, $criteria);
         }
@@ -57,6 +58,7 @@ class ConsultationRepository extends BaseRepository implements ConsultationRepos
                 'consultation_user.executed_status',
                 'consultation_user.executed_at',
                 'consultation_user.product_id',
+                'consultation_user.created_at',
             )
             ->leftJoin('consultation_user', 'consultation_user.consultation_id', '=', 'consultations.id')
             ->where(['consultation_user.user_id' => auth()->user()->getKey()]);
