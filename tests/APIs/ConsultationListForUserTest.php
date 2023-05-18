@@ -56,6 +56,21 @@ class ConsultationListForUserTest extends TestCase
         $this->response->assertOk();
     }
 
+    public function testConsultationListForUserOrderByBoughtDate(): void
+    {
+        $consultationOne = Consultation::factory()->create();
+        $consultationTwo = Consultation::factory()->create();
+
+        $this->user->consultations()->save($consultationOne);
+        $this->travel(5)->days();
+        $this->user->consultations()->save($consultationTwo);
+
+        $this->response = $this->actingAs($this->user, 'api')->json('GET', $this->apiUrl);
+
+        $this->assertTrue($this->response['data'][0]['id'] === $consultationTwo->getKey());
+        $this->assertTrue($this->response['data'][1]['id'] === $consultationOne->getKey());
+    }
+
     public function testConsultationListForUserFilterConsultationTerm(): void
     {
         $this->initVariable();
