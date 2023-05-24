@@ -40,6 +40,7 @@ class ConsultationListTest extends TestCase
             'duration' => 10,
             'active_from' => now()->subDays(5),
             'active_to' => now()->addDays(2),
+            'created_at' => now()->subDays(1),
         ]);
 
         $consultationOne->categories()->save($category);
@@ -51,6 +52,7 @@ class ConsultationListTest extends TestCase
             'duration' => 20,
             'active_from' => now()->subDays(2),
             'active_to' => now()->addDays(5),
+            'created_at' => now(),
         ]);
 
         $this
@@ -98,6 +100,26 @@ class ConsultationListTest extends TestCase
             ->assertJsonFragment([
                 'name' => 'A One',
             ]);
+
+        $response = $this->actingAs($this->user, 'api')->json('GET', '/api/admin/consultations', [
+            'order_by' => 'created_at',
+            'order' => 'ASC'
+        ]);
+
+        $response->assertOk();
+
+        $this->assertTrue($response->json('data.0.id') === $consultationOne->getKey());
+        $this->assertTrue($response->json('data.1.id') === $consultationTwo->getKey());
+
+        $response = $this->actingAs($this->user, 'api')->json('GET', '/api/admin/consultations', [
+            'order_by' => 'created_at',
+            'order' => 'DESC'
+        ]);
+
+        $response->assertOk();
+
+        $this->assertTrue($response->json('data.0.id') === $consultationTwo->getKey());
+        $this->assertTrue($response->json('data.1.id') === $consultationOne->getKey());
 
         $response = $this->actingAs($this->user, 'api')->json('GET', '/api/admin/consultations', [
             'order_by' => 'id',
