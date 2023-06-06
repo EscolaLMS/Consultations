@@ -2,8 +2,12 @@
 
 namespace EscolaLms\Consultations\Http\Controllers;
 
+use EscolaLms\Auth\Dtos\Admin\UserAssignableDto;
+use EscolaLms\Auth\Http\Resources\UserFullResource;
+use EscolaLms\Auth\Services\Contracts\UserServiceContract;
 use EscolaLms\Consultations\Dto\ConsultationDto;
 use EscolaLms\Consultations\Enum\ConstantEnum;
+use EscolaLms\Consultations\Enum\ConsultationsPermissionsEnum;
 use EscolaLms\Consultations\Http\Controllers\Swagger\ConsultationSwagger;
 use EscolaLms\Consultations\Http\Requests\ChangeTermConsultationRequest;
 use EscolaLms\Consultations\Http\Requests\ListConsultationsRequest;
@@ -16,16 +20,20 @@ use EscolaLms\Consultations\Http\Resources\ConsultationTermsResource;
 use EscolaLms\Consultations\Services\Contracts\ConsultationServiceContract;
 use EscolaLms\Core\Dtos\OrderDto;
 use EscolaLms\Core\Http\Controllers\EscolaLmsBaseController;
+use EscolaLms\Courses\Http\Requests\CourseAssignableUserListRequest;
 use Illuminate\Http\JsonResponse;
 
 class ConsultationController extends EscolaLmsBaseController implements ConsultationSwagger
 {
     private ConsultationServiceContract $consultationServiceContract;
+    private UserServiceContract $userService;
 
     public function __construct(
-        ConsultationServiceContract $consultationServiceContract
+        ConsultationServiceContract $consultationServiceContract,
+        UserServiceContract $userService
     ) {
         $this->consultationServiceContract = $consultationServiceContract;
+        $this->userService = $userService;
     }
 
     public function index(ListConsultationsRequest $listConsultationsRequest): JsonResponse
@@ -96,5 +104,13 @@ class ConsultationController extends EscolaLmsBaseController implements Consulta
             $changeTermConsultationRequest->input('executed_at')
         );
         return $this->sendSuccess(__('Consultation term changed successfully'));
+    }
+
+    public function assignableUsers(CourseAssignableUserListRequest $request): JsonResponse
+    {
+        $dto = UserAssignableDto::instantiateFromArray(array_merge($request->validated(), ['assignable_by' => ConsultationsPermissionsEnum::CONSULTATION_CREATE]));
+        $result = $this->userService
+            ->assignableUsers($dto, $request->get('per_page'), $request->get('page'));
+        return $this->sendResponseForResource(UserFullResource::collection($result), __('Users assignable to courses'));
     }
 }

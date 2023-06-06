@@ -7,6 +7,7 @@ use EscolaLms\Consultations\Http\Requests\ScheduleConsultationRequest;
 use EscolaLms\Consultations\Http\Requests\ShowConsultationRequest;
 use EscolaLms\Consultations\Http\Requests\StoreConsultationRequest;
 use EscolaLms\Consultations\Http\Requests\UpdateConsultationRequest;
+use EscolaLms\Courses\Http\Requests\CourseAssignableUserListRequest;
 use Illuminate\Http\JsonResponse;
 
 interface ConsultationSwagger
@@ -463,4 +464,38 @@ interface ConsultationSwagger
      * )
      */
     public function changeTerm(ChangeTermConsultationRequest $changeTermConsultationRequest, int $consultationTermId): JsonResponse;
+
+    /**
+     * @OA\Get(
+     *      tags={"Admin Consultations"},
+     *      path="/api/admin/consultations/users/assignable",
+     *      description="Get users assignable to consultations",
+     *      security={
+     *          {"passport": {}},
+     *      },
+     *      @OA\Parameter(
+     *          name="search",
+     *          required=false,
+     *          in="query",
+     *          @OA\Schema(
+     *              type="string",
+     *          ),
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="successful operation",
+     *          @OA\MediaType(
+     *              mediaType="application/json",
+     *          ),
+     *      ),
+     *      @OA\Response(
+     *          response=422,
+     *          description="Bad request",
+     *          @OA\MediaType(
+     *              mediaType="application/json"
+     *          )
+     *      )
+     *   )
+     */
+    public function assignableUsers(CourseAssignableUserListRequest $request): JsonResponse;
 }
