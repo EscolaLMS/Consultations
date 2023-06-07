@@ -110,7 +110,7 @@ class ConsultationController extends EscolaLmsBaseController implements Consulta
     {
         $dto = UserAssignableDto::instantiateFromArray(array_merge($request->validated(), ['assignable_by' => ConsultationsPermissionsEnum::CONSULTATION_CREATE]));
         $result = $this->userService
-            ->assignableUsers($dto, $request->get('per_page'), $request->get('page'));
+            ->assignableUsersWithCriteria($dto, $request->get('per_page'), $request->get('page'));
         return $this->sendResponseForResource(UserFullResource::collection($result), __('Users assignable to courses'));
     }
 }
