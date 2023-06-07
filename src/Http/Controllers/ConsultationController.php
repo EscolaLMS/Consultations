@@ -10,6 +10,7 @@ use EscolaLms\Consultations\Enum\ConstantEnum;
 use EscolaLms\Consultations\Enum\ConsultationsPermissionsEnum;
 use EscolaLms\Consultations\Http\Controllers\Swagger\ConsultationSwagger;
 use EscolaLms\Consultations\Http\Requests\ChangeTermConsultationRequest;
+use EscolaLms\Consultations\Http\Requests\ConsultationAssignableUserListRequest;
 use EscolaLms\Consultations\Http\Requests\ListConsultationsRequest;
 use EscolaLms\Consultations\Http\Requests\ScheduleConsultationRequest;
 use EscolaLms\Consultations\Http\Requests\ShowConsultationRequest;
@@ -20,7 +21,6 @@ use EscolaLms\Consultations\Http\Resources\ConsultationTermsResource;
 use EscolaLms\Consultations\Services\Contracts\ConsultationServiceContract;
 use EscolaLms\Core\Dtos\OrderDto;
 use EscolaLms\Core\Http\Controllers\EscolaLmsBaseController;
-use EscolaLms\Courses\Http\Requests\CourseAssignableUserListRequest;
 use Illuminate\Http\JsonResponse;
 
 class ConsultationController extends EscolaLmsBaseController implements ConsultationSwagger
@@ -106,7 +106,7 @@ class ConsultationController extends EscolaLmsBaseController implements Consulta
         return $this->sendSuccess(__('Consultation term changed successfully'));
     }
 
-    public function assignableUsers(CourseAssignableUserListRequest $request): JsonResponse
+    public function assignableUsers(ConsultationAssignableUserListRequest $request): JsonResponse
     {
         $dto = UserAssignableDto::instantiateFromArray(array_merge($request->validated(), ['assignable_by' => ConsultationsPermissionsEnum::CONSULTATION_CREATE]));
         $result = $this->userService

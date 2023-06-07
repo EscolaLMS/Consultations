@@ -2,12 +2,12 @@
 namespace EscolaLms\Consultations\Http\Controllers\Swagger;
 
 use EscolaLms\Consultations\Http\Requests\ChangeTermConsultationRequest;
+use EscolaLms\Consultations\Http\Requests\ConsultationAssignableUserListRequest;
 use EscolaLms\Consultations\Http\Requests\ListConsultationsRequest;
 use EscolaLms\Consultations\Http\Requests\ScheduleConsultationRequest;
 use EscolaLms\Consultations\Http\Requests\ShowConsultationRequest;
 use EscolaLms\Consultations\Http\Requests\StoreConsultationRequest;
 use EscolaLms\Consultations\Http\Requests\UpdateConsultationRequest;
-use EscolaLms\Courses\Http\Requests\CourseAssignableUserListRequest;
 use Illuminate\Http\JsonResponse;
 
 interface ConsultationSwagger
@@ -497,5 +497,5 @@ interface ConsultationSwagger
      *      )
      *   )
      */
-    public function assignableUsers(CourseAssignableUserListRequest $request): JsonResponse;
+    public function assignableUsers(ConsultationAssignableUserListRequest $request): JsonResponse;
 }
