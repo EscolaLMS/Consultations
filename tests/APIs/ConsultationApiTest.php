@@ -2,19 +2,24 @@
 
 namespace EscolaLms\Consultations\Tests\APIs;
 
+use EscolaLms\Auth\Dtos\Admin\UserAssignableDto;
+use EscolaLms\Auth\Services\Contracts\UserServiceContract;
 use EscolaLms\Categories\Models\Category;
 use EscolaLms\Consultations\Database\Seeders\ConsultationsPermissionSeeder;
+use EscolaLms\Consultations\Enum\ConsultationsPermissionsEnum;
 use EscolaLms\Consultations\Enum\ConsultationStatusEnum;
 use EscolaLms\Consultations\Models\Consultation;
 use EscolaLms\Consultations\Tests\Models\User;
 use EscolaLms\Consultations\Tests\TestCase;
+use EscolaLms\Core\Tests\CreatesUsers;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 use Illuminate\Testing\Fluent\AssertableJson;
 
 class ConsultationApiTest extends TestCase
 {
-    use DatabaseTransactions;
+    use DatabaseTransactions, CreatesUsers;
 
     private Consultation $consultation;
     private Collection $categories;
@@ -132,4 +137,69 @@ class ConsultationApiTest extends TestCase
         $this->response->assertUnauthorized();
     }
 
+    public function testConsultationsAssignableUsersUnauthorized(): void
+    {
+        $this->response = $this
+            ->json('GET', '/api/admin/consultations/users/assignable')
+            ->assertUnauthorized();
+    }
+
+    public function testConsultationsAssignableUsers(): void
+    {
+        $admin = $this->makeAdmin();
+        $student = $this->makeStudent();
+
+        $dto = UserAssignableDto::instantiateFromArray(['assignable_by' => ConsultationsPermissionsEnum::CONSULTATION_CREATE]);
+        $users = app(UserServiceContract::class)->assignableUsersWithCriteria($dto);
+        assert($users instanceof LengthAwarePaginator);
+
+        $this->response = $this
+            ->actingAs($this->user, 'api')
+            ->json('GET', '/api/admin/consultations/users/assignable')
+            ->assertOk()
+            ->assertJsonCount(min($users->total(), $users->perPage()), 'data')
+            ->assertJsonMissing([
+                'id' => $student->getKey(),
+                'email' => $student->email,
+            ])
+            ->assertJsonFragment([
+                'id' => $admin->getKey(),
+                'email' => $admin->email,
+            ])
+            ->assertJsonFragment([
+                'id' => $this->user->getKey(),
+                'email' => $this->user->email,
+            ]);
+    }
+
+    public function testConsultationsAssignableUsersSearch(): void
+    {
+        $admin = $this->makeAdmin();
+        $student = $this->makeStudent();
+
+        $dto = UserAssignableDto::instantiateFromArray([
+            'assignable_by' => ConsultationsPermissionsEnum::CONSULTATION_CREATE,
+            'search' => $admin->email,
+        ]);
+        $users = app(UserServiceContract::class)->assignableUsersWithCriteria($dto);
+        assert($users instanceof LengthAwarePaginator);
+
+        $this->response = $this
+            ->actingAs($this->user, 'api')
+            ->json('GET', '/api/admin/consultations/users/assignable', ['search' => $admin->email])
+            ->assertOk()
+            ->assertJsonCount(min($users->total(), $users->perPage()), 'data')
+            ->assertJsonFragment([
+                'id' => $admin->getKey(),
+                'email' => $admin->email,
+            ])
+            ->assertJsonMissing([
+                'id' => $student->getKey(),
+                'email' => $student->email,
+            ])
+            ->assertJsonMissing([
+                'id' => $this->user->getKey(),
+                'email' => $this->user->email,
+            ]);
+    }
 }

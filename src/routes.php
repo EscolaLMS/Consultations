@@ -10,6 +10,7 @@ Route::group(['middleware' => ['auth:api'], 'prefix' => 'api/admin'], function (
     Route::resource('consultations', ConsultationController::class);
     Route::get('consultations/{id}/schedule', [ConsultationController::class, 'schedule']);
     Route::post('consultations/change-term/{consultationTermId}', [ConsultationController::class, 'changeTerm']);
+    Route::get('consultations/users/assignable', [ConsultationController::class, 'assignableUsers']);
 });
 
 // user endpoints
