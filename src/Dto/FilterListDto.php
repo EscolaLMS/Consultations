@@ -2,11 +2,13 @@
 
 namespace EscolaLms\Consultations\Dto;
 
+use EscolaLms\Consultations\Enum\ConsultationsPermissionsEnum;
 use EscolaLms\Consultations\Repositories\Criteria\CategoriesCriterion;
 use EscolaLms\Consultations\Repositories\Criteria\ConsultationSearch;
 use EscolaLms\Consultations\Repositories\Criteria\ConsultationTermEqualCriterion;
 use EscolaLms\Consultations\Repositories\Criteria\Primitives\OrderCriterion;
 use EscolaLms\Core\Repositories\Criteria\Primitives\DateCriterion;
+use EscolaLms\Core\Repositories\Criteria\Primitives\EqualCriterion;
 use EscolaLms\Core\Repositories\Criteria\Primitives\HasCriterion;
 use EscolaLms\Core\Repositories\Criteria\Primitives\InCriterion;
 
@@ -28,6 +30,8 @@ class FilterListDto extends BaseDto
     public static function prepareFilters(array $search)
     {
         $dto = new self($search);
+        $user = auth()->user();
+
         if ($dto->getName()) {
             $dto->addToCriteria(new ConsultationSearch($dto->getName()));
         }
@@ -52,6 +56,11 @@ class FilterListDto extends BaseDto
         if ($dto->getOrderBy()) {
             $dto->addToCriteria(new OrderCriterion($dto->getOrderBy(), $dto->getOrder() ?? 'ASC'));
         }
+        if ($user && $user->can(ConsultationsPermissionsEnum::CONSULTATION_LIST_OWN) && !$user->can(ConsultationsPermissionsEnum::CONSULTATION_LIST)) {
+            $dto->addToCriteria(new EqualCriterion('author_id', $user->getKey()));
+        }
+
+
         return $dto->criteria;
     }
 

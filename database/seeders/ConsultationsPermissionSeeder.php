@@ -18,6 +18,7 @@ class ConsultationsPermissionSeeder extends Seeder
         $tutor = Role::findOrCreate(UserRole::TUTOR, 'api');
 
         Permission::findOrCreate(ConsultationsPermissionsEnum::CONSULTATION_LIST, 'api');
+        Permission::findOrCreate(ConsultationsPermissionsEnum::CONSULTATION_LIST_OWN, 'api');
         Permission::findOrCreate(ConsultationsPermissionsEnum::CONSULTATION_UPDATE, 'api');
         Permission::findOrCreate(ConsultationsPermissionsEnum::CONSULTATION_DELETE, 'api');
         Permission::findOrCreate(ConsultationsPermissionsEnum::CONSULTATION_CREATE, 'api');
@@ -33,7 +34,7 @@ class ConsultationsPermissionSeeder extends Seeder
             ConsultationsPermissionsEnum::CONSULTATION_CHANGE_TERM,
         ]);
         $tutor->givePermissionTo([
-            ConsultationsPermissionsEnum::CONSULTATION_LIST,
+            ConsultationsPermissionsEnum::CONSULTATION_LIST_OWN,
             ConsultationsPermissionsEnum::CONSULTATION_UPDATE,
             ConsultationsPermissionsEnum::CONSULTATION_DELETE,
             ConsultationsPermissionsEnum::CONSULTATION_CREATE,
