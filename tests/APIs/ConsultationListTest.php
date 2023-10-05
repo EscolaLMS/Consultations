@@ -18,6 +18,7 @@ class ConsultationListTest extends TestCase
     use DatabaseTransactions, CreatesUsers;
 
     private Consultation $consultation;
+
     private Collection $categories;
 
     protected function setUp(): void
@@ -28,6 +29,21 @@ class ConsultationListTest extends TestCase
         $this->user = User::factory()->create();
         $this->user->guard_name = 'api';
         $this->user->assignRole('tutor');
+    }
+
+    public function testConsultationListForbidden(): void
+    {
+        $this
+            ->actingAs($this->makeStudent(), 'api')
+            ->getJson('/api/admin/consultations')
+            ->assertForbidden();
+    }
+
+    public function testConsultationListUnauthorized(): void
+    {
+        $this
+            ->getJson('/api/admin/consultations')
+            ->assertUnauthorized();
     }
 
     public function testConsultationListWithSorts(): void

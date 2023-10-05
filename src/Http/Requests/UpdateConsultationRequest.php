@@ -3,19 +3,16 @@
 namespace EscolaLms\Consultations\Http\Requests;
 
 use EscolaLms\Consultations\Enum\ConstantEnum;
-use EscolaLms\Consultations\Enum\ConsultationsPermissionsEnum;
 use EscolaLms\Consultations\Enum\ConsultationStatusEnum;
-use EscolaLms\Consultations\Models\Consultation;
 use EscolaLms\Files\Rules\FileOrStringRule;
-use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\Rule;
 
-class UpdateConsultationRequest extends FormRequest
+class UpdateConsultationRequest extends ConsultationRequest
 {
     public function authorize(): bool
     {
-        return Gate::allows(ConsultationsPermissionsEnum::CONSULTATION_UPDATE, Consultation::class);
+        return Gate::allows('update', $this->getConsultation());
     }
 
     public function rules(): array

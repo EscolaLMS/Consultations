@@ -4,11 +4,11 @@ namespace EscolaLms\Consultations\Http\Requests;
 
 use Illuminate\Support\Facades\Gate;
 
-class ShowConsultationRequest extends ConsultationRequest
+class DestroyConsultationRequest extends ConsultationRequest
 {
     public function authorize(): bool
     {
-        return Gate::allows('read', $this->getConsultation());
+        return Gate::allows('delete', $this->getConsultation());
     }
 
     public function rules(): array

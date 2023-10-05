@@ -60,7 +60,6 @@ class FilterListDto extends BaseDto
             $dto->addToCriteria(new EqualCriterion('author_id', $user->getKey()));
         }
 
-
         return $dto->criteria;
     }
 

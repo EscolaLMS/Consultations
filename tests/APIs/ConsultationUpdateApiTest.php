@@ -7,6 +7,7 @@ use EscolaLms\Consultations\Database\Seeders\ConsultationsPermissionSeeder;
 use EscolaLms\Consultations\Enum\ConstantEnum;
 use EscolaLms\Consultations\Models\Consultation;
 use EscolaLms\Consultations\Tests\TestCase;
+use EscolaLms\Core\Tests\CreatesUsers;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use EscolaLms\Consultations\Tests\Models\User;
 use Illuminate\Http\UploadedFile;
@@ -15,8 +16,10 @@ use Illuminate\Testing\Fluent\AssertableJson;
 
 class ConsultationUpdateApiTest extends TestCase
 {
-    use DatabaseTransactions;
+    use DatabaseTransactions, CreatesUsers;
+
     private Consultation $consultation;
+
     private string $apiUrl;
 
     protected function setUp(): void
@@ -33,8 +36,34 @@ class ConsultationUpdateApiTest extends TestCase
 
     public function testConsultationUpdateUnauthorized(): void
     {
-        $response = $this->json('POST',$this->apiUrl);
-        $response->assertUnauthorized();
+        $this
+            ->postJson($this->apiUrl)
+            ->assertUnauthorized();
+    }
+
+    public function testConsultationUpdateForbidden(): void
+    {
+        $this
+            ->actingAs($this->makeStudent(), 'api')
+            ->postJson($this->apiUrl)
+            ->assertForbidden();
+    }
+
+    public function testConsultationUpdateAuthored(): void
+    {
+        $author1 = $this->makeInstructor();
+        $author2 = $this->makeInstructor();
+        $conultation1 = Consultation::factory()->state(['author_id' => $author1->getKey()])->create();
+
+        $this
+            ->actingAs($author1, 'api')
+            ->postJson('/api/admin/consultations/' . $conultation1->getKey(), $conultation1->toArray())
+            ->assertOk();
+
+        $this
+            ->actingAs($author2, 'api')
+            ->postJson('/api/admin/consultations/' . $conultation1->getKey(), $conultation1->toArray())
+            ->assertForbidden();
     }
 
     public function testConsultationUpdate(): void
