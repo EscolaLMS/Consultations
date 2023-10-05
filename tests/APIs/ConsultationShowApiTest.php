@@ -6,74 +6,104 @@ use EscolaLms\Consultations\Tests\Models\User;
 use EscolaLms\Consultations\Database\Seeders\ConsultationsPermissionSeeder;
 use EscolaLms\Consultations\Models\Consultation;
 use EscolaLms\Consultations\Tests\TestCase;
+use EscolaLms\Core\Tests\CreatesUsers;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Testing\Fluent\AssertableJson;
 
 class ConsultationShowApiTest extends TestCase
 {
-    use DatabaseTransactions;
-    private Consultation $consultation;
-    private string $apiUrl;
+    use DatabaseTransactions, CreatesUsers;
 
     protected function setUp(): void
     {
         parent::setUp();
         $this->seed(ConsultationsPermissionSeeder::class);
-
-        $this->user = User::factory()->create();
-        $this->user->guard_name = 'api';
-        $this->user->assignRole('tutor');
-        $this->consultation = Consultation::factory()->create();
-        $this->apiUrl = '/api/admin/consultations/' . $this->consultation->getKey();
     }
 
     public function testConsultationShowUnauthorized(): void
     {
-        $response = $this->json('GET', $this->apiUrl);
-        $response->assertUnauthorized();
+        $this
+            ->getJson('/api/admin/consultations/123')
+            ->assertUnauthorized();
     }
 
-    public function testConsultationShow(): void
+    public function testConsultationShowForbidden(): void
     {
-        $response = $this->actingAs($this->user, 'api')->json(
-            'GET',
-            $this->apiUrl
-        );
-        $response->assertOk();
-        $response->assertJsonFragment([
-            'id' => $this->consultation->getKey(),
-            'name' => $this->consultation->name,
-            'status' => $this->consultation->status,
-            'created_at' => $this->consultation->created_at,
-        ]);
-        $response->assertJson(fn (AssertableJson $json) =>
-            $json->has('data', fn (AssertableJson $json) =>
-                $json->has('author')->etc()
-            )->etc()
-        );
-        $response->assertJsonFragment(['success' => true]);
+        $this
+            ->actingAs($this->makeStudent(), 'api')
+            ->getJson('/api/admin/consultations/' . Consultation::factory()->create()->getKey())
+            ->assertForbidden();
     }
 
-    public function testConsultationShowFailed(): void
+    public function testConsultationShowAuthored(): void
     {
-        $consultation = Consultation::factory()->create();
-        $id = $consultation->getKey();
-        $consultation->delete();
-        $consultationUpdate = Consultation::factory()->make();
-        $response = $this->actingAs($this->user, 'api')->json(
-            'GET',
-            '/api/admin/consultations/' . $id,
-            $consultationUpdate->toArray()
-        );
-        $response->assertStatus(422);
+        $author1 = $this->makeInstructor();
+        $author2 = $this->makeInstructor();
+        $consultation1 = Consultation::factory()->state(['author_id' => $author1->getKey()])->create();
+        $consultation2 = Consultation::factory()->state(['author_id' => $author2->getKey()])->create();
+
+        $this
+            ->actingAs($author1, 'api')
+            ->getJson('/api/admin/consultations/' . $consultation1->getKey())
+            ->assertOk()
+            ->assertJsonFragment([
+                'id' => $consultation1->getKey(),
+                'name' => $consultation1->name,
+                'status' => $consultation1->status,
+                'created_at' => $consultation1->created_at,
+            ])
+            ->assertJson(
+                fn(AssertableJson $json) => $json
+                    ->has('data', fn(AssertableJson $json) => $json->has('author')->etc())->etc()
+            )
+            ->assertJsonFragment(['success' => true]);
+
+        $this
+            ->actingAs($author1, 'api')
+            ->getJson('/api/admin/consultations/' . $consultation2->getKey())
+            ->assertForbidden();
+
+        $this
+            ->actingAs($author2, 'api')
+            ->getJson('/api/admin/consultations/' . $consultation2->getKey())
+            ->assertOk();
     }
 
-    public function testConsultationShowAPI()
+    public function testConsultationShowAdmin(): void
     {
-        $response = $this->actingAs($this->user, 'api')->json(
-            'GET',
-            '/api/consultations/' . $this->consultation->getKey()
-        );
-        $response->assertOk();
+        $author = $this->makeInstructor();
+        $consultation = Consultation::factory()->state(['author_id' => $author->getKey()])->create();
+
+        $this
+            ->actingAs($this->makeAdmin(), 'api')
+            ->getJson('/api/admin/consultations/' . $consultation->getKey())
+            ->assertOk()
+            ->assertJsonFragment([
+                'id' => $consultation->getKey(),
+                'name' => $consultation->name,
+                'status' => $consultation->status,
+                'created_at' => $consultation->created_at,
+            ])
+            ->assertJson(
+                fn(AssertableJson $json) => $json
+                    ->has('data', fn(AssertableJson $json) => $json->has('author')->etc())->etc()
+            )
+            ->assertJsonFragment(['success' => true]);
+    }
+
+    public function testConsultationShowNotFound(): void
+    {
+        $this
+            ->actingAs($this->makeInstructor(), 'api')
+            ->getJson('/api/admin/consultations/123')
+            ->assertStatus(422);
+    }
+
+    public function testConsultationShowAPI(): void
+    {
+        $this
+            ->actingAs($this->makeStudent(), 'api')
+            ->getJson('/api/consultations/' . Consultation::factory()->create()->getKey())
+            ->assertOk();
     }
 }

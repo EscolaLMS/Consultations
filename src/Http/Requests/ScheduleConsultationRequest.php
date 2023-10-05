@@ -9,11 +9,12 @@ use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\Rule;
 
-class ScheduleConsultationRequest extends FormRequest
+class ScheduleConsultationRequest extends ConsultationRequest
 {
+
     public function authorize(): bool
     {
-        return Gate::allows(ConsultationsPermissionsEnum::CONSULTATION_READ, Consultation::class);
+        return Gate::allows('read', $this->getConsultation());
     }
 
     public function rules(): array

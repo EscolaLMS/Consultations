@@ -2,7 +2,6 @@
 
 namespace EscolaLms\Consultations\Http\Requests;
 
-use EscolaLms\Consultations\Enum\ConsultationsPermissionsEnum;
 use EscolaLms\Consultations\Enum\ConsultationStatusEnum;
 use EscolaLms\Consultations\Models\Consultation;
 use Illuminate\Foundation\Http\FormRequest;
@@ -13,7 +12,7 @@ class StoreConsultationRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return Gate::allows(ConsultationsPermissionsEnum::CONSULTATION_CREATE, Consultation::class);
+        return Gate::allows('create', Consultation::class);
     }
 
     public function rules(): array

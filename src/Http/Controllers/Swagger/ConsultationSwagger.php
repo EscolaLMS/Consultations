@@ -3,6 +3,7 @@ namespace EscolaLms\Consultations\Http\Controllers\Swagger;
 
 use EscolaLms\Consultations\Http\Requests\ChangeTermConsultationRequest;
 use EscolaLms\Consultations\Http\Requests\ConsultationAssignableUserListRequest;
+use EscolaLms\Consultations\Http\Requests\DestroyConsultationRequest;
 use EscolaLms\Consultations\Http\Requests\ListConsultationsRequest;
 use EscolaLms\Consultations\Http\Requests\ScheduleConsultationRequest;
 use EscolaLms\Consultations\Http\Requests\ShowConsultationRequest;
@@ -290,7 +291,7 @@ interface ConsultationSwagger
      *      )
      * )
      */
-    public function destroy(int $id): JsonResponse;
+    public function destroy(int $id, DestroyConsultationRequest $request): JsonResponse;
 
     /**
      * @OA\Get(

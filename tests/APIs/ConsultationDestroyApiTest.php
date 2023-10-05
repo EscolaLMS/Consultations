@@ -5,13 +5,16 @@ namespace EscolaLms\Consultations\Tests\APIs;
 use EscolaLms\Consultations\Database\Seeders\ConsultationsPermissionSeeder;
 use EscolaLms\Consultations\Models\Consultation;
 use EscolaLms\Consultations\Tests\TestCase;
+use EscolaLms\Core\Tests\CreatesUsers;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use EscolaLms\Consultations\Tests\Models\User;
 
 class ConsultationDestroyApiTest extends TestCase
 {
-    use DatabaseTransactions;
+    use DatabaseTransactions, CreatesUsers;
+
     private Consultation $consultation;
+
     private string $apiUrl;
 
     protected function setUp(): void
@@ -33,30 +36,56 @@ class ConsultationDestroyApiTest extends TestCase
     public function testConsultationDestroyUnauthorized(): void
     {
         $this->initVariable();
-        $response = $this->json('DELETE', $this->apiUrl);
-        $response->assertUnauthorized();
+
+        $this
+            ->deleteJson($this->apiUrl)
+            ->assertUnauthorized();
+    }
+
+    public function testConsultationDestroyForbidden(): void
+    {
+        $this->initVariable();
+
+        $this
+            ->actingAs($this->makeStudent(), 'api')
+            ->deleteJson($this->apiUrl)
+            ->assertForbidden();
+    }
+
+    public function testConsultationDestroyAuthored(): void
+    {
+        $this->initVariable();
+
+        $author1 = $this->makeInstructor();
+        $author2 = $this->makeInstructor();
+        $consultation = Consultation::factory()->state(['author_id' => $author1->getKey()])->create();
+
+        $this
+            ->actingAs($author2, 'api')
+            ->deleteJson('/api/admin/consultations/' . $consultation->getKey())
+            ->assertForbidden();
+
+        $this
+            ->actingAs($author1, 'api')
+            ->deleteJson('/api/admin/consultations/' . $consultation->getKey())
+            ->assertOk();
     }
 
     public function testConsultationDestroy(): void
     {
         $this->initVariable();
-        $response = $this->actingAs($this->user, 'api')->json(
-            'DELETE',
-            $this->apiUrl
-        );
-        $response->assertOk();
-        $response->assertJsonFragment(['success' => true]);
+
+        $this
+            ->actingAs($this->user, 'api')->deleteJson($this->apiUrl)
+            ->assertOk()
+            ->assertJsonFragment(['success' => true]);
     }
 
     public function testConsultationDestroyFailed(): void
     {
-        $consultation = Consultation::factory()->create();
-        $id = $consultation->getKey();
-        $consultation->delete();
-        $response = $this->actingAs($this->user, 'api')->json(
-            'DELETE',
-            '/api/admin/consultations/' . $id
-        );
-        $response->assertNotFound();
+        $this
+            ->actingAs($this->user, 'api')
+            ->getJson('/api/admin/consultations/123')
+            ->assertUnprocessable();
     }
 }

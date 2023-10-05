@@ -6,6 +6,7 @@ use EscolaLms\Categories\Models\Category;
 use EscolaLms\Consultations\Database\Seeders\ConsultationsPermissionSeeder;
 use EscolaLms\Consultations\Models\Consultation;
 use EscolaLms\Consultations\Tests\TestCase;
+use EscolaLms\Core\Tests\CreatesUsers;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Testing\Fluent\AssertableJson;
@@ -13,7 +14,8 @@ use EscolaLms\Consultations\Tests\Models\User;
 
 class ConsultationStoreApiTest extends TestCase
 {
-    use DatabaseTransactions;
+    use DatabaseTransactions, CreatesUsers;
+
     private string $apiUrl;
 
     protected function setUp(): void
@@ -29,8 +31,17 @@ class ConsultationStoreApiTest extends TestCase
 
     public function testConsultationStoreUnauthorized(): void
     {
-        $response = $this->json('POST',$this->apiUrl);
-        $response->assertUnauthorized();
+        $this
+            ->postJson($this->apiUrl)
+            ->assertUnauthorized();
+    }
+
+    public function testConsultationStoreForbidden(): void
+    {
+        $this
+            ->actingAs($this->makeStudent(), 'api')
+            ->postJson($this->apiUrl)
+            ->assertForbidden();
     }
 
     public function testConsultationStore(): void

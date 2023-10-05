@@ -8,15 +8,17 @@ use EscolaLms\Consultations\Enum\ConsultationStatusEnum;
 use EscolaLms\Consultations\Models\Consultation;
 use EscolaLms\Consultations\Tests\Models\User;
 use EscolaLms\Consultations\Tests\TestCase;
+use EscolaLms\Core\Tests\CreatesUsers;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Collection;
 use Illuminate\Testing\Fluent\AssertableJson;
 
 class ConsultationListTest extends TestCase
 {
-    use DatabaseTransactions;
+    use DatabaseTransactions, CreatesUsers;
 
     private Consultation $consultation;
+
     private Collection $categories;
 
     protected function setUp(): void
@@ -27,6 +29,21 @@ class ConsultationListTest extends TestCase
         $this->user = User::factory()->create();
         $this->user->guard_name = 'api';
         $this->user->assignRole('tutor');
+    }
+
+    public function testConsultationListForbidden(): void
+    {
+        $this
+            ->actingAs($this->makeStudent(), 'api')
+            ->getJson('/api/admin/consultations')
+            ->assertForbidden();
+    }
+
+    public function testConsultationListUnauthorized(): void
+    {
+        $this
+            ->getJson('/api/admin/consultations')
+            ->assertUnauthorized();
     }
 
     public function testConsultationListWithSorts(): void
@@ -240,4 +257,29 @@ class ConsultationListTest extends TestCase
         $this->assertTrue($response->json('data.1.id') === $consultationOne->getKey());
     }
 
+    public function testConsultationListOwn(): void
+    {
+        $author1 = $this->makeAdmin();
+        $author2 = $this->makeInstructor();
+        Consultation::factory()->count(3)->state(['author_id' => $author1->getKey()])->create();
+        Consultation::factory()->count(5)
+            ->sequence(
+                ['author_id' => $author2->getKey()],
+                ['author_id' => $author2->getKey()],
+                ['author_id' => $author2->getKey()],
+                ['author_id' => $author2->getKey()],
+                ['author_id' => $author2->getKey()],
+            )
+            ->create();
+
+        $this
+            ->actingAs($author1, 'api')
+            ->getJson('/api/admin/consultations')
+            ->assertJsonCount(8, 'data');
+
+        $this
+            ->actingAs($author2, 'api')
+            ->getJson('/api/admin/consultations')
+            ->assertJsonCount(5, 'data');
+    }
 }

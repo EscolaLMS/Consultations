@@ -11,6 +11,7 @@ use EscolaLms\Consultations\Enum\ConsultationsPermissionsEnum;
 use EscolaLms\Consultations\Http\Controllers\Swagger\ConsultationSwagger;
 use EscolaLms\Consultations\Http\Requests\ChangeTermConsultationRequest;
 use EscolaLms\Consultations\Http\Requests\ConsultationAssignableUserListRequest;
+use EscolaLms\Consultations\Http\Requests\DestroyConsultationRequest;
 use EscolaLms\Consultations\Http\Requests\ListConsultationsRequest;
 use EscolaLms\Consultations\Http\Requests\ScheduleConsultationRequest;
 use EscolaLms\Consultations\Http\Requests\ShowConsultationRequest;
@@ -91,7 +92,7 @@ class ConsultationController extends EscolaLmsBaseController implements Consulta
         );
     }
 
-    public function destroy(int $id): JsonResponse
+    public function destroy(int $id, DestroyConsultationRequest $request): JsonResponse
     {
         $this->consultationServiceContract->delete($id);
         return $this->sendSuccess(__('Consultation deleted successfully'));
