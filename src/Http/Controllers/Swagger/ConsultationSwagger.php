@@ -26,7 +26,7 @@ interface ConsultationSwagger
      *          in="query",
      *          @OA\Schema(
      *              type="string",
-     *              enum={"finished_at", "started_at", "created_at", "name", "only_with_categories"}
+     *              enum={"id", "name", "status", "duration", "active_from", "active_to", "created_at"}
      *          ),
      *      ),
      *      @OA\Parameter(
