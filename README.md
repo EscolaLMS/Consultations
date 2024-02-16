@@ -68,7 +68,7 @@ Test details [![codecov](https://codecov.io/gh/EscolaLMS/Consultations/branch/ma
 
 ### Front Application
 
-...
+See [implementation](https://github.com/search?q=repo%3AEscolaLMS%2FFront%20Consultation&type=code) in the [demo](https://demo.escolalms.com). 
 
 ## Permissions
 
