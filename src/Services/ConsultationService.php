@@ -422,7 +422,7 @@ class ConsultationService implements ConsultationServiceContract
             abort(400, __('Term is busy for this user.'));
         }
 
-        return $terms->count() >= $consultation->max_session_users;
+        return $terms->count() >= $consultation->max_session_students;
     }
 
     public function getBusyTermsFormatDate(int $consultationId): array
