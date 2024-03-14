@@ -154,6 +154,11 @@ use EscolaLms\Core\Models\User as CoreUser;
  *             ),
  *          ),
  *      ),
+ *      @OA\Property(
+ *          property="max_session_students",
+ *          description="max_session_students",
+ *          type="integer",
+ *      ),
  * )
  *
  */
@@ -172,6 +177,7 @@ class Consultation extends Model
         'author_id',
         'active_from',
         'active_to',
+        'max_session_students',
     ];
 
     public function author(): BelongsTo

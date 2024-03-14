@@ -80,7 +80,8 @@ class ConsultationUpdateApiTest extends TestCase
             $consultationUpdateArray,
             ['proposed_terms' => $proposedTerms],
             ['image' => UploadedFile::fake()->image('image.jpg')],
-            ['categories' => $categories]
+            ['categories' => $categories],
+            ['max_session_students' => 4],
         );
         $response = $this->actingAs($this->user, 'api')->json(
             'POST',
@@ -93,6 +94,7 @@ class ConsultationUpdateApiTest extends TestCase
             'short_desc' => $consultationUpdateArray['short_desc'],
             'name' => $consultationUpdateArray['name'],
             'status' => $consultationUpdateArray['status'],
+            'max_session_students' => 4,
         ]);
         $response->assertJson(fn (AssertableJson $json) => $json->has(
             'data',
