@@ -60,7 +60,8 @@ class ConsultationStoreApiTest extends TestCase
             ['proposed_terms' => $proposedTerms],
             ['image' => UploadedFile::fake()->image('image.jpg')],
             ['logotype' => UploadedFile::fake()->image('image.jpg')],
-            ['categories' => $categories]
+            ['categories' => $categories],
+            ['max_session_students' => 5],
         );
         $response = $this->actingAs($this->user, 'api')->json(
             'POST',
@@ -72,6 +73,7 @@ class ConsultationStoreApiTest extends TestCase
             'name' => $consultationArr['name'],
             'short_desc' => $consultationArr['short_desc'],
             'status' => $consultationArr['status'],
+            'max_session_students' => 5,
         ]);
         $response->assertJsonFragment([
             'proposed_terms' => $proposedTerms

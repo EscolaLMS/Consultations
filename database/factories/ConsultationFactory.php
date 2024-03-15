@@ -25,6 +25,7 @@ class ConsultationFactory extends Factory
             'author_id' => empty($tutor) ? null : $tutor->getKey(),
             'active_from' => $now,
             'active_to' => (clone $now)->modify('+1 hour'),
+            'max_session_students' => rand(1, 99),
         ];
     }
 }

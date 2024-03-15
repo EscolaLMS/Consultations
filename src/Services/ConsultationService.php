@@ -2,6 +2,7 @@
 
 namespace EscolaLms\Consultations\Services;
 
+use Auth;
 use Carbon\Carbon;
 use EscolaLms\Consultations\Dto\ConsultationDto;
 use EscolaLms\Consultations\Dto\FilterConsultationTermsListDto;
@@ -403,7 +404,25 @@ class ConsultationService implements ConsultationServiceContract
 
     public function termIsBusy(int $consultationId, string $date): bool
     {
-        return $this->consultationUserRepositoryContract->getBusyTerms($consultationId, $date)->count() > 0;
+        $consultation = $this->consultationRepositoryContract->find($consultationId);
+        $terms = $this->consultationUserRepositoryContract->getBusyTerms($consultationId, $date);
+        $userId = Auth::user()->getKey();
+        if ($terms->first(fn (ConsultationUserPivot $userPivot) => $userPivot->user_id === $userId) !== null) {
+            abort(400, __('You already reported this term.'));
+        }
+
+        return $terms->count() >= $consultation->max_session_students;
+    }
+
+    public function termIsBusyForUser(int $consultationId, string $date, int $userId): bool
+    {
+        $consultation = $this->consultationRepositoryContract->find($consultationId);
+        $terms = $this->consultationUserRepositoryContract->getBusyTerms($consultationId, $date);
+        if ($terms->first(fn (ConsultationUserPivot $userPivot) => $userPivot->user_id === $userId) !== null) {
+            abort(400, __('Term is busy for this user.'));
+        }
+
+        return $terms->count() >= $consultation->max_session_students;
     }
 
     public function getBusyTermsFormatDate(int $consultationId): array

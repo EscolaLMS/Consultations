@@ -33,6 +33,7 @@ class ConsultationSimpleResource extends JsonResource
             'proposed_terms' => ConsultationProposedTermResource::collection($consultationServiceContract->filterProposedTerms($this->getKey(), $this->proposedTerms)),
             'busy_terms' => ConsultationTermResource::collection($consultationServiceContract->getBusyTermsFormatDate($this->getKey())),
             'categories' => $this->categories,
+            'max_session_students' => $this->max_session_students,
         ];
         return self::apply($fields, $this);
     }
