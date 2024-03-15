@@ -5,6 +5,8 @@ namespace EscolaLms\Consultations\Http\Resources;
 use Carbon\Carbon;
 use EscolaLms\Auth\Traits\ResourceExtandable;
 use EscolaLms\Consultations\Services\Contracts\ConsultationServiceContract;
+use EscolaLms\ModelFields\Enum\MetaFieldVisibilityEnum;
+use EscolaLms\ModelFields\Facades\ModelFields;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class ConsultationSimpleResource extends JsonResource
@@ -33,6 +35,7 @@ class ConsultationSimpleResource extends JsonResource
             'proposed_terms' => ConsultationProposedTermResource::collection($consultationServiceContract->filterProposedTerms($this->getKey(), $this->proposedTerms)),
             'busy_terms' => ConsultationTermResource::collection($consultationServiceContract->getBusyTermsFormatDate($this->getKey())),
             'categories' => $this->categories,
+            ...ModelFields::getExtraAttributesValues($this->resource, MetaFieldVisibilityEnum::PUBLIC)
         ];
         return self::apply($fields, $this);
     }

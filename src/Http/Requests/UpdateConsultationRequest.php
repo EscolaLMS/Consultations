@@ -4,7 +4,9 @@ namespace EscolaLms\Consultations\Http\Requests;
 
 use EscolaLms\Consultations\Enum\ConstantEnum;
 use EscolaLms\Consultations\Enum\ConsultationStatusEnum;
+use EscolaLms\Consultations\Models\Consultation;
 use EscolaLms\Files\Rules\FileOrStringRule;
+use EscolaLms\ModelFields\Facades\ModelFields;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\Rule;
 
@@ -19,7 +21,7 @@ class UpdateConsultationRequest extends ConsultationRequest
     {
         $prefixPath = ConstantEnum::DIRECTORY . '/' . $this->route('id');
 
-        return [
+        return array_merge([
             'name' => ['string', 'max:255', 'min:3'],
             'status' => ['string', Rule::in(ConsultationStatusEnum::getValues())],
             'description' => ['string', 'min:3'],
@@ -32,6 +34,6 @@ class UpdateConsultationRequest extends ConsultationRequest
             'proposed_dates.*' => ['date', 'after_or_equal:active_from'],
             'categories' => ['array'],
             'categories.*' => ['integer', 'exists:categories,id'],
-        ];
+        ], ModelFields::getFieldsMetadataRules(Consultation::class));
     }
 }

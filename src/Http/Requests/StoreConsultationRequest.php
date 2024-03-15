@@ -4,6 +4,7 @@ namespace EscolaLms\Consultations\Http\Requests;
 
 use EscolaLms\Consultations\Enum\ConsultationStatusEnum;
 use EscolaLms\Consultations\Models\Consultation;
+use EscolaLms\ModelFields\Facades\ModelFields;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\Rule;
@@ -17,7 +18,7 @@ class StoreConsultationRequest extends FormRequest
 
     public function rules(): array
     {
-        return [
+        return array_merge([
             'name' => ['required', 'string', 'max:255', 'min:3'],
             'status' => ['required', 'string', Rule::in(ConsultationStatusEnum::getValues())],
             'description' => ['required', 'string', 'min:3'],
@@ -30,6 +31,6 @@ class StoreConsultationRequest extends FormRequest
             'proposed_dates.*' => ['date', 'after_or_equal:active_from'],
             'categories' => ['array'],
             'categories.*' => ['integer', 'exists:categories,id'],
-        ];
+        ], ModelFields::getFieldsMetadataRules(Consultation::class));
     }
 }

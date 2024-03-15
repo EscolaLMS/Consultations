@@ -2,11 +2,11 @@
 
 namespace EscolaLms\Consultations\Tests\APIs;
 
-use EscolaLms\Consultations\Tests\Models\User;
 use EscolaLms\Consultations\Database\Seeders\ConsultationsPermissionSeeder;
 use EscolaLms\Consultations\Models\Consultation;
 use EscolaLms\Consultations\Tests\TestCase;
 use EscolaLms\Core\Tests\CreatesUsers;
+use EscolaLms\ModelFields\Facades\ModelFields;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Testing\Fluent\AssertableJson;
 
@@ -105,5 +105,31 @@ class ConsultationShowApiTest extends TestCase
             ->actingAs($this->makeStudent(), 'api')
             ->getJson('/api/consultations/' . Consultation::factory()->create()->getKey())
             ->assertOk();
+    }
+
+    public function testConsultationShowModelFields(): void
+    {
+        ModelFields::addOrUpdateMetadataField(
+            Consultation::class,
+            'extra_field',
+            'text',
+            '',
+            ['required', 'string', 'max:255']
+        );
+
+        $author = $this->makeInstructor();
+        $consultation = Consultation::factory()->state(['author_id' => $author->getKey()])->create(['extra_field' => 'value']);
+
+        $this
+            ->actingAs($this->makeAdmin(), 'api')
+            ->getJson('/api/admin/consultations/' . $consultation->getKey())
+            ->assertOk()
+            ->assertJsonFragment([
+                'id' => $consultation->getKey(),
+                'name' => $consultation->name,
+                'status' => $consultation->status,
+                'created_at' => $consultation->created_at,
+                'extra_field' => 'value',
+            ]);
     }
 }

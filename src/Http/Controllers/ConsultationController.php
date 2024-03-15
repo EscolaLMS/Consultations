@@ -67,6 +67,7 @@ class ConsultationController extends EscolaLmsBaseController implements Consulta
     {
         $dto = new ConsultationDto($storeConsultationRequest->all());
         $consultation = $this->consultationServiceContract->store($dto);
+        $this->consultationServiceContract->updateModelFieldsFromRequest($consultation, $storeConsultationRequest);
         return $this->sendResponseForResource(
             ConsultationSimpleResource::make($consultation),
             __('Consultation saved successfully')
@@ -77,6 +78,7 @@ class ConsultationController extends EscolaLmsBaseController implements Consulta
     {
         $dto = new ConsultationDto($updateConsultationRequest->all());
         $consultation = $this->consultationServiceContract->update($id, $dto);
+        $this->consultationServiceContract->updateModelFieldsFromRequest($consultation, $updateConsultationRequest);
         return $this->sendResponseForResource(
             ConsultationSimpleResource::make($consultation),
             __('Consultation updated successfully')
