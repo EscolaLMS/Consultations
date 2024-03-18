@@ -34,6 +34,7 @@ class UpdateConsultationRequest extends ConsultationRequest
             'proposed_dates.*' => ['date', 'after_or_equal:active_from'],
             'categories' => ['array'],
             'categories.*' => ['integer', 'exists:categories,id'],
+            'max_session_students' => ['integer', 'min:1', 'max:99'],
         ], ModelFields::getFieldsMetadataRules(Consultation::class));
     }
 }

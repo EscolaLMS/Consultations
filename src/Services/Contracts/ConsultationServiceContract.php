@@ -96,6 +96,7 @@ interface ConsultationServiceContract
     public function changeTerm(int $consultationTermId, string $executedAt): bool;
     public function getConsultationTermsForTutor(): Collection;
     public function termIsBusy(int $consultationId, string $date): bool;
+    public function termIsBusyForUser(int $consultationId, string $date, int $userId): bool;
     public function getBusyTermsFormatDate(int $consultationId): array;
     public function updateModelFieldsFromRequest(Consultation $consultation, FormRequest $request): void;
 }
