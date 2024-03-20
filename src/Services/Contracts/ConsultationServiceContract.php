@@ -9,6 +9,7 @@ use EscolaLms\Consultations\Models\Consultation;
 use EscolaLms\Consultations\Models\ConsultationUserPivot;
 use EscolaLms\Core\Dtos\OrderDto;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Collection;
 
@@ -97,4 +98,5 @@ interface ConsultationServiceContract
     public function termIsBusy(int $consultationId, string $date): bool;
     public function termIsBusyForUser(int $consultationId, string $date, int $userId): bool;
     public function getBusyTermsFormatDate(int $consultationId): array;
+    public function updateModelFieldsFromRequest(Consultation $consultation, FormRequest $request): void;
 }

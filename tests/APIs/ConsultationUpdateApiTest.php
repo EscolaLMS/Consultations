@@ -8,6 +8,7 @@ use EscolaLms\Consultations\Enum\ConstantEnum;
 use EscolaLms\Consultations\Models\Consultation;
 use EscolaLms\Consultations\Tests\TestCase;
 use EscolaLms\Core\Tests\CreatesUsers;
+use EscolaLms\ModelFields\Facades\ModelFields;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use EscolaLms\Consultations\Tests\Models\User;
 use Illuminate\Http\UploadedFile;
@@ -182,5 +183,28 @@ class ConsultationUpdateApiTest extends TestCase
         $data = $response->getData()->data;
         Storage::assertExists($data->image_path);
         Storage::assertExists($data->logotype_path);
+    }
+
+    public function testConsultationUpdateModelFields(): void
+    {
+        ModelFields::addOrUpdateMetadataField(
+            Consultation::class,
+            'extra_field',
+            'text',
+            '',
+            ['required', 'string', 'max:255']
+        );
+
+        $this->actingAs($this->user, 'api')->json(
+            'POST',
+            $this->apiUrl,
+            [
+                'extra_field' => 'updated value',
+            ],
+        )
+            ->assertOk()
+            ->assertJsonFragment([
+                'extra_field' => 'updated value',
+            ]);
     }
 }

@@ -4,8 +4,6 @@ namespace EscolaLms\Consultations;
 
 use EscolaLms\Auth\EscolaLmsAuthServiceProvider;
 use EscolaLms\Categories\EscolaLmsCategoriesServiceProvider;
-use EscolaLms\Consultations\Enum\ConsultationTermReminderStatusEnum;
-use EscolaLms\Consultations\Jobs\ReminderAboutConsultationJob;
 use EscolaLms\Consultations\Providers\EventServiceProvider;
 use EscolaLms\Consultations\Repositories\ConsultationRepository;
 use EscolaLms\Consultations\Repositories\ConsultationUserRepository;
@@ -14,8 +12,8 @@ use EscolaLms\Consultations\Repositories\Contracts\ConsultationUserRepositoryCon
 use EscolaLms\Consultations\Services\ConsultationService;
 use EscolaLms\Consultations\Services\Contracts\ConsultationServiceContract;
 use EscolaLms\Jitsi\EscolaLmsJitsiServiceProvider;
+use EscolaLms\ModelFields\ModelFieldsServiceProvider;
 use EscolaLms\Settings\EscolaLmsSettingsServiceProvider;
-use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Support\ServiceProvider;
 
 /**
@@ -60,5 +58,6 @@ class EscolaLmsConsultationsServiceProvider extends ServiceProvider
         $this->app->register(EscolaLmsCategoriesServiceProvider::class);
         $this->app->register(EventServiceProvider::class);
         $this->app->register(EscolaLmsAuthServiceProvider::class);
+        $this->app->register(ModelFieldsServiceProvider::class);
     }
 }

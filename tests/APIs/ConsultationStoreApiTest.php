@@ -7,6 +7,7 @@ use EscolaLms\Consultations\Database\Seeders\ConsultationsPermissionSeeder;
 use EscolaLms\Consultations\Models\Consultation;
 use EscolaLms\Consultations\Tests\TestCase;
 use EscolaLms\Core\Tests\CreatesUsers;
+use EscolaLms\ModelFields\Facades\ModelFields;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Testing\Fluent\AssertableJson;
@@ -98,6 +99,38 @@ class ConsultationStoreApiTest extends TestCase
             )
             ->etc()
         );
+    }
+
+    public function testConsultationStoreWithModelFields(): void
+    {
+        ModelFields::addOrUpdateMetadataField(
+            Consultation::class,
+            'extra_field',
+            'text',
+            '',
+            ['required', 'string', 'max:255']
+        );
+
+        $consultation = Consultation::factory()->make();
+        $consultationArr = $consultation->toArray();
+        $requestArray = array_merge(
+            $consultationArr,
+            [
+                'extra_field' => 'value',
+            ],
+        );
+        $this->actingAs($this->user, 'api')->json(
+            'POST',
+            $this->apiUrl,
+            $requestArray
+        )
+            ->assertCreated()
+            ->assertJsonFragment([
+                'name' => $consultationArr['name'],
+                'short_desc' => $consultationArr['short_desc'],
+                'status' => $consultationArr['status'],
+                'extra_field' => 'value',
+            ]);
     }
 
     public function testConsultationStoreRequiredValidation(): void

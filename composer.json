@@ -9,6 +9,7 @@
     "escolalms/core": "^1",
     "escolalms/jitsi": "^0",
     "escolalms/settings": "^0",
+    "escolalms/model-fields": "^0",
     "laravel/framework": ">=8.0",
     "escolalms/files": "^0"
   },

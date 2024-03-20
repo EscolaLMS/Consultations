@@ -34,7 +34,9 @@ use EscolaLms\Core\Dtos\OrderDto;
 use EscolaLms\Files\Helpers\FileHelper;
 use EscolaLms\Jitsi\Helpers\StringHelper;
 use EscolaLms\Jitsi\Services\Contracts\JitsiServiceContract;
+use EscolaLms\ModelFields\Facades\ModelFields;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
@@ -436,6 +438,13 @@ class ConsultationService implements ConsultationServiceContract
     {
         $busyTerms = $this->getBusyTermsFormatDate($consultationId);
         return $proposedTerms->map(fn(ConsultationProposedTerm $proposedTerm) => Carbon::make($proposedTerm->proposed_at))->filter(fn (Carbon $proposedTerm) => !in_array($proposedTerm, $busyTerms))->toArray();
+    }
+
+    public function updateModelFieldsFromRequest(Consultation $consultation, FormRequest $request): void
+    {
+        $keys = ModelFields::getFieldsMetadata(Consultation::class)->pluck('name');
+        $fields = $request->collect()->only($keys)->toArray();
+        $this->consultationRepositoryContract->update($fields, $consultation->getKey());
     }
 
     private function getReminderData(string $reminderStatus): Collection

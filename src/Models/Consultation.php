@@ -5,6 +5,7 @@ namespace EscolaLms\Consultations\Models;
 use EscolaLms\Categories\Models\Category;
 use EscolaLms\Consultations\Database\Factories\ConsultationFactory;
 use EscolaLms\Consultations\Services\Contracts\ConsultationServiceContract;
+use EscolaLms\ModelFields\Traits\ModelFields;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -165,6 +166,7 @@ use EscolaLms\Core\Models\User as CoreUser;
 class Consultation extends Model
 {
     use HasFactory;
+    use ModelFields;
 
     protected $fillable = [
         'name',
