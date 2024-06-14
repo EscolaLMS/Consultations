@@ -15,7 +15,7 @@ class ConsultationAuthorResource extends JsonResource
     {
         $fields = array_merge(
             $this->resource->toArray(),
-            ['categories' => $this->categories],
+            ['categories' => $this->resource->categories],
             ModelFields::getExtraAttributesValues($this->resource, MetaFieldVisibilityEnum::PUBLIC)
         );
 

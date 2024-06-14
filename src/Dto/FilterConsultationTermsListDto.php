@@ -55,6 +55,7 @@ class FilterConsultationTermsListDto extends BaseDto implements ModelDtoContract
 
     public function model(): ConsultationUserPivot
     {
+        // @phpstan-ignore-next-line
         return ConsultationUserPivot::newModelInstance();
     }
 

@@ -74,29 +74,29 @@ class ConsultationTermsResource extends JsonResource
     {
         $consultationServiceContract = app(ConsultationServiceContract::class);
         $fields = [
-            'consultation_term_id' => $this->getKey(),
-            'date' => Carbon::make($this->executed_at) ?? '',
-            'status' => $this->executed_status ?? '',
-            'duration' => $this->consultation->getDuration(),
-            'user' => isset($this->user) ?
-                ConsultationAuthorResource::make($this->user) :
+            'consultation_term_id' => $this->resource->getKey(),
+            'date' => Carbon::make($this->resource->executed_at) ?? '',
+            'status' => $this->resource->executed_status ?? '',
+            'duration' => $this->resource->consultation->getDuration(),
+            'user' => isset($this->resource->user) ?
+                ConsultationAuthorResource::make($this->resource->user) :
                 null,
             'is_started' => $consultationServiceContract->isStarted(
-                $this->executed_at,
-                $this->executed_status,
-                $this->consultation->getDuration()
+                $this->resource->executed_at,
+                $this->resource->executed_status,
+                $this->resource->consultation->getDuration()
             ),
             'is_ended' => $consultationServiceContract->isEnded(
-                $this->executed_at,
-                $this->consultation->getDuration()
+                $this->resource->executed_at,
+                $this->resource->consultation->getDuration()
             ),
             'in_coming' => $consultationServiceContract->inComing(
-                $this->executed_at,
-                $this->executed_status,
-                $this->consultation->getDuration()
+                $this->resource->executed_at,
+                $this->resource->executed_status,
+                $this->resource->consultation->getDuration()
             ),
-            'busy_terms' => ConsultationTermResource::collection($consultationServiceContract->getBusyTermsFormatDate($this->consultation->getKey())),
-            'author' =>  $this->consultation->author ? ConsultationAuthorResource::make($this->consultation->author) : null,
+            'busy_terms' => ConsultationTermResource::collection($consultationServiceContract->getBusyTermsFormatDate($this->resource->consultation->getKey())),
+            'author' =>  $this->resource->consultation->author ? ConsultationAuthorResource::make($this->resource->consultation->author) : null,
         ];
         return self::apply($fields, $this);
     }

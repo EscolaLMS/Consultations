@@ -26,6 +26,7 @@ abstract class ConsultationRequest extends FormRequest
 
     private function getRouteIdParameter(): ?int
     {
-        return $this->route('consultation') ?? $this->route('id');
+        $result = $this->route('consultation') ?? $this->route('id');
+        return $result ? (int) $result : null;
     }
 }

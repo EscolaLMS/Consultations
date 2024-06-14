@@ -35,6 +35,7 @@ use EscolaLms\Files\Helpers\FileHelper;
 use EscolaLms\Jitsi\Helpers\StringHelper;
 use EscolaLms\Jitsi\Services\Contracts\JitsiServiceContract;
 use EscolaLms\ModelFields\Facades\ModelFields;
+use Exception;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
@@ -88,6 +89,7 @@ class ConsultationService implements ConsultationServiceContract
     public function store(ConsultationDto $consultationDto): Consultation
     {
         return DB::transaction(function () use($consultationDto) {
+            /** @var Consultation $consultation */
             $consultation = $this->consultationRepositoryContract->create($consultationDto->toArray());
             $this->setRelations($consultation, $consultationDto->getRelations());
             $this->setFiles($consultation, $consultationDto->getFiles());
@@ -109,6 +111,7 @@ class ConsultationService implements ConsultationServiceContract
 
     public function show(int $id): Consultation
     {
+        /** @var Consultation|null $consultation */
         $consultation = $this->consultationRepositoryContract->find($id);
         if (!$consultation) {
             throw new ConsultationNotFound();
@@ -126,6 +129,7 @@ class ConsultationService implements ConsultationServiceContract
     public function reportTerm(int $consultationTermId, string $executedAt): bool
     {
         return DB::transaction(function () use ($consultationTermId, $executedAt) {
+            /** @var ConsultationUserPivot $consultationTerm */
             $consultationTerm = $this->consultationUserRepositoryContract->find($consultationTermId);
             if ($this->termIsBusy($consultationTerm->consultation_id, $executedAt)) {
                 abort(400, __('Term is busy, change your term.'));
@@ -143,19 +147,25 @@ class ConsultationService implements ConsultationServiceContract
 
     public function approveTerm(int $consultationTermId): bool
     {
+        /** @var ConsultationUserPivot $consultationTerm */
         $consultationTerm = $this->consultationUserRepositoryContract->find($consultationTermId);
         $this->setStatus($consultationTerm, ConsultationTermStatusEnum::APPROVED);
         event(new ApprovedTerm($consultationTerm->user, $consultationTerm));
-        event(new ApprovedTermWithTrainer(auth()->user(), $consultationTerm));
+        /** @var User $authUser */
+        $authUser = auth()->user();
+        event(new ApprovedTermWithTrainer($authUser, $consultationTerm));
         return true;
     }
 
     public function rejectTerm(int $consultationTermId): bool
     {
+        /** @var ConsultationUserPivot $consultationTerm */
         $consultationTerm = $this->consultationUserRepositoryContract->find($consultationTermId);
         $this->setStatus($consultationTerm, ConsultationTermStatusEnum::REJECT);
         event(new RejectTerm($consultationTerm->user, $consultationTerm));
-        event(new RejectTermWithTrainer(auth()->user(), $consultationTerm));
+        /** @var User $authUser */
+        $authUser = auth()->user();
+        event(new RejectTermWithTrainer($authUser, $consultationTerm));
         return true;
     }
 
@@ -168,6 +178,7 @@ class ConsultationService implements ConsultationServiceContract
 
     public function generateJitsi(int $consultationTermId): array
     {
+        /** @var ConsultationUserPivot $consultationTerm */
         $consultationTerm = $this->consultationUserRepositoryContract->find($consultationTermId);
         if (!$this->canGenerateJitsi(
             $consultationTerm->executed_at,
@@ -179,7 +190,7 @@ class ConsultationService implements ConsultationServiceContract
         $isModerator = false;
         $configOverwrite = [];
         $configInterface = [];
-        if ($consultationTerm->consultation->author === auth()->user()->getKey()) {
+        if ($consultationTerm->consultation->author->getKey() === auth()->user()->getKey()) {
             $configOverwrite = [
                 "disableModeratorIndicator" => true,
                 "startScreenSharing" => false,
@@ -195,8 +206,10 @@ class ConsultationService implements ConsultationServiceContract
                 'HIDE_INVITE_MORE_HEADER' => true
             ];
         }
+        /** @var User $authUser */
+        $authUser = auth()->user();
         return $this->jitsiServiceContract->getChannelData(
-            auth()->user(),
+            $authUser,
             StringHelper::convertToJitsiSlug($consultationTerm->consultation->name),
             $isModerator,
             $configOverwrite,
@@ -218,11 +231,12 @@ class ConsultationService implements ConsultationServiceContract
 
     public function generateJitsiUrlForEmail(int $consultationTermId, int $userId): ?string
     {
+        /** @var ConsultationUserPivot $consultationTerm */
         $consultationTerm = $this->consultationUserRepositoryContract->find($consultationTermId);
         $isModerator = false;
         $configOverwrite = [];
         $configInterface = [];
-        if ($consultationTerm->consultation->author === $userId) {
+        if ($consultationTerm->consultation->author->getKey() === $userId) {
             $configOverwrite = [
                 "disableModeratorIndicator" => true,
                 "startScreenSharing" => false,
@@ -277,8 +291,9 @@ class ConsultationService implements ConsultationServiceContract
 
     public function proposedTerms(int $consultationTermId): ?array
     {
+        /** @var ConsultationUserPivot $consultationUserPivot */
         $consultationUserPivot = $this->consultationUserRepositoryContract->find($consultationTermId);
-        return $this->filterProposedTerms($consultationUserPivot->consultation_id, $consultationUserPivot->consultation->proposedTerms) ?? null;
+        return $this->filterProposedTerms($consultationUserPivot->consultation_id, $consultationUserPivot->consultation->proposedTerms);
     }
 
     public function setFiles(Consultation $consultation, array $files = []): void
@@ -314,22 +329,22 @@ class ConsultationService implements ConsultationServiceContract
         }
         ConsultationSimpleResource::extend(function (ConsultationSimpleResource $consultation) {
             return [
-                'consultation_term_id' => $consultation->consultation_user_id,
-                'name' => $consultation->name,
-                'image_path' => $consultation->image_path,
-                'image_url' => $consultation->image_url,
-                'executed_status' => $consultation->executed_status,
-                'executed_at' => Carbon::make($consultation->executed_at),
+                'consultation_term_id' => $consultation->resource->consultation_user_id,
+                'name' => $consultation->resource->name,
+                'image_path' => $consultation->resource->image_path,
+                'image_url' => $consultation->resource->image_url,
+                'executed_status' => $consultation->resource->executed_status,
+                'executed_at' => Carbon::make($consultation->resource->executed_at),
                 'is_started' => $this->isStarted(
-                    $consultation->executed_at,
-                    $consultation->executed_status,
-                    $consultation->getDuration()
+                    $consultation->resource->executed_at,
+                    $consultation->resource->executed_status,
+                    $consultation->resource->getDuration()
                 ),
-                'is_ended' => $this->isEnded($consultation->executed_at, $consultation->getDuration()),
+                'is_ended' => $this->isEnded($consultation->resource->executed_at, $consultation->resource->getDuration()),
                 'in_coming' => $this->inComing(
-                    $consultation->executed_at,
-                    $consultation->executed_status,
-                    $consultation->getDuration()
+                    $consultation->resource->executed_at,
+                    $consultation->resource->executed_status,
+                    $consultation->resource->getDuration()
                 ),
             ];
         });
@@ -384,17 +399,20 @@ class ConsultationService implements ConsultationServiceContract
     public function changeTerm(int $consultationTermId, string $executedAt): bool
     {
         DB::transaction(function () use ($consultationTermId, $executedAt) {
-            if ($consultationUser = $this->consultationUserRepositoryContract->update([
-                'executed_at' => Carbon::make($executedAt),
-                'executed_status' => ConsultationTermStatusEnum::APPROVED
-            ], $consultationTermId)) {
-                if (!$consultationUser->user || !$consultationUser) {
+            try {
+                /** @var ConsultationUserPivot $consultationUser */
+                $consultationUser = $this->consultationUserRepositoryContract->update([
+                    'executed_at' => Carbon::make($executedAt),
+                    'executed_status' => ConsultationTermStatusEnum::APPROVED
+                ], $consultationTermId);
+                if (!$consultationUser->user) {
                     throw new ChangeTermException(__('Term is changed but not executed event because user or term is no exists'));
                 }
                 event(new ChangeTerm($consultationUser->user, $consultationUser));
                 return true;
+            } catch (Exception $e) {
+                throw new ChangeTermException(__('Term is not changed'));
             }
-            throw new ChangeTermException(__('Term is not changed'));
         });
         return false;
     }
@@ -406,6 +424,7 @@ class ConsultationService implements ConsultationServiceContract
 
     public function termIsBusy(int $consultationId, string $date): bool
     {
+        /** @var Consultation $consultation */
         $consultation = $this->consultationRepositoryContract->find($consultationId);
         $terms = $this->consultationUserRepositoryContract->getBusyTerms($consultationId, $date);
         $userId = Auth::user()->getKey();
@@ -418,6 +437,7 @@ class ConsultationService implements ConsultationServiceContract
 
     public function termIsBusyForUser(int $consultationId, string $date, int $userId): bool
     {
+        /** @var Consultation $consultation */
         $consultation = $this->consultationRepositoryContract->find($consultationId);
         $terms = $this->consultationUserRepositoryContract->getBusyTerms($consultationId, $date);
         if ($terms->first(fn (ConsultationUserPivot $userPivot) => $userPivot->user_id === $userId) !== null) {

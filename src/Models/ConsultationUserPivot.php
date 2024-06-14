@@ -7,7 +7,15 @@ use EscolaLms\Consultations\Enum\ConsultationTermStatusEnum;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Carbon;
 
+/**
+ * @property ConsultationTermStatusEnum $executed_status
+ * @property int $user_id
+ * @property int $consultation_id
+ * @property Consultation $consultation
+ * @property Carbon $executed_at
+ */
 class ConsultationUserPivot extends Model
 {
     use HasFactory;
@@ -35,12 +43,12 @@ class ConsultationUserPivot extends Model
 
     public function isApproved(): bool
     {
-        return $this->executed_status === ConsultationTermStatusEnum::APPROVED;
+        return $this->executed_status->is(ConsultationTermStatusEnum::APPROVED);
     }
 
     public function isRejected(): bool
     {
-        return $this->executed_status === ConsultationTermStatusEnum::REJECT;
+        return $this->executed_status->is(ConsultationTermStatusEnum::REJECT);
     }
 
     protected static function newFactory(): ConsultationUserFactory
