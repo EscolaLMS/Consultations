@@ -63,6 +63,7 @@ class ConsultationScheduleTermsTest extends TestCase
     {
         $this->initVariable();
         $this->response = $this->actingAs($this->user, 'api')->get($this->apiUrl);
+
         $this->response->assertOk();
         $this->response->assertJson(fn (AssertableJson $json) =>
             $json->has('data', fn (AssertableJson $json) =>
