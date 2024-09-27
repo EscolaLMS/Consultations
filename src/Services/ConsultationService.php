@@ -190,7 +190,7 @@ class ConsultationService implements ConsultationServiceContract
         $isModerator = false;
         $configOverwrite = [];
         $configInterface = [];
-        if ($consultationTerm->consultation->author->getKey() === auth()->user()->getKey()) {
+        if ($consultationTerm->consultation->author->getKey() === auth()->user()->getKey() || in_array(auth()->user()->getKey(), $consultationTerm->consultation->teachers()->pluck('id')->toArray())) {
             $configOverwrite = [
                 "disableModeratorIndicator" => true,
                 "startScreenSharing" => false,
@@ -236,7 +236,7 @@ class ConsultationService implements ConsultationServiceContract
         $isModerator = false;
         $configOverwrite = [];
         $configInterface = [];
-        if ($consultationTerm->consultation->author->getKey() === $userId) {
+        if ($consultationTerm->consultation->author->getKey() === $userId || in_array($userId, $consultationTerm->consultation->teachers()->pluck('id')->toArray())) {
             $configOverwrite = [
                 "disableModeratorIndicator" => true,
                 "startScreenSharing" => false,
@@ -383,11 +383,21 @@ class ConsultationService implements ConsultationServiceContract
                 $consultationTerm,
                 $reminderStatus
             ));
-            event(new ReminderTrainerAboutTerm(
-                $consultationTerm->consultation->author,
-                $consultationTerm,
-                $reminderStatus
-            ));
+            if ($consultationTerm->consultation->teachers) {
+                $consultationTerm->consultation->teachers->each(
+                    fn (User $teacher) => event(new ReminderTrainerAboutTerm(
+                        $teacher,
+                        $consultationTerm,
+                        $reminderStatus
+                    ))
+                );
+            } else {
+                event(new ReminderTrainerAboutTerm(
+                    $consultationTerm->consultation->author,
+                    $consultationTerm,
+                    $reminderStatus
+                ));
+            }
         }
     }
 
