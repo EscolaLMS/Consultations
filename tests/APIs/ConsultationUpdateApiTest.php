@@ -77,12 +77,14 @@ class ConsultationUpdateApiTest extends TestCase
         $consultationUpdateArray = $consultationUpdate->toArray();
         $this->assertTrue(!isset($consultation['image_path']));
         $categories = Category::factory(2)->create()->pluck('id')->toArray();
+        $teachers = User::factory()->count(4)->create();
         $requestArray = array_merge(
             $consultationUpdateArray,
             ['proposed_terms' => $proposedTerms],
             ['image' => UploadedFile::fake()->image('image.jpg')],
             ['categories' => $categories],
             ['max_session_students' => 4],
+            ['teachers' => $teachers->pluck('id')->toArray()],
         );
         $response = $this->actingAs($this->user, 'api')->json(
             'POST',
@@ -118,6 +120,7 @@ class ConsultationUpdateApiTest extends TestCase
             'proposed_terms' => $proposedTerms
         ]);
         $response->assertJsonFragment(['success' => true]);
+        $response->assertJsonCount(4, 'data.teachers');
     }
 
     public function testConsultationUpdateSingleField(): void
