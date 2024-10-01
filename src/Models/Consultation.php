@@ -196,6 +196,11 @@ class Consultation extends Model
         return $this->belongsToMany(User::class, 'consultation_user');
     }
 
+    public function teachers(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'consultation_teachers', 'consultation_id', 'teacher_id');
+    }
+
     public function proposedTerms(): HasMany
     {
         return $this->hasMany(ConsultationProposedTerm::class, 'consultation_id');

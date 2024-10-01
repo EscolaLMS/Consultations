@@ -36,6 +36,7 @@ class ConsultationSimpleResource extends JsonResource
             'busy_terms' => ConsultationTermResource::collection($consultationServiceContract->getBusyTermsFormatDate($this->resource->getKey())),
             'categories' => $this->resource->categories,
             'max_session_students' => $this->resource->max_session_students,
+            'teachers' => ConsultationAuthorResource::collection($this->resource->teachers),
             ...ModelFields::getExtraAttributesValues($this->resource, MetaFieldVisibilityEnum::PUBLIC)
         ];
         return self::apply($fields, $this);

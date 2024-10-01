@@ -32,6 +32,8 @@ class StoreConsultationRequest extends FormRequest
             'categories' => ['array'],
             'categories.*' => ['integer', 'exists:categories,id'],
             'max_session_students' => ['integer', 'min:1', 'max:99'],
+            'teachers' => ['array'],
+            'teachers.*' => ['integer', 'exists:users,id'],
         ], ModelFields::getFieldsMetadataRules(Consultation::class));
     }
 }

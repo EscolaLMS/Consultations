@@ -56,6 +56,7 @@ class ConsultationStoreApiTest extends TestCase
             now()->modify('+1 day')->format("Y-m-d\TH:i:s.000000\Z")
         ];
         $categories = Category::factory(2)->create()->pluck('id')->toArray();
+        $teachers = User::factory()->count(4)->create();
         $requestArray = array_merge(
             $consultationArr,
             ['proposed_terms' => $proposedTerms],
@@ -63,6 +64,7 @@ class ConsultationStoreApiTest extends TestCase
             ['logotype' => UploadedFile::fake()->image('image.jpg')],
             ['categories' => $categories],
             ['max_session_students' => 5],
+            ['teachers' => $teachers->pluck('id')->toArray()],
         );
         $response = $this->actingAs($this->user, 'api')->json(
             'POST',
@@ -99,6 +101,7 @@ class ConsultationStoreApiTest extends TestCase
             )
             ->etc()
         );
+        $response->assertJsonCount(4, 'data.teachers');
     }
 
     public function testConsultationStoreWithModelFields(): void

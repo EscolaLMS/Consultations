@@ -57,9 +57,11 @@ class ConsultationUserRepository extends BaseRepository implements ConsultationU
 
     public function getByCurrentUserTutor(): Collection
     {
-        $query = $this->model->newQuery();
-        $query->whereHas('consultation', fn (Builder $query) => $query->whereAuthorId(auth()->user()->getKey()));
-        return $query->get();
+        return $this->model->newQuery()
+            ->whereHas('consultation', fn (Builder $query) => $query
+            ->whereAuthorId(auth()->user()->getKey())
+            ->orWhereHas('teachers', fn (Builder $query) => $query->where('users.id', '=', auth()->user()->getKey()))
+        )->get();
     }
 
     public function getBusyTerms(int $consultationId, ?string $date = null): Collection

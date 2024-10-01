@@ -87,4 +87,9 @@ class ConsultationDto extends BaseDto implements ModelDtoContract
     {
         $this->activeFrom = $activeFrom ? Carbon::make($activeFrom) : null;
     }
+
+    protected function setTeachers(array $teachers): void
+    {
+        $this->relations['teachers'] = $teachers;
+    }
 }
