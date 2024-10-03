@@ -4,9 +4,11 @@ namespace EscolaLms\Consultations\Dto;
 
 use Carbon\Carbon;
 use EscolaLms\Consultations\Dto\Contracts\ModelDtoContract;
+use EscolaLms\Consultations\Enum\ConstantEnum;
 use EscolaLms\Consultations\Models\Consultation;
 use EscolaLms\Consultations\Models\ConsultationProposedTerm;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Str;
 
 class ConsultationDto extends BaseDto implements ModelDtoContract
 {
@@ -36,7 +38,7 @@ class ConsultationDto extends BaseDto implements ModelDtoContract
     public function getImagePath()
     {
         if ($this->imagePath !== false) {
-            return $this->imagePath === null ? '' : $this->imagePath;
+            return $this->imagePath === null ? '' : Str::after($this->imagePath, env('AWS_ACCESS_KEY_ID') . '/');
         }
         return false;
     }
@@ -44,7 +46,11 @@ class ConsultationDto extends BaseDto implements ModelDtoContract
     public function getLogotypePath()
     {
         if ($this->logotypePath !== false) {
-            return $this->logotypePath === null ? '' : $this->logotypePath;
+            if ($this->logotypePath) {
+                $logotypePath = Str::after($this->logotypePath, env('AWS_ACCESS_KEY_ID') . '/');
+                return Str::startsWith($logotypePath, ConstantEnum::DIRECTORY) ? $logotypePath : ConstantEnum::DIRECTORY . '/' .$logotypePath;
+            }
+            return '';
         }
         return false;
     }
