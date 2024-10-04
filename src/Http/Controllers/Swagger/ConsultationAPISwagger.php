@@ -1,6 +1,7 @@
 <?php
 namespace EscolaLms\Consultations\Http\Controllers\Swagger;
 
+use EscolaLms\Consultations\Http\Requests\ConsultationScreenSaveRequest;
 use EscolaLms\Consultations\Http\Requests\ListAPIConsultationsRequest;
 use EscolaLms\Consultations\Http\Requests\ListConsultationsRequest;
 use EscolaLms\Consultations\Http\Requests\ReportTermConsultationRequest;
@@ -542,4 +543,72 @@ interface ConsultationAPISwagger
      * )
      */
     public function schedule(ScheduleConsultationAPIRequest $scheduleConsultationAPIRequest): JsonResponse;
+
+    /**
+     * @OA\Post(
+     *      path="/api/consultations/save-screen",
+     *      security={
+     *          {"passport": {}},
+     *      },
+     *      summary="Save screen from jitsi meeting",
+     *      tags={"Consultations"},
+     *      description="Report term consultation",
+     *      @OA\RequestBody(
+     *          required=true,
+     *          @OA\JsonContent(
+     *              @OA\Property(
+     *                  property="consultation_id",
+     *                  type=int
+     *              ),
+     *              @OA\Property(
+     *                  property="user_termin_id",
+     *                  type=int
+     *              ),
+     *              @OA\Property(
+     *                  property="user_email",
+     *                  type=string
+     *              ),
+     *              @OA\Property(
+     *                  property="timestamp",
+     *                  type=string,
+     *                  example="2024-10-04 12:02:12"
+     *              ),
+     *              @OA\Property(
+     *                  property="file",
+     *                  type=file
+     *              ),
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="successful operation",
+     *          @OA\MediaType(
+     *              mediaType="application/json"
+     *          ),
+     *          @OA\Schema(
+     *              type="object",
+     *              @OA\Property(
+     *                  property="success",
+     *                  type="boolean"
+     *              ),
+     *              @OA\Property(
+     *                  property="data",
+     *                  type="string"
+     *              ),
+     *              @OA\Property(
+     *                  property="message",
+     *                  type="string"
+     *              )
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=404,
+     *          description="Bad request",
+     *          @OA\MediaType(
+     *              mediaType="application/json"
+     *          )
+     *      )
+     * )
+     */
+    public function screenSave(ConsultationScreenSaveRequest $request): JsonResponse;
 }

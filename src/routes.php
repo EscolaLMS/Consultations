@@ -30,4 +30,5 @@ Route::group(['prefix' => 'api/consultations'], function () {
     Route::get('/{id}', [ConsultationAPIController::class, 'show']);
 });
 
+Route::post('api/consultations/save-screen', [ConsultationAPIController::class, 'screenSave']);
 
