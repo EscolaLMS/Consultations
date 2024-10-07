@@ -5,6 +5,7 @@ namespace EscolaLms\Consultations\Services;
 use Auth;
 use Carbon\Carbon;
 use EscolaLms\Consultations\Dto\ConsultationDto;
+use EscolaLms\Consultations\Dto\ConsultationSaveScreenDto;
 use EscolaLms\Consultations\Dto\FilterConsultationTermsListDto;
 use EscolaLms\Consultations\Dto\FilterListDto;
 use EscolaLms\Consultations\Enum\ConstantEnum;
@@ -21,6 +22,7 @@ use EscolaLms\Consultations\Events\ReportTerm;
 use EscolaLms\Consultations\Exceptions\ChangeTermException;
 use EscolaLms\Consultations\Exceptions\ConsultationNotFound;
 use EscolaLms\Consultations\Helpers\StrategyHelper;
+use EscolaLms\Consultations\Http\Requests\ConsultationScreenSaveRequest;
 use EscolaLms\Consultations\Http\Requests\ListConsultationsRequest;
 use EscolaLms\Consultations\Http\Resources\ConsultationSimpleResource;
 use EscolaLms\Consultations\Models\Consultation;
@@ -39,8 +41,11 @@ use Exception;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class ConsultationService implements ConsultationServiceContract
@@ -190,7 +195,7 @@ class ConsultationService implements ConsultationServiceContract
         $isModerator = false;
         $configOverwrite = [];
         $configInterface = [];
-        if ($consultationTerm->consultation->author->getKey() === auth()->user()->getKey() || in_array(auth()->user()->getKey(), $consultationTerm->consultation->teachers()->pluck('id')->toArray())) {
+        if ($consultationTerm->consultation->author->getKey() === auth()->user()->getKey() || in_array(auth()->user()->getKey(), $consultationTerm->consultation->teachers()->pluck('users.id')->toArray())) {
             $configOverwrite = [
                 "disableModeratorIndicator" => true,
                 "startScreenSharing" => false,
@@ -236,7 +241,7 @@ class ConsultationService implements ConsultationServiceContract
         $isModerator = false;
         $configOverwrite = [];
         $configInterface = [];
-        if ($consultationTerm->consultation->author->getKey() === $userId || in_array($userId, $consultationTerm->consultation->teachers()->pluck('id')->toArray())) {
+        if ($consultationTerm->consultation->author->getKey() === $userId || in_array($userId, $consultationTerm->consultation->teachers()->pluck('users.id')->toArray())) {
             $configOverwrite = [
                 "disableModeratorIndicator" => true,
                 "startScreenSharing" => false,
@@ -495,5 +500,23 @@ class ConsultationService implements ConsultationServiceContract
         return $this->consultationUserRepositoryContract->getIncomingTerm(
             FilterConsultationTermsListDto::prepareFilters($data)->getCriteria()
         );
+    }
+
+    public function saveScreen(ConsultationSaveScreenDto $dto): void
+    {
+        /** @var ConsultationUserPivot $consultationUser */
+        $consultationUser = ConsultationUserPivot::query()->where('consultation_id', '=', $dto->getConsultationId())->where('id', '=', $dto->getUserTerminId())->firstOrFail();
+        $user = User::query()->where('email', '=', $dto->getUserEmail())->firstOrFail();
+
+        if ($user->getKey() !== $consultationUser->user_id || $consultationUser->executed_at === null) {
+            throw new NotFoundHttpException(__('Consultation term for this user is not available'));
+        }
+
+        $termin = Carbon::make($consultationUser->executed_at);
+        // consultation_id/term_start_timestamp/user_id/timestamp.jpg
+        $folder = "consultations/{$dto->getConsultationId()}/{$termin->getTimestamp()}/{$user->getKey()}";
+
+        $extension = $dto->getFile() instanceof UploadedFile ? $dto->getFile()->getClientOriginalExtension() : Str::between($dto->getFile(), 'data:image/', ';base64');
+        Storage::putFileAs($folder, $dto->getFile(), Carbon::make($dto->getTimestamp())->getTimestamp() . '.' . $extension);
     }
 }

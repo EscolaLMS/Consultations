@@ -4,6 +4,8 @@ namespace EscolaLms\Consultations\Services\Contracts;
 
 use Carbon\Carbon;
 use EscolaLms\Consultations\Dto\ConsultationDto;
+use EscolaLms\Consultations\Dto\ConsultationSaveScreenDto;
+use EscolaLms\Consultations\Http\Requests\ConsultationScreenSaveRequest;
 use EscolaLms\Consultations\Http\Requests\ListConsultationsRequest;
 use EscolaLms\Consultations\Models\Consultation;
 use EscolaLms\Consultations\Models\ConsultationUserPivot;
@@ -99,4 +101,5 @@ interface ConsultationServiceContract
     public function termIsBusyForUser(int $consultationId, string $date, int $userId): bool;
     public function getBusyTermsFormatDate(int $consultationId): array;
     public function updateModelFieldsFromRequest(Consultation $consultation, FormRequest $request): void;
+    public function saveScreen(ConsultationSaveScreenDto $dto);
 }

@@ -2,8 +2,10 @@
 
 namespace EscolaLms\Consultations\Http\Controllers;
 
+use EscolaLms\Consultations\Dto\ConsultationSaveScreenDto;
 use EscolaLms\Consultations\Enum\ConstantEnum;
 use EscolaLms\Consultations\Http\Controllers\Swagger\ConsultationAPISwagger;
+use EscolaLms\Consultations\Http\Requests\ConsultationScreenSaveRequest;
 use EscolaLms\Consultations\Http\Requests\ListAPIConsultationsRequest;
 use EscolaLms\Consultations\Http\Requests\ListConsultationsRequest;
 use EscolaLms\Consultations\Http\Requests\ReportTermConsultationRequest;
@@ -109,5 +111,11 @@ class ConsultationAPIController extends EscolaLmsBaseController implements Consu
             ConsultationTermsResource::collection($consultationTerms),
             __('Consultation updated successfully')
         );
+    }
+
+    public function screenSave(ConsultationScreenSaveRequest $request): JsonResponse
+    {
+        $this->consultationServiceContract->saveScreen(new ConsultationSaveScreenDto($request->all()));
+        return $this->sendSuccess(__('Screen saved successfully'));
     }
 }
