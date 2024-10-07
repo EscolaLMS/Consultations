@@ -41,11 +41,11 @@ use Exception;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
-use Nyholm\Psr7\UploadedFile;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class ConsultationService implements ConsultationServiceContract
@@ -508,7 +508,7 @@ class ConsultationService implements ConsultationServiceContract
         $consultationUser = ConsultationUserPivot::query()->where('consultation_id', '=', $dto->getConsultationId())->where('id', '=', $dto->getUserTerminId())->firstOrFail();
         $user = User::query()->where('email', '=', $dto->getUserEmail())->firstOrFail();
 
-        if ($user->getKey() !== $consultationUser->user_id) {
+        if ($user->getKey() !== $consultationUser->user_id || $consultationUser->executed_at === null) {
             throw new NotFoundHttpException(__('Consultation term for this user is not available'));
         }
 

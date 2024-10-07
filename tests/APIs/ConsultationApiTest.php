@@ -2,19 +2,24 @@
 
 namespace EscolaLms\Consultations\Tests\APIs;
 
+use Carbon\Carbon;
 use EscolaLms\Auth\Dtos\Admin\UserAssignableDto;
 use EscolaLms\Auth\Services\Contracts\UserServiceContract;
 use EscolaLms\Categories\Models\Category;
 use EscolaLms\Consultations\Database\Seeders\ConsultationsPermissionSeeder;
 use EscolaLms\Consultations\Enum\ConsultationsPermissionsEnum;
 use EscolaLms\Consultations\Enum\ConsultationStatusEnum;
+use EscolaLms\Consultations\Enum\ConsultationTermStatusEnum;
 use EscolaLms\Consultations\Models\Consultation;
+use EscolaLms\Consultations\Models\ConsultationUserPivot;
 use EscolaLms\Consultations\Tests\Models\User;
 use EscolaLms\Consultations\Tests\TestCase;
 use EscolaLms\Core\Tests\CreatesUsers;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Testing\Fluent\AssertableJson;
 
 class ConsultationApiTest extends TestCase
@@ -200,6 +205,62 @@ class ConsultationApiTest extends TestCase
             ->assertJsonMissing([
                 'id' => $this->user->getKey(),
                 'email' => $this->user->email,
+            ]);
+    }
+
+    public function testConsultationSaveScreen(): void
+    {
+        $admin = $this->makeAdmin();
+        $student = $this->makeStudent();
+
+        /** @var Consultation $consultation */
+        $consultation = Consultation::factory()->create();
+        $consultation->author()->associate($this->user);
+        $time = now();
+        $data = [
+            'consultation_id' => $consultation->getKey(),
+            'user_id' => $student->getKey(),
+            'executed_status' => ConsultationTermStatusEnum::APPROVED,
+            'executed_at' => $time,
+        ];
+        $consultation->attachToConsultationPivot($data);
+
+        $consultationUser = ConsultationUserPivot::query()
+            ->where('user_id', '=', $student->getKey())
+            ->where('consultation_id', '=', $consultation->getKey())->first();
+
+        Storage::fake();
+        $this->response = $this->json('POST', '/api/consultations/save-screen', [
+            'consultation_id' => $consultation->getKey(),
+            'user_email' => $student->email,
+            'user_termin_id' => $consultationUser->getKey(),
+            'file' => UploadedFile::fake()->image('image.jpg'),
+            'timestamp' => $time->format('Y-m-d H:i:s'),
+        ])
+            ->assertOk();
+
+        $term = Carbon::make($consultationUser->executed_at);
+        // consultation_id/term_start_timestamp/user_id/timestamp.jpg
+        Storage::assertExists("consultations/{$consultation->getKey()}/{$term->getTimestamp()}/{$student->getKey()}/{$time->getTimestamp()}.jpg");
+
+        $this->response = $this->json('POST', '/api/consultations/save-screen', [
+            'consultation_id' => $consultation->getKey(),
+            'user_email' => $admin->email,
+            'user_termin_id' => $consultationUser->getKey(),
+            'file' => UploadedFile::fake()->image('image.jpg'),
+            'timestamp' => $time->format('Y-m-d H:i:s'),
+        ])->assertNotFound();
+
+        $this->response = $this->json('POST', '/api/consultations/save-screen', [
+            'consultation_id' => $consultation->getKey(),
+            'user_email' => $student->email,
+            'user_termin_id' => $consultationUser->getKey() + 1,
+            'file' => UploadedFile::fake()->image('image.jpg'),
+            'timestamp' => $time->format('Y-m-d H:i:s'),
+        ])
+            ->assertUnprocessable()
+            ->assertJsonFragment([
+                'message' => 'The selected user termin id is invalid.',
             ]);
     }
 }
