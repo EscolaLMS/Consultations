@@ -1,4 +1,5 @@
 <?php
+
 namespace EscolaLms\Consultations\Http\Controllers\Swagger;
 
 use EscolaLms\Consultations\Http\Requests\ConsultationScreenSaveRequest;
@@ -555,28 +556,32 @@ interface ConsultationAPISwagger
      *      description="Report term consultation",
      *      @OA\RequestBody(
      *          required=true,
-     *          @OA\JsonContent(
-     *              @OA\Property(
-     *                  property="consultation_id",
-     *                  type=int
-     *              ),
-     *              @OA\Property(
-     *                  property="user_termin_id",
-     *                  type=int
-     *              ),
-     *              @OA\Property(
-     *                  property="user_email",
-     *                  type=string
-     *              ),
-     *              @OA\Property(
-     *                  property="timestamp",
-     *                  type=string,
-     *                  example="2024-10-04 12:02:12"
-     *              ),
-     *              @OA\Property(
-     *                  property="file",
-     *                  type=file
-     *              ),
+     *          @OA\MediaType(
+     *              mediaType="multipart/form-data",
+     *              @OA\Schema(
+     *                  @OA\Property(
+     *                      property="consultation_id",
+     *                      type="int"
+     *                  ),
+     *                  @OA\Property(
+     *                      property="user_termin_id",
+     *                      type="int"
+     *                  ),
+     *                  @OA\Property(
+     *                      property="user_email",
+     *                      type="string"
+     *                  ),
+     *                  @OA\Property(
+     *                      property="timestamp",
+     *                      type="string",
+     *                      example="2024-10-04 12:02:12"
+     *                  ),
+     *                  @OA\Property(
+     *                      property="file",
+     *                      type="string",
+     *                      format="binary"
+     *                  )
+     *              )
      *          )
      *      ),
      *      @OA\Response(
