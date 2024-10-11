@@ -215,7 +215,7 @@ class ConsultationService implements ConsultationServiceContract
         $authUser = auth()->user();
         return $this->jitsiServiceContract->getChannelData(
             $authUser,
-            StringHelper::convertToJitsiSlug($consultationTerm->consultation->name, [], ConstantEnum::DIRECTORY, $consultationTerm->consultation_id, Carbon::make($consultationTerm->executed_at)->getTimestamp()),
+            StringHelper::convertToJitsiSlug($consultationTerm->consultation->name, [], ConstantEnum::DIRECTORY, $consultationTerm->consultation_id, (string) Carbon::make($consultationTerm->executed_at)->getTimestamp()),
             $isModerator,
             $configOverwrite,
             $configInterface
@@ -260,7 +260,7 @@ class ConsultationService implements ConsultationServiceContract
         $user = User::find($userId);
         $result = $this->jitsiServiceContract->getChannelData(
             $user,
-            StringHelper::convertToJitsiSlug($consultationTerm->consultation->name, [], ConstantEnum::DIRECTORY, $consultationTerm->consultation_id, Carbon::make($consultationTerm->executed_at)->getTimestamp()),
+            StringHelper::convertToJitsiSlug($consultationTerm->consultation->name, [], ConstantEnum::DIRECTORY, $consultationTerm->consultation_id, (string) Carbon::make($consultationTerm->executed_at)->getTimestamp()),
             $isModerator,
             $configOverwrite,
             $configInterface
