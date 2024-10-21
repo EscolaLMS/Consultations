@@ -259,8 +259,6 @@ class ConsultationApiTest extends TestCase
             'timestamp' => $time->format('Y-m-d H:i:s'),
         ])
             ->assertUnprocessable()
-            ->assertJsonFragment([
-                'message' => 'The selected user termin id is invalid.',
-            ]);
+            ->assertJsonValidationErrors(['user_termin_id']);
     }
 }
