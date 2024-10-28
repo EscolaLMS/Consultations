@@ -38,7 +38,7 @@ class ConsultationDto extends BaseDto implements ModelDtoContract
     public function getImagePath()
     {
         if ($this->imagePath !== false) {
-            return $this->imagePath === null ? '' : Str::after($this->imagePath, env('AWS_ACCESS_KEY_ID') . '/');
+            return $this->imagePath === null ? '' : Str::after($this->imagePath, env('AWS_URL') . '/');
         }
         return false;
     }
@@ -47,7 +47,7 @@ class ConsultationDto extends BaseDto implements ModelDtoContract
     {
         if ($this->logotypePath !== false) {
             if ($this->logotypePath) {
-                $logotypePath = Str::after($this->logotypePath, env('AWS_ACCESS_KEY_ID') . '/');
+                $logotypePath = Str::after($this->logotypePath, env('AWS_URL') . '/');
                 return Str::startsWith($logotypePath, ConstantEnum::DIRECTORY) ? $logotypePath : ConstantEnum::DIRECTORY . '/' .$logotypePath;
             }
             return '';

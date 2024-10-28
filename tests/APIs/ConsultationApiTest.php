@@ -7,6 +7,7 @@ use EscolaLms\Auth\Dtos\Admin\UserAssignableDto;
 use EscolaLms\Auth\Services\Contracts\UserServiceContract;
 use EscolaLms\Categories\Models\Category;
 use EscolaLms\Consultations\Database\Seeders\ConsultationsPermissionSeeder;
+use EscolaLms\Consultations\Enum\ConstantEnum;
 use EscolaLms\Consultations\Enum\ConsultationsPermissionsEnum;
 use EscolaLms\Consultations\Enum\ConsultationStatusEnum;
 use EscolaLms\Consultations\Enum\ConsultationTermStatusEnum;
@@ -241,7 +242,7 @@ class ConsultationApiTest extends TestCase
 
         $term = Carbon::make($consultationUser->executed_at);
         // consultation_id/term_start_timestamp/user_id/timestamp.jpg
-        Storage::assertExists("consultations/{$consultation->getKey()}/{$term->getTimestamp()}/{$student->getKey()}/{$time->getTimestamp()}.jpg");
+        Storage::assertExists(ConstantEnum::DIRECTORY . "/{$consultation->getKey()}/{$term->getTimestamp()}/{$student->getKey()}/{$time->getTimestamp()}.jpg");
 
         $this->response = $this->json('POST', '/api/consultations/save-screen', [
             'consultation_id' => $consultation->getKey(),
