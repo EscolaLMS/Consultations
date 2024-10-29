@@ -60,7 +60,8 @@ class ConsultationDto extends BaseDto implements ModelDtoContract
         $result = [];
         foreach ($proposedTerms as $term) {
             if (is_int($term)) {
-                $date = Carbon::parse($term/1000);
+                // @phpstan-ignore-next-line
+                $date = Carbon::parse($term / 1000);
             } else {
                 $date = Carbon::parse($term);
             }
