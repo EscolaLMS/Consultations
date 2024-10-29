@@ -514,7 +514,7 @@ class ConsultationService implements ConsultationServiceContract
 
         $termin = Carbon::make($consultationUser->executed_at);
         // consultation_id/term_start_timestamp/user_id/timestamp.jpg
-        $folder = "consultations/{$dto->getConsultationId()}/{$termin->getTimestamp()}/{$user->getKey()}";
+        $folder = ConstantEnum::DIRECTORY . "/{$dto->getConsultationId()}/{$termin->getTimestamp()}/{$user->getKey()}";
 
         $extension = $dto->getFile() instanceof UploadedFile ? $dto->getFile()->getClientOriginalExtension() : Str::between($dto->getFile(), 'data:image/', ';base64');
         Storage::putFileAs($folder, $dto->getFile(), Carbon::make($dto->getTimestamp())->getTimestamp() . '.' . $extension);

@@ -38,7 +38,7 @@ class ConsultationDto extends BaseDto implements ModelDtoContract
     public function getImagePath()
     {
         if ($this->imagePath !== false) {
-            return $this->imagePath === null ? '' : Str::after($this->imagePath, env('AWS_ACCESS_KEY_ID') . '/');
+            return $this->imagePath === null ? '' : Str::after($this->imagePath, Str::after(env('AWS_URL'), 'https://') . '/');
         }
         return false;
     }
@@ -47,7 +47,7 @@ class ConsultationDto extends BaseDto implements ModelDtoContract
     {
         if ($this->logotypePath !== false) {
             if ($this->logotypePath) {
-                $logotypePath = Str::after($this->logotypePath, env('AWS_ACCESS_KEY_ID') . '/');
+                $logotypePath = Str::after($this->logotypePath, Str::after(env('AWS_URL'), 'https://') . '/');
                 return Str::startsWith($logotypePath, ConstantEnum::DIRECTORY) ? $logotypePath : ConstantEnum::DIRECTORY . '/' .$logotypePath;
             }
             return '';
@@ -60,7 +60,8 @@ class ConsultationDto extends BaseDto implements ModelDtoContract
         $result = [];
         foreach ($proposedTerms as $term) {
             if (is_int($term)) {
-                $date = Carbon::parse((string) ($term/1000));
+                // @phpstan-ignore-next-line
+                $date = Carbon::parse($term / 1000);
             } else {
                 $date = Carbon::parse($term);
             }
