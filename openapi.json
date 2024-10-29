@@ -190,11 +190,13 @@
                         "schema": {
                             "type": "string",
                             "enum": [
-                                "finished_at",
-                                "started_at",
-                                "created_at",
+                                "id",
                                 "name",
-                                "only_with_categories"
+                                "status",
+                                "duration",
+                                "active_from",
+                                "active_to",
+                                "created_at"
                             ]
                         }
                     },
@@ -456,6 +458,64 @@
                 ]
             }
         },
+        "/api/consultations/save-screen": {
+            "post": {
+                "tags": [
+                    "Consultations"
+                ],
+                "summary": "Save screen from jitsi meeting",
+                "description": "Report term consultation",
+                "operationId": "7a95c97b0135d1af5ef5464c635bc6fa",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "properties": {
+                                    "consultation_id": {
+                                        "type": "integer"
+                                    },
+                                    "user_termin_id": {
+                                        "type": "integer"
+                                    },
+                                    "user_email": {
+                                        "type": "string"
+                                    },
+                                    "timestamp": {
+                                        "type": "string",
+                                        "example": "2024-10-04 12:02:12"
+                                    },
+                                    "file": {
+                                        "type": "string",
+                                        "format": "binary"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "content": {
+                            "application/json": {}
+                        }
+                    },
+                    "404": {
+                        "description": "Bad request",
+                        "content": {
+                            "application/json": {}
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "passport": []
+                    }
+                ]
+            }
+        },
         "/api/admin/consultations": {
             "get": {
                 "tags": [
@@ -470,11 +530,13 @@
                         "schema": {
                             "type": "string",
                             "enum": [
-                                "finished_at",
-                                "started_at",
-                                "created_at",
+                                "id",
                                 "name",
-                                "only_with_categories"
+                                "status",
+                                "duration",
+                                "active_from",
+                                "active_to",
+                                "created_at"
                             ]
                         }
                     },
@@ -752,55 +814,6 @@
                 ]
             }
         },
-        "/api/admin/consultations/change-term/{consultationTermId}": {
-            "post": {
-                "tags": [
-                    "Admin Consultations"
-                ],
-                "summary": "Change term in consultation ",
-                "description": "Change term consultation",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "description": "id of Consultation Term",
-                        "required": true,
-                        "schema": {
-                            "type": "integer"
-                        }
-                    }
-                ],
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "properties": {
-                                    "executed_at": {
-                                        "type": "string",
-                                        "example": "New term consultation"
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "201": {
-                        "description": "successful operation",
-                        "content": {
-                            "application/json": {}
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "passport": []
-                    }
-                ]
-            }
-        },
         "/api/consultations/change-term/{consultationTermId}": {
             "post": {
                 "tags": [
@@ -850,6 +863,44 @@
                     }
                 ]
             }
+        },
+        "/api/admin/consultations/users/assignable": {
+            "get": {
+                "tags": [
+                    "Admin Consultations"
+                ],
+                "description": "Get users assignable to consultations",
+                "operationId": "e84c3e0df1aac185262a87717a08310e",
+                "parameters": [
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "content": {
+                            "application/json": {}
+                        }
+                    },
+                    "422": {
+                        "description": "Bad request",
+                        "content": {
+                            "application/json": {}
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "passport": []
+                    }
+                ]
+            }
         }
     },
     "components": {
@@ -862,7 +913,8 @@
                     },
                     "date": {
                         "description": "date",
-                        "type": "datetime",
+                        "type": "string",
+                        "format": "date-time",
                         "example": "2022-04-15T04:00:00.000Z"
                     },
                     "duration": {
@@ -939,19 +991,23 @@
                     },
                     "active_to": {
                         "description": "active_to",
-                        "type": "datetime"
+                        "type": "string",
+                        "format": "date-time"
                     },
                     "active_from": {
                         "description": "active_from",
-                        "type": "datetime"
+                        "type": "string",
+                        "format": "date-time"
                     },
                     "created_at": {
                         "description": "created_at",
-                        "type": "datetime"
+                        "type": "string",
+                        "format": "date-time"
                     },
                     "updated_at": {
                         "description": "updated_at",
-                        "type": "datetime"
+                        "type": "string",
+                        "format": "date-time"
                     },
                     "consultation_user_id": {
                         "description": "consultation_user_id",
@@ -979,7 +1035,8 @@
                     },
                     "executed_at": {
                         "description": "executed_at",
-                        "type": "datetime"
+                        "type": "string",
+                        "format": "date-time"
                     },
                     "categories": {
                         "description": "categories",
@@ -995,7 +1052,7 @@
                                     "example": "fa-business-time"
                                 },
                                 "is_active": {
-                                    "type": "bool",
+                                    "type": "boolean",
                                     "example": "true"
                                 },
                                 "parent_id": {
@@ -1031,6 +1088,10 @@
                             },
                             "type": "object"
                         }
+                    },
+                    "max_session_students": {
+                        "description": "max_session_students",
+                        "type": "integer"
                     }
                 },
                 "type": "object"
@@ -1055,7 +1116,8 @@
                     },
                     "executed_at": {
                         "description": "executed_at",
-                        "type": "datetime",
+                        "type": "string",
+                        "format": "date-time",
                         "example": "2022-04-15T04:00:00.000Z"
                     },
                     "is_ended": {
@@ -1108,32 +1170,6 @@
                     "name": "Group"
                 }
             },
-            "pre-user": {
-                "required": [
-                    "email",
-                    "first_name",
-                    "last_name"
-                ],
-                "properties": {
-                    "id": {
-                        "description": "id",
-                        "type": "integer"
-                    },
-                    "email": {
-                        "description": "email",
-                        "type": "string"
-                    },
-                    "first_name": {
-                        "description": "first_name",
-                        "type": "string"
-                    },
-                    "last_name": {
-                        "description": "last_name",
-                        "type": "string"
-                    }
-                },
-                "type": "object"
-            },
             "User": {
                 "title": "User",
                 "description": "User model",
@@ -1153,5 +1189,15 @@
                 }
             }
         }
-    }
+    },
+    "tags": [
+        {
+            "name": "Consultations",
+            "description": "Consultations"
+        },
+        {
+            "name": "Admin Consultations",
+            "description": "Admin Consultations"
+        }
+    ]
 }
