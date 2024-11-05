@@ -390,7 +390,16 @@ interface ConsultationSwagger
      *              @OA\Property(
      *                  property="executed_at",
      *                  type="string",
-     *                  example="New term consultation",
+     *                  example="2024-10-31 10:45",
+     *              ),
+     *              @OA\Property(
+     *                  property="term",
+     *                  type="string",
+     *                  example="2024-10-31 10:45",
+     *              ),
+     *              @OA\Property(
+     *                  property="for_all_users",
+     *                  type="boolean",
      *              ),
      *          )
      *      ),
@@ -440,7 +449,16 @@ interface ConsultationSwagger
      *              @OA\Property(
      *                  property="executed_at",
      *                  type="string",
-     *                  example="New term consultation",
+     *                  example="2024-10-31 10:45",
+     *              ),
+     *              @OA\Property(
+     *                  property="term",
+     *                  type="string",
+     *                  example="2024-10-31 10:45",
+     *              ),
+     *              @OA\Property(
+     *                  property="for_all_users",
+     *                  type="boolean",
      *              ),
      *          )
      *      ),

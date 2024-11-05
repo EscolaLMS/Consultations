@@ -55,29 +55,20 @@ class ConsultationUserRepository extends BaseRepository implements ConsultationU
         return $query->get();
     }
 
-    public function getByCurrentUserTutor(): Collection
-    {
-        return $this->model->newQuery()
-            ->whereHas('consultation', fn (Builder $query) => $query
-            ->whereAuthorId(auth()->user()->getKey())
-            ->orWhereHas('teachers', fn (Builder $query) => $query->where('users.id', '=', auth()->user()->getKey()))
-        )->get();
-    }
-
     public function getBusyTerms(int $consultationId, ?string $date = null): Collection
     {
         $query = $this->model->newQuery();
         $query->where([
             'consultation_id' => $consultationId
         ]);
-        $query->whereNotNull('executed_at');
+
+        $query->whereHas('userTerms');
+
         if ($date) {
-            $query->where([
-                'executed_at' => $date
-            ]);
+            $query->whereHas('userTerms', fn ($query) => $query->where('executed_at', '=', $date));
         }
-        $query->whereIn('executed_status', [ConsultationTermStatusEnum::APPROVED, ConsultationTermStatusEnum::REPORTED]);
+        $query->whereHas('userTerms', fn ($query) => $query->whereIn('executed_status', [ConsultationTermStatusEnum::APPROVED, ConsultationTermStatusEnum::REPORTED]));
+
         return $query->get();
     }
-
 }

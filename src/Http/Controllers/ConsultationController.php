@@ -5,6 +5,7 @@ namespace EscolaLms\Consultations\Http\Controllers;
 use EscolaLms\Auth\Dtos\Admin\UserAssignableDto;
 use EscolaLms\Auth\Http\Resources\UserFullResource;
 use EscolaLms\Auth\Services\Contracts\UserServiceContract;
+use EscolaLms\Consultations\Dto\ChangeTermConsultationDto;
 use EscolaLms\Consultations\Dto\ConsultationDto;
 use EscolaLms\Consultations\Enum\ConstantEnum;
 use EscolaLms\Consultations\Enum\ConsultationsPermissionsEnum;
@@ -19,6 +20,7 @@ use EscolaLms\Consultations\Http\Requests\StoreConsultationRequest;
 use EscolaLms\Consultations\Http\Requests\UpdateConsultationRequest;
 use EscolaLms\Consultations\Http\Resources\ConsultationSimpleResource;
 use EscolaLms\Consultations\Http\Resources\ConsultationTermsResource;
+use EscolaLms\Consultations\Http\Resources\ConsultationUserTermsResource;
 use EscolaLms\Consultations\Services\Contracts\ConsultationServiceContract;
 use EscolaLms\Core\Dtos\OrderDto;
 use EscolaLms\Core\Http\Controllers\EscolaLmsBaseController;
@@ -55,10 +57,12 @@ class ConsultationController extends EscolaLmsBaseController implements Consulta
     public function schedule(int $id, ScheduleConsultationRequest $scheduleConsultationRequest): JsonResponse
     {
         $search = $scheduleConsultationRequest->except(['limit', 'skip', 'order', 'order_by']);
-        $consultationTerms = $this->consultationServiceContract
+
+        $consultationUserTerms = $this->consultationServiceContract
             ->getConsultationTermsByConsultationId($id, $search);
+
         return $this->sendResponseForResource(
-            ConsultationTermsResource::collection($consultationTerms),
+            ConsultationUserTermsResource::collection($consultationUserTerms),
             __('Consultation schedules retrieved successfully')
         );
     }
@@ -104,7 +108,7 @@ class ConsultationController extends EscolaLmsBaseController implements Consulta
     {
         $this->consultationServiceContract->changeTerm(
             $consultationTermId,
-            $changeTermConsultationRequest->input('executed_at')
+            new ChangeTermConsultationDto($changeTermConsultationRequest->all())
         );
         return $this->sendSuccess(__('Consultation term changed successfully'));
     }

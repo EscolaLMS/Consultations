@@ -4,10 +4,14 @@ namespace EscolaLms\Consultations\Services;
 
 use Auth;
 use Carbon\Carbon;
+use DateTime;
+use EscolaLms\Consultations\Dto\ChangeTermConsultationDto;
+use EscolaLms\Consultations\Dto\ConsultationUserTermDto;
 use EscolaLms\Consultations\Dto\ConsultationDto;
 use EscolaLms\Consultations\Dto\ConsultationSaveScreenDto;
 use EscolaLms\Consultations\Dto\FilterConsultationTermsListDto;
 use EscolaLms\Consultations\Dto\FilterListDto;
+use EscolaLms\Consultations\Dto\FinishTermDto;
 use EscolaLms\Consultations\Enum\ConstantEnum;
 use EscolaLms\Consultations\Enum\ConsultationStatusEnum;
 use EscolaLms\Consultations\Enum\ConsultationTermStatusEnum;
@@ -22,15 +26,16 @@ use EscolaLms\Consultations\Events\ReportTerm;
 use EscolaLms\Consultations\Exceptions\ChangeTermException;
 use EscolaLms\Consultations\Exceptions\ConsultationNotFound;
 use EscolaLms\Consultations\Helpers\StrategyHelper;
-use EscolaLms\Consultations\Http\Requests\ConsultationScreenSaveRequest;
 use EscolaLms\Consultations\Http\Requests\ListConsultationsRequest;
 use EscolaLms\Consultations\Http\Resources\ConsultationSimpleResource;
 use EscolaLms\Consultations\Models\Consultation;
 use EscolaLms\Consultations\Models\ConsultationProposedTerm;
 use EscolaLms\Consultations\Models\ConsultationUserPivot;
+use EscolaLms\Consultations\Models\ConsultationUserTerm;
 use EscolaLms\Consultations\Models\User;
 use EscolaLms\Consultations\Repositories\Contracts\ConsultationRepositoryContract;
 use EscolaLms\Consultations\Repositories\Contracts\ConsultationUserRepositoryContract;
+use EscolaLms\Consultations\Repositories\Contracts\ConsultationUserTermRepositoryContract;
 use EscolaLms\Consultations\Services\Contracts\ConsultationServiceContract;
 use EscolaLms\Core\Dtos\OrderDto;
 use EscolaLms\Files\Helpers\FileHelper;
@@ -53,15 +58,18 @@ class ConsultationService implements ConsultationServiceContract
     private ConsultationRepositoryContract $consultationRepositoryContract;
     private ConsultationUserRepositoryContract $consultationUserRepositoryContract;
     private JitsiServiceContract $jitsiServiceContract;
+    protected ConsultationUserTermRepositoryContract $consultationUserTermRepository;
 
     public function __construct(
         ConsultationRepositoryContract $consultationRepositoryContract,
         ConsultationUserRepositoryContract $consultationUserRepositoryContract,
-        JitsiServiceContract $jitsiServiceContract
+        JitsiServiceContract $jitsiServiceContract,
+        ConsultationUserTermRepositoryContract $consultationUserTermRepository,
     ) {
         $this->consultationRepositoryContract = $consultationRepositoryContract;
         $this->consultationUserRepositoryContract = $consultationUserRepositoryContract;
         $this->jitsiServiceContract = $jitsiServiceContract;
+        $this->consultationUserTermRepository = $consultationUserTermRepository;
     }
 
     public function getConsultationsList(array $search = [], bool $onlyActive = false, OrderDto $orderDto = null): Builder
@@ -143,51 +151,78 @@ class ConsultationService implements ConsultationServiceContract
                 'executed_status' => ConsultationTermStatusEnum::REPORTED,
                 'executed_at' => Carbon::make($executedAt)
             ];
-            $this->consultationUserRepositoryContract->updateModel($consultationTerm, $data);
+
+            $userTerm = $this->consultationUserTermRepository->createUserTerm($consultationTerm, $data);
             $author = $consultationTerm->consultation->author;
-            event(new ReportTerm($author, $consultationTerm));
+            event(new ReportTerm($author, $consultationTerm, $userTerm));
             return true;
         });
     }
 
-    public function approveTerm(int $consultationTermId): bool
+    public function approveTerm(int $consultationTermId, ConsultationUserTermDto $dto): bool
     {
         /** @var ConsultationUserPivot $consultationTerm */
         $consultationTerm = $this->consultationUserRepositoryContract->find($consultationTermId);
-        $this->setStatus($consultationTerm, ConsultationTermStatusEnum::APPROVED);
-        event(new ApprovedTerm($consultationTerm->user, $consultationTerm));
+
         /** @var User $authUser */
         $authUser = auth()->user();
-        event(new ApprovedTermWithTrainer($authUser, $consultationTerm));
+
+        $userTerms = $dto->getForAllUsers() ? $this->consultationUserTermRepository->getAllUserTermsByConsultationIdAndExecutedAt($consultationTerm->consultation_id, $dto->getTerm())
+            : collect($this->consultationUserTermRepository->getUserTermByConsultationUserIdAndExecutedAt($consultationTermId, $dto->getTerm()));
+
+        DB::transaction(function () use ($userTerms, $consultationTerm, $authUser) {
+            /** @var ConsultationUserTerm $userTerm */
+            foreach ($userTerms as $userTerm) {
+                /** @var ConsultationUserTerm $userTerm */
+                $userTerm = $this->consultationUserTermRepository->update(['executed_status' => ConsultationTermStatusEnum::APPROVED], $userTerm->getKey());
+                event(new ApprovedTerm($consultationTerm->user, $consultationTerm, $userTerm));
+                event(new ApprovedTermWithTrainer($authUser, $consultationTerm, $userTerm));
+            }
+        });
+
         return true;
     }
 
-    public function rejectTerm(int $consultationTermId): bool
+    public function rejectTerm(int $consultationTermId, ConsultationUserTermDto $dto): bool
     {
         /** @var ConsultationUserPivot $consultationTerm */
         $consultationTerm = $this->consultationUserRepositoryContract->find($consultationTermId);
-        $this->setStatus($consultationTerm, ConsultationTermStatusEnum::REJECT);
-        event(new RejectTerm($consultationTerm->user, $consultationTerm));
+
         /** @var User $authUser */
         $authUser = auth()->user();
-        event(new RejectTermWithTrainer($authUser, $consultationTerm));
+
+        $userTerms = $dto->getForAllUsers() ? $this->consultationUserTermRepository->getAllUserTermsByConsultationIdAndExecutedAt($consultationTerm->consultation_id, $dto->getTerm())
+            : collect($this->consultationUserTermRepository->getUserTermByConsultationUserIdAndExecutedAt($consultationTermId, $dto->getTerm()));
+
+        DB::transaction(function () use ($userTerms, $consultationTerm, $authUser) {
+            /** @var ConsultationUserTerm $userTerm */
+            foreach ($userTerms as $userTerm) {
+                /** @var ConsultationUserTerm $userTerm */
+                $userTerm = $this->consultationUserTermRepository->update(['executed_status' => ConsultationTermStatusEnum::REJECT], $userTerm->getKey());
+                event(new RejectTerm($consultationTerm->user, $consultationTerm, $userTerm));
+                event(new RejectTermWithTrainer($authUser, $consultationTerm, $userTerm));
+            }
+        });
+
         return true;
     }
 
-    public function setStatus(ConsultationUserPivot $consultationTerm, string $status): ConsultationUserPivot
+    public function setStatus(ConsultationUserPivot $consultationTerm, string $status, string $executedAt): ConsultationUserTerm
     {
-        return DB::transaction(function () use ($status, $consultationTerm) {
-            return $this->consultationUserRepositoryContract->updateModel($consultationTerm, ['executed_status' => $status]);
+        return DB::transaction(function () use ($status, $consultationTerm, $executedAt) {
+            return $this->consultationUserTermRepository->updateUserTermByExecutedAt($consultationTerm, $executedAt, ['executed_status' => $status]);
         });
     }
 
-    public function generateJitsi(int $consultationTermId): array
+    public function generateJitsi(int $consultationTermId, ConsultationUserTermDto $dto): array
     {
         /** @var ConsultationUserPivot $consultationTerm */
         $consultationTerm = $this->consultationUserRepositoryContract->find($consultationTermId);
+        /** @var ConsultationUserTerm $term */
+        $term = $consultationTerm->userTerms()->where('executed_at', '=', $dto->getTerm())->firstOrFail();
         if (!$this->canGenerateJitsi(
-            $consultationTerm->executed_at,
-            $consultationTerm->executed_status,
+            $term->executed_at,
+            $term->executed_status,
             $consultationTerm->consultation->getDuration()
         )) {
             throw new NotFoundHttpException(__('Consultation term is not available'));
@@ -215,7 +250,7 @@ class ConsultationService implements ConsultationServiceContract
         $authUser = auth()->user();
         return $this->jitsiServiceContract->getChannelData(
             $authUser,
-            StringHelper::convertToJitsiSlug($consultationTerm->consultation->name, [], ConstantEnum::DIRECTORY, $consultationTerm->consultation_id, (string) Carbon::make($consultationTerm->executed_at)->getTimestamp()),
+            StringHelper::convertToJitsiSlug($consultationTerm->consultation->name, [], ConstantEnum::DIRECTORY, $consultationTerm->consultation_id, (string) Carbon::make($term->executed_at)->getTimestamp()),
             $isModerator,
             $configOverwrite,
             $configInterface
@@ -234,10 +269,12 @@ class ConsultationService implements ConsultationServiceContract
         return false;
     }
 
-    public function generateJitsiUrlForEmail(int $consultationTermId, int $userId): ?string
+    public function generateJitsiUrlForEmail(int $consultationTermId, int $userId, string $executedAt): ?string
     {
         /** @var ConsultationUserPivot $consultationTerm */
         $consultationTerm = $this->consultationUserRepositoryContract->find($consultationTermId);
+        /** @var ConsultationUserTerm $term */
+        $term = $consultationTerm->userTerms()->where('executed_at', '=', $executedAt)->firstOrFail();
         $isModerator = false;
         $configOverwrite = [];
         $configInterface = [];
@@ -260,7 +297,7 @@ class ConsultationService implements ConsultationServiceContract
         $user = User::find($userId);
         $result = $this->jitsiServiceContract->getChannelData(
             $user,
-            StringHelper::convertToJitsiSlug($consultationTerm->consultation->name, [], ConstantEnum::DIRECTORY, $consultationTerm->consultation_id, (string) Carbon::make($consultationTerm->executed_at)->getTimestamp()),
+            StringHelper::convertToJitsiSlug($consultationTerm->consultation->name, [], ConstantEnum::DIRECTORY, $consultationTerm->consultation_id, (string) Carbon::make($term->executed_at)->getTimestamp()),
             $isModerator,
             $configOverwrite,
             $configInterface
@@ -313,10 +350,9 @@ class ConsultationService implements ConsultationServiceContract
         $filterConsultationTermsDto = FilterConsultationTermsListDto::prepareFilters(
             array_merge($search, ['consultation_id' => $consultationId])
         );
-        return $this->consultationUserRepositoryContract->allQueryBuilder(
-            $search,
-            $filterConsultationTermsDto
-        )->get();
+
+        return $this->consultationUserTermRepository
+            ->allQueryBuilder($filterConsultationTermsDto);
     }
 
     public function forCurrentUserResponse(
@@ -332,6 +368,7 @@ class ConsultationService implements ConsultationServiceContract
         } else {
             $consultationsCollection = ConsultationSimpleResource::collection($consultations->get());
         }
+
         ConsultationSimpleResource::extend(function (ConsultationSimpleResource $consultation) {
             return [
                 'consultation_term_id' => $consultation->resource->consultation_user_id,
@@ -382,25 +419,30 @@ class ConsultationService implements ConsultationServiceContract
 
     public function reminderAboutConsultation(string $reminderStatus): void
     {
-        foreach ($this->getReminderData($reminderStatus) as $consultationTerm) {
+        /** @var ConsultationUserTerm $userTerm */
+        foreach ($this->getReminderData($reminderStatus) as $userTerm) {
             event(new ReminderAboutTerm(
-                $consultationTerm->user,
-                $consultationTerm,
-                $reminderStatus
+                $userTerm->consultationUser->user,
+                $userTerm->consultationUser,
+                $reminderStatus,
+                $userTerm
             ));
-            if ($consultationTerm->consultation->teachers) {
-                $consultationTerm->consultation->teachers->each(
+            $consultation = $userTerm->consultationUser->consultation;
+            if ($consultation->teachers) {
+                $consultation->teachers->each(
                     fn (User $teacher) => event(new ReminderTrainerAboutTerm(
                         $teacher,
-                        $consultationTerm,
-                        $reminderStatus
+                        $userTerm->consultationUser,
+                        $reminderStatus,
+                        $userTerm
                     ))
                 );
             } else {
                 event(new ReminderTrainerAboutTerm(
-                    $consultationTerm->consultation->author,
-                    $consultationTerm,
-                    $reminderStatus
+                    $consultation->author,
+                    $userTerm->consultationUser,
+                    $reminderStatus,
+                    $userTerm
                 ));
             }
         }
@@ -411,19 +453,30 @@ class ConsultationService implements ConsultationServiceContract
         $this->consultationUserRepositoryContract->updateModel($consultationTerm, ['reminder_status' => $status]);
     }
 
-    public function changeTerm(int $consultationTermId, string $executedAt): bool
+    public function changeTerm(int $consultationTermId, ChangeTermConsultationDto $dto): bool
     {
-        DB::transaction(function () use ($consultationTermId, $executedAt) {
+        DB::transaction(function () use ($consultationTermId, $dto) {
             try {
-                /** @var ConsultationUserPivot $consultationUser */
-                $consultationUser = $this->consultationUserRepositoryContract->update([
-                    'executed_at' => Carbon::make($executedAt),
-                    'executed_status' => ConsultationTermStatusEnum::APPROVED
-                ], $consultationTermId);
-                if (!$consultationUser->user) {
-                    throw new ChangeTermException(__('Term is changed but not executed event because user or term is no exists'));
+                /** @var ConsultationUserPivot $consultationTerm */
+                $consultationTerm = $this->consultationUserRepositoryContract->find($consultationTermId);
+
+                $userTerms = $dto->getForAllUsers() ? $this->consultationUserTermRepository->getAllUserTermsByConsultationIdAndExecutedAt($consultationTerm->consultation_id, $dto->getTerm())
+                    : collect($this->consultationUserTermRepository->getUserTermByConsultationUserIdAndExecutedAt($consultationTermId, $dto->getTerm()));
+
+                /** @var ConsultationUserTerm $userTerm */
+                foreach ($userTerms as $userTerm) {
+                    /** @var ConsultationUserTerm $consultationUserTerm */
+                    $consultationUserTerm = $this->consultationUserTermRepository->update([
+                        'executed_at' => Carbon::make($dto->getExecutedAt()),
+                        'executed_status' => ConsultationTermStatusEnum::APPROVED,
+                    ], $userTerm->getKey());
+
+
+                    if (!$consultationUserTerm->consultationUser->user) {
+                        throw new ChangeTermException(__('Term is changed but not executed event because user or term is no exists'));
+                    }
+                    event(new ChangeTerm($consultationUserTerm->consultationUser->user, $consultationUserTerm->consultationUser, $consultationUserTerm));
                 }
-                event(new ChangeTerm($consultationUser->user, $consultationUser));
                 return true;
             } catch (Exception $e) {
                 throw new ChangeTermException(__('Term is not changed'));
@@ -434,7 +487,7 @@ class ConsultationService implements ConsultationServiceContract
 
     public function getConsultationTermsForTutor(): Collection
     {
-        return $this->consultationUserRepositoryContract->getByCurrentUserTutor();
+        return $this->consultationUserTermRepository->getByCurrentUserTutor();
     }
 
     public function termIsBusy(int $consultationId, string $date): bool
@@ -464,8 +517,8 @@ class ConsultationService implements ConsultationServiceContract
 
     public function getBusyTermsFormatDate(int $consultationId): array
     {
-        return $this->consultationUserRepositoryContract->getBusyTerms($consultationId)->map(
-            fn ($term) => Carbon::make($term->executed_at)
+        return $this->consultationUserTermRepository->getBusyTerms($consultationId)->map(
+            fn (ConsultationUserTerm $term) => Carbon::make($term->executed_at)
         )->unique()->toArray();
     }
 
@@ -497,9 +550,8 @@ class ConsultationService implements ConsultationServiceContract
             'reminder_status' => $exclusionStatuses,
             'status' => [ConsultationTermStatusEnum::APPROVED]
         ];
-        return $this->consultationUserRepositoryContract->getIncomingTerm(
-            FilterConsultationTermsListDto::prepareFilters($data)->getCriteria()
-        );
+
+        return $this->consultationUserTermRepository->allQueryBuilder(FilterConsultationTermsListDto::prepareFilters($data));
     }
 
     public function saveScreen(ConsultationSaveScreenDto $dto): void
@@ -508,15 +560,37 @@ class ConsultationService implements ConsultationServiceContract
         $consultationUser = ConsultationUserPivot::query()->where('consultation_id', '=', $dto->getConsultationId())->where('id', '=', $dto->getUserTerminId())->firstOrFail();
         $user = User::query()->where('email', '=', $dto->getUserEmail())->firstOrFail();
 
-        if ($user->getKey() !== $consultationUser->user_id || $consultationUser->executed_at === null) {
+        /** @var ConsultationUserTerm $userTerm */
+        $userTerm = $consultationUser->userTerms()->where('executed_at', '=', $dto->getExecutedAt())->firstOrFail();
+
+        if ($user->getKey() !== $consultationUser->user_id) {
             throw new NotFoundHttpException(__('Consultation term for this user is not available'));
         }
 
-        $termin = Carbon::make($consultationUser->executed_at);
+        $termin = Carbon::make($userTerm->executed_at);
         // consultation_id/term_start_timestamp/user_id/timestamp.jpg
         $folder = ConstantEnum::DIRECTORY . "/{$dto->getConsultationId()}/{$termin->getTimestamp()}/{$user->getKey()}";
 
         $extension = $dto->getFile() instanceof UploadedFile ? $dto->getFile()->getClientOriginalExtension() : Str::between($dto->getFile(), 'data:image/', ';base64');
         Storage::putFileAs($folder, $dto->getFile(), Carbon::make($dto->getTimestamp())->getTimestamp() . '.' . $extension);
+    }
+
+    public function finishTerm(int $consultationTermId, FinishTermDto $dto): bool
+    {
+        /** @var ConsultationUserPivot $consultationTerm */
+        $consultationTerm = $this->consultationUserRepositoryContract->find($consultationTermId);
+
+        $userTerms = $this->consultationUserTermRepository->getAllUserTermsByConsultationIdAndExecutedAt($consultationTerm->consultation_id, $dto->getTerm());
+
+        $this->finishTerms($userTerms, $dto->getFinishedAt() ?? now());
+
+        return true;
+    }
+
+    public function finishTerms(Collection $usersTerm, DateTime $finishedAt): void
+    {
+        DB::transaction(function () use ($usersTerm, $finishedAt) {
+            $this->consultationUserTermRepository->updateModels($usersTerm, ['finished_at' => $finishedAt]);
+        });
     }
 }

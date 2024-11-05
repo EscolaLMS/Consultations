@@ -7,11 +7,11 @@ use EscolaLms\Consultations\Services\Contracts\ConsultationServiceContract;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Carbon;
 
-class ConsultationTermsResource extends JsonResource
+class ConsultationUserTermsResource extends JsonResource
 {
     /**
      * @OA\Schema(
-     *      schema="ConsultationTerm",
+     *      schema="ConsultationUserTerm",
      *      @OA\Property(
      *          property="status",
      *          description="status",
@@ -73,35 +73,34 @@ class ConsultationTermsResource extends JsonResource
     public function toArray($request)
     {
         $consultationServiceContract = app(ConsultationServiceContract::class);
+
+        $consultation = $this->resource->consultationUser->consultation;
         $fields = [
             'consultation_term_id' => $this->resource->consultation_user_id,
             'date' => Carbon::make($this->resource->executed_at) ?? '',
             'status' => $this->resource->executed_status ?? '',
-            'duration' => $this->resource->duration,
-            'users' => ConsultationAuthorResource::collection($this->resource->users),
+            'duration' => $consultation->getDuration(),
+            'user' => isset($this->resource->consultationUser->user) ?
+                ConsultationAuthorResource::make($this->resource->consultationUser->user) :
+                null,
             'is_started' => $consultationServiceContract->isStarted(
                 $this->resource->executed_at,
                 $this->resource->executed_status,
-                $this->resource->duration
+                $consultation->getDuration()
             ),
             'is_ended' => $consultationServiceContract->isEnded(
                 $this->resource->executed_at,
-                $this->resource->duration
+                $consultation->getDuration()
             ),
             'in_coming' => $consultationServiceContract->inComing(
                 $this->resource->executed_at,
                 $this->resource->executed_status,
-                $this->resource->duration
+                $consultation->getDuration()
             ),
-            'busy_terms' => ConsultationTermResource::collection($consultationServiceContract->getBusyTermsFormatDate($this->resource->consultation_id)),
-            'author' =>  $this->resource->author ? ConsultationAuthorResource::make($this->resource->author) : null,
+            'busy_terms' => ConsultationTermResource::collection($consultationServiceContract->getBusyTermsFormatDate($consultation->getKey())),
+            'author' =>  $consultation->author ? ConsultationAuthorResource::make($consultation->author) : null,
             'finished_at' => $this->resource->finished_at,
         ];
         return self::apply($fields, $this);
-    }
-
-    public function getKey(): int
-    {
-        return $this->resource->consultation_user_id;
     }
 }

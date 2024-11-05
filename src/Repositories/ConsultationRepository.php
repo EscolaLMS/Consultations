@@ -55,12 +55,13 @@ class ConsultationRepository extends BaseRepository implements ConsultationRepos
             ->select(
                 'consultations.*',
                 'consultation_user.id as consultation_user_id',
-                'consultation_user.executed_status',
-                'consultation_user.executed_at',
+                'consultation_user_terms.executed_status',
+                'consultation_user_terms.executed_at',
                 'consultation_user.product_id',
                 'consultation_user.created_at',
             )
             ->leftJoin('consultation_user', 'consultation_user.consultation_id', '=', 'consultations.id')
+            ->leftJoin('consultation_user_terms', 'consultation_user_terms.consultation_user_id', '=', 'consultation_user.id')
             ->where(['consultation_user.user_id' => auth()->user()->getKey()]);
     }
 }

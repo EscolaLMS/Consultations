@@ -2,7 +2,9 @@
 
 namespace EscolaLms\Consultations\Http\Controllers\Swagger;
 
+use EscolaLms\Consultations\Http\Requests\ConsultationUserTermRequest;
 use EscolaLms\Consultations\Http\Requests\ConsultationScreenSaveRequest;
+use EscolaLms\Consultations\Http\Requests\FinishTermRequest;
 use EscolaLms\Consultations\Http\Requests\ListAPIConsultationsRequest;
 use EscolaLms\Consultations\Http\Requests\ListConsultationsRequest;
 use EscolaLms\Consultations\Http\Requests\ReportTermConsultationRequest;
@@ -87,6 +89,23 @@ interface ConsultationAPISwagger
      *              type="integer",
      *          ),
      *      ),
+     *      @OA\Parameter(
+     *          name="term",
+     *          required=true,
+     *          in="query",
+     *          @OA\Schema(
+     *              type="string",
+     *              example="2024-10-31 10:45"
+     *          )
+     *      ),
+     *      @OA\Parameter(
+     *          name="for_all_users",
+     *          required=false,
+     *          in="query",
+     *          @OA\Schema(
+     *              type="boolean"
+     *          )
+     *      ),
      *      @OA\Response(
      *          response=200,
      *          description="successful operation",
@@ -119,7 +138,7 @@ interface ConsultationAPISwagger
      *      )
      *   )
      */
-    public function approveTerm(int $consultationTermId): JsonResponse;
+    public function approveTerm(ConsultationUserTermRequest $request, int $consultationTermId): JsonResponse;
 
     /**
      * @OA\Get(
@@ -137,6 +156,23 @@ interface ConsultationAPISwagger
      *              type="integer",
      *          ),
      *      ),
+     *      @OA\Parameter(
+     *          name="term",
+     *          required=true,
+     *          in="query",
+     *          @OA\Schema(
+     *              type="string",
+     *              example="2024-10-31 10:45"
+     *          )
+     *      ),
+     *      @OA\Parameter(
+     *          name="for_all_users",
+     *          required=false,
+     *          in="query",
+     *          @OA\Schema(
+     *              type="boolean"
+     *          )
+     *      ),
      *      @OA\Response(
      *          response=200,
      *          description="successful operation",
@@ -169,7 +205,7 @@ interface ConsultationAPISwagger
      *      )
      *   )
      */
-    public function rejectTerm(int $consultationTermId): JsonResponse;
+    public function rejectTerm(ConsultationUserTermRequest $request, int $consultationTermId): JsonResponse;
 
     /**
      * @OA\Get(
@@ -186,6 +222,15 @@ interface ConsultationAPISwagger
      *          @OA\Schema(
      *              type="integer",
      *          ),
+     *      ),
+     *      @OA\Parameter(
+     *          name="term",
+     *          required=true,
+     *          in="query",
+     *          @OA\Schema(
+     *              type="string",
+     *              example="2024-10-31 10:45"
+     *          )
      *      ),
      *      @OA\Response(
      *          response=200,
@@ -218,7 +263,7 @@ interface ConsultationAPISwagger
      *      )
      *   )
      */
-    public function generateJitsi(int $consultationTermId): JsonResponse;
+    public function generateJitsi(ConsultationUserTermRequest $request, int $consultationTermId): JsonResponse;
 
     /**
      * @OA\Get(
@@ -533,7 +578,7 @@ interface ConsultationAPISwagger
      *              @OA\Property(
      *                  property="data",
      *                  type="array",
-     *                  @OA\Items(ref="#/components/schemas/ConsultationTerm")
+     *                  @OA\Items(ref="#/components/schemas/ConsultationUserTerm")
      *              ),
      *              @OA\Property(
      *                  property="message",
@@ -580,6 +625,11 @@ interface ConsultationAPISwagger
      *                      property="file",
      *                      type="string",
      *                      format="binary"
+     *                  ),
+     *                  @OA\Property(
+     *                      property="executed_at",
+     *                      type="string",
+     *                      example="2024-10-04 12:02:12"
      *                  )
      *              )
      *          )
@@ -616,4 +666,72 @@ interface ConsultationAPISwagger
      * )
      */
     public function screenSave(ConsultationScreenSaveRequest $request): JsonResponse;
+
+    /**
+     * @OA\Post(
+     *      path="/api/consultations/finish-term/{consultationTermId}",
+     *      security={
+     *          {"passport": {}},
+     *      },
+     *      summary="Finish consultation term",
+     *      tags={"Consultations"},
+     *      description="Finish consultation term",
+     *      @OA\Parameter(
+     *          name="consultationTermId",
+     *          required=true,
+     *          in="path",
+     *          @OA\Schema(
+     *              type="integer",
+     *          ),
+     *      ),
+     *      @OA\RequestBody(
+     *          required=true,
+     *          @OA\MediaType(
+     *              mediaType="application/json",
+     *              @OA\Schema(
+     *                  @OA\Property(
+     *                      property="finished_at",
+     *                      type="string",
+     *                      example="2024-10-04 12:02:12"
+     *                  ),
+     *                  @OA\Property(
+     *                      property="term",
+     *                      type="string",
+     *                      example="2024-10-04 12:02:12"
+     *                  )
+     *              )
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="successful operation",
+     *          @OA\MediaType(
+     *              mediaType="application/json"
+     *          ),
+     *          @OA\Schema(
+     *              type="object",
+     *              @OA\Property(
+     *                  property="success",
+     *                  type="boolean"
+     *              ),
+     *              @OA\Property(
+     *                  property="data",
+     *                  type="string"
+     *              ),
+     *              @OA\Property(
+     *                  property="message",
+     *                  type="string"
+     *              )
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=404,
+     *          description="Bad request",
+     *          @OA\MediaType(
+     *              mediaType="application/json"
+     *          )
+     *      )
+     * )
+     */
+    public function finishTerm(FinishTermRequest $request, int $consultationTermId): JsonResponse;
 }

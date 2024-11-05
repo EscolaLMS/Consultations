@@ -11,6 +11,7 @@ class ConsultationSaveScreenDto extends BaseDto
     protected string $userEmail;
     protected UploadedFile|string $file;
     protected string $timestamp;
+    protected string $executedAt;
 
     public function getConsultationId(): int
     {
@@ -35,5 +36,10 @@ class ConsultationSaveScreenDto extends BaseDto
     public function getTimestamp(): string
     {
         return $this->timestamp;
+    }
+
+    public function getExecutedAt(): string
+    {
+        return $this->executedAt;
     }
 }

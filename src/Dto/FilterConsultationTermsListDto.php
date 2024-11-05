@@ -4,7 +4,10 @@ namespace EscolaLms\Consultations\Dto;
 
 use EscolaLms\Consultations\Dto\Contracts\ModelDtoContract;
 use EscolaLms\Consultations\Models\ConsultationUserPivot;
+use EscolaLms\Consultations\Models\ConsultationUserTerm;
 use EscolaLms\Consultations\Repositories\Criteria\UserExistsCriterion;
+use EscolaLms\Consultations\Repositories\Criteria\UserTermConsultationCriterion;
+use EscolaLms\Consultations\Repositories\Criteria\UserTermUserExistsCriterion;
 use EscolaLms\Core\Repositories\Criteria\Primitives\NotNullCriterion;
 use EscolaLms\Core\Repositories\Criteria\Primitives\WhereCriterion;
 use EscolaLms\Core\Repositories\Criteria\Primitives\WhereNotInOrIsNullCriterion;
@@ -44,19 +47,19 @@ class FilterConsultationTermsListDto extends BaseDto implements ModelDtoContract
             $dto->addToCriteria(new WhereCriterion($dto->model()->getTable() . '.executed_at', $dto->getDateTimeTo(), '<='));
         }
         if ($dto->getConsultationId()) {
-            $dto->addToCriteria(new EqualCriterion($dto->model()->getTable() . '.consultation_id', $dto->getConsultationId()));
+            $dto->addToCriteria(new UserTermConsultationCriterion($dto->getConsultationId()));
         }
         if ($dto->getReminderStatus()) {
             $dto->addToCriteria(new WhereNotInOrIsNullCriterion($dto->model()->getTable() . '.reminder_status', $dto->getReminderStatus()));
         }
-        $dto->addToCriteria(new UserExistsCriterion());
+        $dto->addToCriteria(new UserTermUserExistsCriterion());
         return $dto;
     }
 
-    public function model(): ConsultationUserPivot
+    public function model(): ConsultationUserTerm
     {
         // @phpstan-ignore-next-line
-        return ConsultationUserPivot::newModelInstance();
+        return ConsultationUserTerm::newModelInstance();
     }
 
     public function toArray($filters = false): array

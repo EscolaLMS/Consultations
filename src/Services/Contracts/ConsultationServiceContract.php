@@ -3,12 +3,15 @@
 namespace EscolaLms\Consultations\Services\Contracts;
 
 use Carbon\Carbon;
+use EscolaLms\Consultations\Dto\ChangeTermConsultationDto;
+use EscolaLms\Consultations\Dto\ConsultationUserTermDto;
 use EscolaLms\Consultations\Dto\ConsultationDto;
 use EscolaLms\Consultations\Dto\ConsultationSaveScreenDto;
-use EscolaLms\Consultations\Http\Requests\ConsultationScreenSaveRequest;
+use EscolaLms\Consultations\Dto\FinishTermDto;
 use EscolaLms\Consultations\Http\Requests\ListConsultationsRequest;
 use EscolaLms\Consultations\Models\Consultation;
 use EscolaLms\Consultations\Models\ConsultationUserPivot;
+use EscolaLms\Consultations\Models\ConsultationUserTerm;
 use EscolaLms\Core\Dtos\OrderDto;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Foundation\Http\FormRequest;
@@ -24,12 +27,12 @@ interface ConsultationServiceContract
     public function delete(int $id): ?bool;
     public function attachToUser(array $data): void;
     public function reportTerm(int $orderItemId, string $executedAt): bool;
-    public function approveTerm(int $consultationTermId): bool;
-    public function rejectTerm(int $consultationTermId): bool;
-    public function setStatus(ConsultationUserPivot $consultationTerm, string $status): ConsultationUserPivot;
-    public function generateJitsi(int $consultationTermId): array;
+    public function approveTerm(int $consultationTermId, ConsultationUserTermDto $dto): bool;
+    public function rejectTerm(int $consultationTermId, ConsultationUserTermDto $dto): bool;
+    public function setStatus(ConsultationUserPivot $consultationTerm, string $status, string $executedAt): ConsultationUserTerm;
+    public function generateJitsi(int $consultationTermId, ConsultationUserTermDto $dto): array;
     public function canGenerateJitsi(?string $executedAt, ?string $status, ?string $duration): bool;
-    public function generateJitsiUrlForEmail(int $consultationTermId, int $userId): ?string;
+    public function generateJitsiUrlForEmail(int $consultationTermId, int $userId, string $executedAt): ?string;
     public function proposedTerms(int $consultationTermId): ?array;
     public function setRelations(Consultation $consultation, array $relations = []): void;
     public function setFiles(Consultation $consultation, array $files = []): void;
@@ -95,11 +98,12 @@ interface ConsultationServiceContract
     public function inComing(?string $executedAt, ?string $status, ?string $duration): bool;
     public function reminderAboutConsultation(string $reminderStatus): void;
     public function setReminderStatus(ConsultationUserPivot $consultationTerm, string $status): void;
-    public function changeTerm(int $consultationTermId, string $executedAt): bool;
+    public function changeTerm(int $consultationTermId, ChangeTermConsultationDto $dto): bool;
     public function getConsultationTermsForTutor(): Collection;
     public function termIsBusy(int $consultationId, string $date): bool;
     public function termIsBusyForUser(int $consultationId, string $date, int $userId): bool;
     public function getBusyTermsFormatDate(int $consultationId): array;
     public function updateModelFieldsFromRequest(Consultation $consultation, FormRequest $request): void;
     public function saveScreen(ConsultationSaveScreenDto $dto): void;
+    public function finishTerm(int $consultationTermId, FinishTermDto $dto): bool;
 }

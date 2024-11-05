@@ -3,18 +3,22 @@
 namespace EscolaLms\Consultations\Models;
 
 use EscolaLms\Consultations\Database\Factories\ConsultationUserFactory;
+use EscolaLms\Consultations\Enum\ConsultationTermReminderStatusEnum;
 use EscolaLms\Consultations\Enum\ConsultationTermStatusEnum;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Carbon;
 
 /**
- * @property ConsultationTermStatusEnum $executed_status
  * @property int $user_id
  * @property int $consultation_id
  * @property Consultation $consultation
- * @property Carbon $executed_at
+ *
+ * @property @deprecated Carbon $executed_at
+ * @property @deprecated ConsultationTermReminderStatusEnum $reminder_status
+ * @property @deprecated ConsultationTermStatusEnum $executed_status
  */
 class ConsultationUserPivot extends Model
 {
@@ -29,6 +33,7 @@ class ConsultationUserPivot extends Model
         'consultation_id',
         'product_id',
         'reminder_status',
+        'finished_at',
     ];
 
     public function user(): BelongsTo
@@ -41,14 +46,25 @@ class ConsultationUserPivot extends Model
         return $this->belongsTo(Consultation::class);
     }
 
+    /**
+     * @deprecated
+     */
     public function isApproved(): bool
     {
         return $this->executed_status->is(ConsultationTermStatusEnum::APPROVED);
     }
 
+    /**
+     * @deprecated
+     */
     public function isRejected(): bool
     {
         return $this->executed_status->is(ConsultationTermStatusEnum::REJECT);
+    }
+
+    public function userTerms(): HasMany
+    {
+        return $this->hasMany(ConsultationUserTerm::class, 'consultation_user_id');
     }
 
     protected static function newFactory(): ConsultationUserFactory
