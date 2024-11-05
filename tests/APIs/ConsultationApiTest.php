@@ -236,13 +236,14 @@ class ConsultationApiTest extends TestCase
             'user_email' => $student->email,
             'user_termin_id' => $consultationUser->getKey(),
             'file' => UploadedFile::fake()->image('image.jpg'),
-            'timestamp' => $time->format('Y-m-d H:i:s'),
+            'timestamp' => $time->addMinutes(10)->format('Y-m-d H:i:s'),
+            'executed_at' => $this->format('Y-m-d H:i:s'),
         ])
             ->assertOk();
 
         $term = Carbon::make($consultationUser->executed_at);
         // consultation_id/term_start_timestamp/user_id/timestamp.jpg
-        Storage::assertExists(ConstantEnum::DIRECTORY . "/{$consultation->getKey()}/{$term->getTimestamp()}/{$student->getKey()}/{$time->getTimestamp()}.jpg");
+        Storage::assertExists(ConstantEnum::DIRECTORY . "/{$consultation->getKey()}/{$term->getTimestamp()}/{$student->getKey()}/{$time->addMinutes(10)->getTimestamp()}.jpg");
 
         $this->response = $this->json('POST', '/api/consultations/save-screen', [
             'consultation_id' => $consultation->getKey(),
@@ -250,6 +251,7 @@ class ConsultationApiTest extends TestCase
             'user_termin_id' => $consultationUser->getKey(),
             'file' => UploadedFile::fake()->image('image.jpg'),
             'timestamp' => $time->format('Y-m-d H:i:s'),
+            'executed_at' => $this->format('Y-m-d H:i:s'),
         ])->assertNotFound();
 
         $this->response = $this->json('POST', '/api/consultations/save-screen', [
@@ -258,6 +260,7 @@ class ConsultationApiTest extends TestCase
             'user_termin_id' => $consultationUser->getKey() + 1,
             'file' => UploadedFile::fake()->image('image.jpg'),
             'timestamp' => $time->format('Y-m-d H:i:s'),
+            'executed_at' => $this->format('Y-m-d H:i:s'),
         ])
             ->assertUnprocessable()
             ->assertJsonValidationErrors(['user_termin_id']);

@@ -40,7 +40,7 @@ class ConsultationChangeTermTest extends TestCase
         $newTerm = now()->modify('+2 hours')->format('Y-m-d H:i:s');
         $this->response = $this->actingAs($this->user, 'api')->post(
             '/api/admin/consultations/change-term/' . $term->getKey(),
-            ['executed_at' => $newTerm]
+            ['executed_at' => $newTerm, 'term' => $term->userTerms()->first()->executed_at]
         );
         $this->response->assertOk();
         $term->refresh();
@@ -56,7 +56,7 @@ class ConsultationChangeTermTest extends TestCase
         $newTerm = now()->modify('+2 hours')->format('Y-m-d H:i:s');
         $this->response = $this->actingAs($this->user, 'api')->post(
             '/api/consultations/change-term/' . $term->getKey(),
-            ['executed_at' => $newTerm]
+            ['executed_at' => $newTerm, 'term' => $term->userTerms()->first()->executed_at]
         );
         $this->response->assertOk();
         $term->refresh();
