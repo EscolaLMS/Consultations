@@ -6,7 +6,6 @@ use EscolaLms\Consultations\Dto\FilterConsultationTermsListDto;
 use EscolaLms\Consultations\Models\ConsultationUserPivot;
 use EscolaLms\Consultations\Models\ConsultationUserTerm;
 use EscolaLms\Core\Repositories\Contracts\BaseRepositoryContract;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 
 interface ConsultationUserTermRepositoryContract extends BaseRepositoryContract
@@ -24,5 +23,6 @@ interface ConsultationUserTermRepositoryContract extends BaseRepositoryContract
     public function getUserTermByConsultationUserIdAndExecutedAt(int $consultationUserId, string $executedAt): ConsultationUserTerm;
     public function updateModels(Collection $models, array $data): void;
     public function getByCurrentUserTutor(): \Illuminate\Support\Collection;
+    public function updateModel(ConsultationUserTerm $userTerm, array $data): ConsultationUserTerm;
 
 }

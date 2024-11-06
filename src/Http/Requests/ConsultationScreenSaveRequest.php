@@ -14,7 +14,7 @@ class ConsultationScreenSaveRequest extends FormRequest
             'file' => ['required'],
             'user_email' => ['required', 'email', 'exists:users,email'],
             'timestamp' => ['required', 'date_format:Y-m-d H:i:s'],
-            'executed_at' => ['required', 'exists:consultation_user_terms,executed_at'],
+            'executed_at' => ['required'],
         ];
     }
 }

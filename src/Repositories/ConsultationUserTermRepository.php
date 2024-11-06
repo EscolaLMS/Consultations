@@ -144,4 +144,11 @@ class ConsultationUserTermRepository extends BaseRepository implements Consultat
 
         return $result;
     }
+
+    public function updateModel(ConsultationUserTerm $userTerm, array $data): ConsultationUserTerm
+    {
+        $userTerm->fill($data);
+        $userTerm->save();
+        return $userTerm;
+    }
 }

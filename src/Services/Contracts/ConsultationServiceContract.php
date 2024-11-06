@@ -25,7 +25,7 @@ interface ConsultationServiceContract
     public function update(int $id, ConsultationDto $consultationDto): Consultation;
     public function show(int $id): Consultation;
     public function delete(int $id): ?bool;
-    public function attachToUser(array $data): void;
+    public function attachToUser(array $data, ?array $termData): void;
     public function reportTerm(int $orderItemId, string $executedAt): bool;
     public function approveTerm(int $consultationTermId, ConsultationUserTermDto $dto): bool;
     public function rejectTerm(int $consultationTermId, ConsultationUserTermDto $dto): bool;
@@ -97,7 +97,7 @@ interface ConsultationServiceContract
     public function isStarted(?string $executedAt, ?string $status, ?string $duration): bool;
     public function inComing(?string $executedAt, ?string $status, ?string $duration): bool;
     public function reminderAboutConsultation(string $reminderStatus): void;
-    public function setReminderStatus(ConsultationUserPivot $consultationTerm, string $status): void;
+    public function setReminderStatus(ConsultationUserPivot $consultationTerm, string $status, ?ConsultationUserTerm $userTerm = null): void;
     public function changeTerm(int $consultationTermId, ChangeTermConsultationDto $dto): bool;
     public function getConsultationTermsForTutor(): Collection;
     public function termIsBusy(int $consultationId, string $date): bool;

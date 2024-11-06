@@ -27,6 +27,6 @@ class ReminderAboutTermListener
      */
     public function handle(ReminderAboutTerm $event)
     {
-        $this->consultationServiceContract->setReminderStatus($event->getConsultationTerm(), $event->getStatus());
+        $this->consultationServiceContract->setReminderStatus($event->getConsultationTerm(), $event->getStatus(), $event->getConsultationUserTerm());
     }
 }

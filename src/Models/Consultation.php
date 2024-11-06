@@ -244,10 +244,10 @@ class Consultation extends Model
         return '';
     }
 
-    public function attachToConsultationPivot(array $data): void
+    public function attachToConsultationPivot(array $data, ?array $termData = null): void
     {
         $consultationServiceContract = app(ConsultationServiceContract::class);
-        $consultationServiceContract->attachToUser($data);
+        $consultationServiceContract->attachToUser($data, $termData);
     }
 
     public function getDuration(): string

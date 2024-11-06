@@ -13,6 +13,7 @@ use EscolaLms\Consultations\Enum\ConsultationStatusEnum;
 use EscolaLms\Consultations\Enum\ConsultationTermStatusEnum;
 use EscolaLms\Consultations\Models\Consultation;
 use EscolaLms\Consultations\Models\ConsultationUserPivot;
+use EscolaLms\Consultations\Models\ConsultationUserTerm;
 use EscolaLms\Consultations\Tests\Models\User;
 use EscolaLms\Consultations\Tests\TestCase;
 use EscolaLms\Core\Tests\CreatesUsers;
@@ -217,33 +218,36 @@ class ConsultationApiTest extends TestCase
         /** @var Consultation $consultation */
         $consultation = Consultation::factory()->create();
         $consultation->author()->associate($this->user);
+
+        /** @var ConsultationUserPivot $consultationUser */
+        $consultationUser = ConsultationUserPivot::factory()
+            ->create([
+                'consultation_id' => $consultation->getKey(),
+                'user_id' => $student->getKey(),
+            ]);
+
         $time = now();
-        $data = [
-            'consultation_id' => $consultation->getKey(),
-            'user_id' => $student->getKey(),
+        /** @var ConsultationUserTerm $userTerm */
+        $userTerm = $consultationUser->userTerms()->create([
             'executed_status' => ConsultationTermStatusEnum::APPROVED,
             'executed_at' => $time,
-        ];
-        $consultation->attachToConsultationPivot($data);
+        ]);
 
-        $consultationUser = ConsultationUserPivot::query()
-            ->where('user_id', '=', $student->getKey())
-            ->where('consultation_id', '=', $consultation->getKey())->first();
-
+        $screenTime = now()->addMinutes(10);
         Storage::fake();
         $this->response = $this->json('POST', '/api/consultations/save-screen', [
             'consultation_id' => $consultation->getKey(),
             'user_email' => $student->email,
             'user_termin_id' => $consultationUser->getKey(),
             'file' => UploadedFile::fake()->image('image.jpg'),
-            'timestamp' => $time->addMinutes(10)->format('Y-m-d H:i:s'),
-            'executed_at' => $this->format('Y-m-d H:i:s'),
+            'timestamp' => $screenTime->format('Y-m-d H:i:s'),
+            'executed_at' => $userTerm->executed_at->format('Y-m-d H:i:s'),
         ])
             ->assertOk();
 
-        $term = Carbon::make($consultationUser->executed_at);
+        $term = Carbon::make($userTerm->executed_at);
         // consultation_id/term_start_timestamp/user_id/timestamp.jpg
-        Storage::assertExists(ConstantEnum::DIRECTORY . "/{$consultation->getKey()}/{$term->getTimestamp()}/{$student->getKey()}/{$time->addMinutes(10)->getTimestamp()}.jpg");
+        Storage::assertExists(ConstantEnum::DIRECTORY . "/{$consultation->getKey()}/{$term->getTimestamp()}/{$student->getKey()}/{$screenTime->getTimestamp()}.jpg");
 
         $this->response = $this->json('POST', '/api/consultations/save-screen', [
             'consultation_id' => $consultation->getKey(),
@@ -251,7 +255,7 @@ class ConsultationApiTest extends TestCase
             'user_termin_id' => $consultationUser->getKey(),
             'file' => UploadedFile::fake()->image('image.jpg'),
             'timestamp' => $time->format('Y-m-d H:i:s'),
-            'executed_at' => $this->format('Y-m-d H:i:s'),
+            'executed_at' => $userTerm->executed_at->format('Y-m-d H:i:s'),
         ])->assertNotFound();
 
         $this->response = $this->json('POST', '/api/consultations/save-screen', [
@@ -260,7 +264,7 @@ class ConsultationApiTest extends TestCase
             'user_termin_id' => $consultationUser->getKey() + 1,
             'file' => UploadedFile::fake()->image('image.jpg'),
             'timestamp' => $time->format('Y-m-d H:i:s'),
-            'executed_at' => $this->format('Y-m-d H:i:s'),
+            'executed_at' => $userTerm->executed_at->format('Y-m-d H:i:s'),
         ])
             ->assertUnprocessable()
             ->assertJsonValidationErrors(['user_termin_id']);

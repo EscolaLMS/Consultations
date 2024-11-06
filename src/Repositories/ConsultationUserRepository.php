@@ -62,8 +62,6 @@ class ConsultationUserRepository extends BaseRepository implements ConsultationU
             'consultation_id' => $consultationId
         ]);
 
-        $query->whereHas('userTerms');
-
         if ($date) {
             $query->whereHas('userTerms', fn ($query) => $query->where('executed_at', '=', $date));
         }

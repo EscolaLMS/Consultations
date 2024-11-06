@@ -95,8 +95,8 @@ class ConsultationScheduleTermsTest extends TestCase
         )->etc());
         $this->response->assertJsonFragment([
             'consultation_term_id' => $this->consultationUserPivot->getKey(),
-            'date' => isset($this->consultationUserPivot->executed_at) ? Carbon::make($this->consultationUserPivot->executed_at)->format("Y-m-d\TH:i:s.000000\Z") : '',
-            'status' => $this->consultationUserPivot->executed_status ?? '',
+            'date' => isset($this->consultationUserTerm->executed_at) ? Carbon::make($this->consultationUserTerm->executed_at)->format("Y-m-d\TH:i:s.000000\Z") : '',
+            'status' => $this->consultationUserTerm->executed_status ?? '',
         ]);
     }
 
