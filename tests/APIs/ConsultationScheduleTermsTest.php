@@ -4,6 +4,7 @@ namespace EscolaLms\Consultations\Tests\APIs;
 
 use EscolaLms\Consultations\Http\Resources\ConsultationAuthorResource;
 use EscolaLms\Consultations\Http\Resources\ConsultationTermResource;
+use EscolaLms\Consultations\Models\ConsultationUserTerm;
 use EscolaLms\Consultations\Services\Contracts\ConsultationServiceContract;
 use EscolaLms\Consultations\Tests\Models\User;
 use EscolaLms\Consultations\Database\Seeders\ConsultationsPermissionSeeder;
@@ -23,6 +24,7 @@ class ConsultationScheduleTermsTest extends TestCase
     private ConsultationUserPivot $consultationUserPivot;
     private string $apiUrl;
     private User $student;
+    private ConsultationUserTerm $consultationUserTerm;
 
     protected function setUp(): void
     {
@@ -48,9 +50,12 @@ class ConsultationScheduleTermsTest extends TestCase
         $this->consultationUserPivot = ConsultationUserPivot::factory([
             'consultation_id' => $this->consultation->getKey(),
             'user_id' => $this->student->getKey(),
+        ])->create();
+
+        $this->consultationUserTerm = $this->consultationUserPivot->userTerms()->create([
             'executed_at' => now()->format('Y-m-d H:i:s'),
             'executed_status' => ConsultationTermStatusEnum::APPROVED
-        ])->create();
+        ]);
     }
 
     public function testConsultationTermsListUnauthorized(): void
@@ -90,8 +95,8 @@ class ConsultationScheduleTermsTest extends TestCase
         )->etc());
         $this->response->assertJsonFragment([
             'consultation_term_id' => $this->consultationUserPivot->getKey(),
-            'date' => isset($this->consultationUserPivot->executed_at) ? Carbon::make($this->consultationUserPivot->executed_at)->format("Y-m-d\TH:i:s.000000\Z") : '',
-            'status' => $this->consultationUserPivot->executed_status ?? '',
+            'date' => isset($this->consultationUserTerm->executed_at) ? Carbon::make($this->consultationUserTerm->executed_at)->format("Y-m-d\TH:i:s.000000\Z") : '',
+            'status' => $this->consultationUserTerm->executed_status ?? '',
         ]);
     }
 

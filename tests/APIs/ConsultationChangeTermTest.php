@@ -6,6 +6,7 @@ use EscolaLms\Consultations\Database\Seeders\ConsultationsPermissionSeeder;
 use EscolaLms\Consultations\Enum\ConsultationTermStatusEnum;
 use EscolaLms\Consultations\Events\ChangeTerm;
 use EscolaLms\Consultations\Models\Consultation;
+use EscolaLms\Consultations\Models\ConsultationUserPivot;
 use EscolaLms\Consultations\Tests\TestCase;
 use EscolaLms\Core\Models\User;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
@@ -36,32 +37,46 @@ class ConsultationChangeTermTest extends TestCase
     public function testChangeTermWithAdmin()
     {
         Event::fake();
+        /** @var ConsultationUserPivot $term */
         $term = $this->consultation->terms()->first();
+
+        $userTerm = $term->userTerms()->create([
+            'executed_at' => now()->format('Y-m-d H:i:s'),
+            'executed_status' => ConsultationTermStatusEnum::REPORTED,
+        ]);
+
         $newTerm = now()->modify('+2 hours')->format('Y-m-d H:i:s');
         $this->response = $this->actingAs($this->user, 'api')->post(
             '/api/admin/consultations/change-term/' . $term->getKey(),
-            ['executed_at' => $newTerm]
+            ['executed_at' => $newTerm, 'term' => $userTerm->executed_at]
         );
         $this->response->assertOk();
-        $term->refresh();
-        $this->assertTrue($term->executed_at === $newTerm);
-        $this->assertTrue($term->executed_status === ConsultationTermStatusEnum::APPROVED);
+        $userTerm->refresh();
+        $this->assertTrue($userTerm->executed_at === $newTerm);
+        $this->assertTrue($userTerm->executed_status === ConsultationTermStatusEnum::APPROVED);
         Event::assertDispatched(ChangeTerm::class);
     }
 
     public function testChangeTermWithUser()
     {
         Event::fake();
+        /** @var ConsultationUserPivot $term */
         $term = $this->consultation->terms()->first();
+
+        $userTerm = $term->userTerms()->create([
+            'executed_at' => now()->format('Y-m-d H:i:s'),
+            'executed_status' => ConsultationTermStatusEnum::REPORTED,
+        ]);
+
         $newTerm = now()->modify('+2 hours')->format('Y-m-d H:i:s');
         $this->response = $this->actingAs($this->user, 'api')->post(
             '/api/consultations/change-term/' . $term->getKey(),
-            ['executed_at' => $newTerm]
+            ['executed_at' => $newTerm, 'term' => $userTerm->executed_at]
         );
         $this->response->assertOk();
-        $term->refresh();
-        $this->assertTrue($term->executed_at === $newTerm);
-        $this->assertTrue($term->executed_status === ConsultationTermStatusEnum::APPROVED);
+        $userTerm->refresh();
+        $this->assertTrue($userTerm->executed_at === $newTerm);
+        $this->assertTrue($userTerm->executed_status === ConsultationTermStatusEnum::APPROVED);
         Event::assertDispatched(ChangeTerm::class);
     }
 

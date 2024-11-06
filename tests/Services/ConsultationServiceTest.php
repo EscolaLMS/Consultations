@@ -43,12 +43,16 @@ class ConsultationServiceTest extends TestCase
         $this->expectExceptionMessage('Term is busy for this user.');
         $date = now()->addDay()->format('Y-m-d H:i:s');
 
-        ConsultationUserPivot::factory([
-            'executed_at' => $date,
-            'executed_status' => ConsultationTermStatusEnum::APPROVED,
+        /** @var ConsultationUserPivot $consultationTerm */
+        $consultationTerm = ConsultationUserPivot::factory([
             'consultation_id' => $this->consultation->getKey(),
             'user_id' => $this->user->getKey()
         ])->create();
+
+        $userTerm = $consultationTerm->userTerms()->create([
+            'executed_at' => $date,
+            'executed_status' => ConsultationTermStatusEnum::APPROVED,
+        ]);
 
         $this->consultationService->termIsBusyForUser($this->consultation->getKey(), $date, $this->user->getKey());
     }
@@ -60,12 +64,16 @@ class ConsultationServiceTest extends TestCase
         $user = User::factory()->create();
         $user->assignRole('student');
 
-        ConsultationUserPivot::factory([
-            'executed_at' => $date,
-            'executed_status' => ConsultationTermStatusEnum::APPROVED,
+        /** @var ConsultationUserPivot $consultationTerm */
+        $consultationTerm = ConsultationUserPivot::factory([
             'consultation_id' => $this->consultation->getKey(),
             'user_id' => $user->getKey()
         ])->create();
+
+        $userTerm = $consultationTerm->userTerms()->create([
+            'executed_at' => $date,
+            'executed_status' => ConsultationTermStatusEnum::APPROVED,
+        ]);
 
         $this->assertTrue($this->consultationService->termIsBusyForUser($this->consultation->getKey(), $date, $this->user->getKey()));
     }
@@ -81,12 +89,16 @@ class ConsultationServiceTest extends TestCase
             'max_session_students' => 2,
         ]);
 
-        ConsultationUserPivot::factory([
-            'executed_at' => $date,
-            'executed_status' => ConsultationTermStatusEnum::APPROVED,
+        /** @var ConsultationUserPivot $consultationTerm */
+        $consultationTerm = ConsultationUserPivot::factory([
             'consultation_id' => $this->consultation->getKey(),
             'user_id' => $user->getKey()
         ])->create();
+
+        $userTerm = $consultationTerm->userTerms()->create([
+            'executed_at' => $date,
+            'executed_status' => ConsultationTermStatusEnum::APPROVED,
+        ]);
 
         $this->assertFalse($this->consultationService->termIsBusyForUser($this->consultation->getKey(), $date, $this->user->getKey()));
     }

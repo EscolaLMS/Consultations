@@ -16,6 +16,5 @@ interface ConsultationUserRepositoryContract extends BaseRepositoryContract
     ): Builder;
     public function updateModel(ConsultationUserPivot $consultationUserPivot, array $data): ConsultationUserPivot;
     public function getIncomingTerm(array $criteria = []): Collection;
-    public function getByCurrentUserTutor(): Collection;
     public function getBusyTerms(int $consultationId, ?string $date = null): Collection;
 }

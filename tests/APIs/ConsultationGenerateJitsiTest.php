@@ -44,12 +44,16 @@ class ConsultationGenerateJitsiTest extends TestCase
     public function testGenerateJitsiWithApprovedTerm(): void
     {
         $consultation = Consultation::factory()->create();
+        $time = now();
         $this->consultationUserPivot = ConsultationUserPivot::factory([
             'consultation_id' => $consultation->getKey(),
             'user_id' => $this->user->getKey(),
-            'executed_at' => now(),
-            'executed_status' => ConsultationTermStatusEnum::APPROVED,
         ])->create();
+
+        $consultationUserTerm = $this->consultationUserPivot->userTerms()->create([
+            'executed_at' => $time->format('Y-m-d H:i:s'),
+            'executed_status' => ConsultationTermStatusEnum::APPROVED,
+        ]);
 
         $returnData = [
             'data' =>
@@ -69,7 +73,7 @@ class ConsultationGenerateJitsiTest extends TestCase
         ];
         $jitsiService = $this->mock(JitsiServiceContract::class);
         $jitsiService->shouldReceive('getChannelData')->once()->andReturn($returnData);
-        $response = $this->actingAs($this->user, 'api')->json('GET', 'api/consultations/generate-jitsi/' . $this->consultationUserPivot->getKey());
+        $response = $this->actingAs($this->user, 'api')->json('GET', 'api/consultations/generate-jitsi/' . $this->consultationUserPivot->getKey(), ['term' => $consultationUserTerm->executed_at]);
         $response->assertOk();
         $response->assertJson(
             fn (AssertableJson $json) => $json->has('data',
@@ -91,7 +95,14 @@ class ConsultationGenerateJitsiTest extends TestCase
     public function testGenerateJitsiWithRejectedTerm(): void
     {
         $this->initVariable();
-        $response = $this->actingAs($this->user, 'api')->json('GET', 'api/consultations/generate-jitsi/' . $this->consultationUserPivot->getKey());
+
+        $time = now();
+        $this->consultationUserPivot->userTerms()->create([
+            'executed_at' => $time->format('Y-m-d H:i:s'),
+            'executed_status' => ConsultationTermStatusEnum::REJECT,
+        ]);
+
+        $response = $this->actingAs($this->user, 'api')->json('GET', 'api/consultations/generate-jitsi/' . $this->consultationUserPivot->getKey(), ['term' => $time->format('Y-m-d H:i:s')]);
         $response->assertNotFound();
         $response->assertJson(fn (AssertableJson $json) => $json->where('message', __('Consultation term is not available'))->etc());
     }
@@ -99,7 +110,14 @@ class ConsultationGenerateJitsiTest extends TestCase
     public function testGenerateJitsiBeforeExecutedAt(): void
     {
         $this->initVariable();
-        $response = $this->actingAs($this->user, 'api')->json('GET', 'api/consultations/generate-jitsi/' . $this->consultationUserPivot->getKey());
+
+        $time = now()->addHours(4);
+        $this->consultationUserPivot->userTerms()->create([
+            'executed_at' => $time->format('Y-m-d H:i:s'),
+            'executed_status' => ConsultationTermStatusEnum::APPROVED,
+        ]);
+
+        $response = $this->actingAs($this->user, 'api')->json('GET', 'api/consultations/generate-jitsi/' . $this->consultationUserPivot->getKey(), ['term' => $time->format('Y-m-d H:i:s')]);
         $response->assertNotFound();
         $response->assertJson(fn (AssertableJson $json) => $json->where('message', __('Consultation term is not available'))->etc());
     }

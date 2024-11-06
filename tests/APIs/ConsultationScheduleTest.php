@@ -48,6 +48,9 @@ class ConsultationScheduleTest extends TestCase
         $this->consultationUserPivot = ConsultationUserPivot::factory([
             'consultation_id' => $this->consultation->getKey(),
             'user_id' => $this->user->getKey(),
+        ])->create();
+
+        $userTerm = $this->consultationUserPivot->userTerms()->create([
             'executed_at' => now()->modify(
                 config(
                     'escolalms_consultations.modifier_date.' .
@@ -58,7 +61,7 @@ class ConsultationScheduleTest extends TestCase
                 ConsultationTermStatusEnum::REPORTED,
                 ConsultationTermStatusEnum::NOT_REPORTED
             ])
-        ])->create();
+        ]);
         $this->assertTrue($this->consultationUserPivot->reminder_status === null);
         $job = new ReminderAboutConsultationJob(ConsultationTermReminderStatusEnum::REMINDED_HOUR_BEFORE);
         $job->handle();
@@ -66,7 +69,7 @@ class ConsultationScheduleTest extends TestCase
         Event::assertNotDispatched(ReminderTrainerAboutTerm::class);
         $this->consultationUserPivot->refresh();
         $this->assertTrue(
-            $this->consultationUserPivot->reminder_status === null
+            $userTerm->reminder_status === null
         );
     }
 
@@ -76,18 +79,20 @@ class ConsultationScheduleTest extends TestCase
         $this->consultationUserPivot = ConsultationUserPivot::factory([
             'consultation_id' => $this->consultation->getKey(),
             'user_id' => $this->user->getKey(),
+        ])->create();
+        $consultationUserTerm = $this->consultationUserPivot->userTerms()->create([
             'executed_at' => now()->modify(
                 config('escolalms_consultations.modifier_date.' .
                     ConsultationTermReminderStatusEnum::REMINDED_HOUR_BEFORE, '+1 hour')
             )->format('Y-m-d H:i:s'),
             'executed_status' => ConsultationTermStatusEnum::APPROVED
-        ])->create();
-        $this->assertTrue($this->consultationUserPivot->reminder_status === null);
+        ]);
+        $this->assertTrue($consultationUserTerm->reminder_status === null);
         $job = new ReminderAboutConsultationJob(ConsultationTermReminderStatusEnum::REMINDED_HOUR_BEFORE);
         $job->handle();
-        $this->consultationUserPivot->refresh();
+        $consultationUserTerm->refresh();
         $this->assertTrue(
-            $this->consultationUserPivot->reminder_status === ConsultationTermReminderStatusEnum::REMINDED_HOUR_BEFORE
+            $consultationUserTerm->reminder_status === ConsultationTermReminderStatusEnum::REMINDED_HOUR_BEFORE
         );
     }
 
@@ -97,16 +102,20 @@ class ConsultationScheduleTest extends TestCase
         $this->consultationUserPivot = ConsultationUserPivot::factory([
             'consultation_id' => $this->consultation->getKey(),
             'user_id' => $this->user->getKey(),
+        ])->create();
+
+        $consultationUserTerm = $this->consultationUserPivot->userTerms()->create([
             'executed_at' => now()->modify(config('escolalms_consultations.modifier_date.' .
                 ConsultationTermReminderStatusEnum::REMINDED_DAY_BEFORE, '+1 day'))->format('Y-m-d H:i:s'),
             'executed_status' => ConsultationTermStatusEnum::APPROVED
-        ])->create();
-        $this->assertTrue($this->consultationUserPivot->reminder_status === null);
+        ]);
+
+        $this->assertTrue($consultationUserTerm->reminder_status === null);
         $job = new ReminderAboutConsultationJob(ConsultationTermReminderStatusEnum::REMINDED_DAY_BEFORE);
         $job->handle();
-        $this->consultationUserPivot->refresh();
+        $consultationUserTerm->refresh();
         $this->assertTrue(
-            $this->consultationUserPivot->reminder_status === ConsultationTermReminderStatusEnum::REMINDED_DAY_BEFORE
+            $consultationUserTerm->reminder_status === ConsultationTermReminderStatusEnum::REMINDED_DAY_BEFORE
         );
     }
 
@@ -116,19 +125,23 @@ class ConsultationScheduleTest extends TestCase
         $this->consultationUserPivot = ConsultationUserPivot::factory([
             'consultation_id' => $this->consultation->getKey(),
             'user_id' => $this->user->getKey(),
+        ])->create();
+
+        $consultationUserTerm = $this->consultationUserPivot->userTerms()->create([
             'executed_at' => now()->modify(
                 config('escolalms_consultations.modifier_date.' .
                     ConsultationTermReminderStatusEnum::REMINDED_HOUR_BEFORE, '+1 hour')
             )->format('Y-m-d H:i:s'),
             'executed_status' => ConsultationTermStatusEnum::APPROVED,
             'reminder_status' => ConsultationTermReminderStatusEnum::REMINDED_DAY_BEFORE,
-        ])->create();
-        $this->assertTrue($this->consultationUserPivot->reminder_status === ConsultationTermReminderStatusEnum::REMINDED_DAY_BEFORE);
+        ]);
+
+        $this->assertTrue($consultationUserTerm->reminder_status === ConsultationTermReminderStatusEnum::REMINDED_DAY_BEFORE);
         $job = new ReminderAboutConsultationJob(ConsultationTermReminderStatusEnum::REMINDED_HOUR_BEFORE);
         $job->handle();
-        $this->consultationUserPivot->refresh();
+        $consultationUserTerm->refresh();
         $this->assertTrue(
-            $this->consultationUserPivot->reminder_status === ConsultationTermReminderStatusEnum::REMINDED_HOUR_BEFORE
+            $consultationUserTerm->reminder_status === ConsultationTermReminderStatusEnum::REMINDED_HOUR_BEFORE
         );
     }
 
@@ -139,21 +152,25 @@ class ConsultationScheduleTest extends TestCase
         $this->consultationUserPivot = ConsultationUserPivot::factory([
             'consultation_id' => $this->consultation->getKey(),
             'user_id' => $this->user->getKey(),
+        ])->create();
+
+        $consultationUserTerm = $this->consultationUserPivot->userTerms()->create([
             'executed_at' => now()->modify(
                 config('escolalms_consultations.modifier_date.' .
                     ConsultationTermReminderStatusEnum::REMINDED_HOUR_BEFORE, '+1 hour')
             )->format('Y-m-d H:i:s'),
             'executed_status' => ConsultationTermStatusEnum::APPROVED,
             'reminder_status' => ConsultationTermReminderStatusEnum::REMINDED_HOUR_BEFORE,
-        ])->create();
-        $this->assertTrue($this->consultationUserPivot->reminder_status === ConsultationTermReminderStatusEnum::REMINDED_HOUR_BEFORE);
+        ]);
+
+        $this->assertTrue($consultationUserTerm->reminder_status === ConsultationTermReminderStatusEnum::REMINDED_HOUR_BEFORE);
         $job = new ReminderAboutConsultationJob(ConsultationTermReminderStatusEnum::REMINDED_HOUR_BEFORE);
         $job->handle();
-        $this->consultationUserPivot->refresh();
+        $consultationUserTerm->refresh();
         Event::assertNotDispatched(ReminderAboutTerm::class);
         Event::assertNotDispatched(ReminderTrainerAboutTerm::class);
         $this->assertTrue(
-            $this->consultationUserPivot->reminder_status === ConsultationTermReminderStatusEnum::REMINDED_HOUR_BEFORE
+            $consultationUserTerm->reminder_status === ConsultationTermReminderStatusEnum::REMINDED_HOUR_BEFORE
         );
     }
 
@@ -164,20 +181,25 @@ class ConsultationScheduleTest extends TestCase
         $this->consultationUserPivot = ConsultationUserPivot::factory([
             'consultation_id' => $this->consultation->getKey(),
             'user_id' => $this->user->getKey(),
+
+        ])->create();
+
+        $consultationUserTerm = $this->consultationUserPivot->userTerms()->create([
             'executed_at' => now()->modify(
                 config('escolalms_consultations.modifier_date.' .
                     ConsultationTermReminderStatusEnum::REMINDED_DAY_BEFORE, '+1 day')
             )->subHour()->format('Y-m-d H:i:s'),
             'executed_status' => ConsultationTermStatusEnum::APPROVED,
-        ])->create();
-        $this->assertTrue($this->consultationUserPivot->reminder_status === null);
+        ]);
+
+        $this->assertTrue($consultationUserTerm->reminder_status === null);
         $job = new ReminderAboutConsultationJob(ConsultationTermReminderStatusEnum::REMINDED_DAY_BEFORE);
         $job->handle();
-        $this->consultationUserPivot->refresh();
+        $consultationUserTerm->refresh();
         Event::assertNotDispatched(ReminderAboutTerm::class);
         Event::assertNotDispatched(ReminderTrainerAboutTerm::class);
         $this->assertTrue(
-            $this->consultationUserPivot->reminder_status === null
+            $consultationUserTerm->reminder_status === null
         );
     }
 }

@@ -2,10 +2,14 @@
 
 namespace EscolaLms\Consultations\Http\Controllers;
 
+use EscolaLms\Consultations\Dto\ConsultationUserTermDto;
 use EscolaLms\Consultations\Dto\ConsultationSaveScreenDto;
+use EscolaLms\Consultations\Dto\FinishTermDto;
 use EscolaLms\Consultations\Enum\ConstantEnum;
 use EscolaLms\Consultations\Http\Controllers\Swagger\ConsultationAPISwagger;
+use EscolaLms\Consultations\Http\Requests\ConsultationUserTermRequest;
 use EscolaLms\Consultations\Http\Requests\ConsultationScreenSaveRequest;
+use EscolaLms\Consultations\Http\Requests\FinishTermRequest;
 use EscolaLms\Consultations\Http\Requests\ListAPIConsultationsRequest;
 use EscolaLms\Consultations\Http\Requests\ListConsultationsRequest;
 use EscolaLms\Consultations\Http\Requests\ReportTermConsultationRequest;
@@ -67,9 +71,9 @@ class ConsultationAPIController extends EscolaLmsBaseController implements Consu
         return $this->sendSuccess(__('Consultation reserved term successfully'));
     }
 
-    public function approveTerm(int $consultationTermId): JsonResponse
+    public function approveTerm(ConsultationUserTermRequest $request, int $consultationTermId): JsonResponse
     {
-        $this->consultationServiceContract->approveTerm($consultationTermId);
+        $this->consultationServiceContract->approveTerm($consultationTermId, new ConsultationUserTermDto($request->all()));
         $consultationTerms = $this->consultationServiceContract->getConsultationTermsForTutor();
         return $this->sendResponse(
             ConsultationTermsResource::collection($consultationTerms),
@@ -77,9 +81,9 @@ class ConsultationAPIController extends EscolaLmsBaseController implements Consu
         );
     }
 
-    public function rejectTerm(int $consultationTermId): JsonResponse
+    public function rejectTerm(ConsultationUserTermRequest $request, int $consultationTermId): JsonResponse
     {
-        $this->consultationServiceContract->rejectTerm($consultationTermId);
+        $this->consultationServiceContract->rejectTerm($consultationTermId, new ConsultationUserTermDto($request->all()));
         $consultationTerms = $this->consultationServiceContract->getConsultationTermsForTutor();
         return $this->sendResponse(
             ConsultationTermsResource::collection($consultationTerms),
@@ -96,10 +100,10 @@ class ConsultationAPIController extends EscolaLmsBaseController implements Consu
         );
     }
 
-    public function generateJitsi(int $consultationTermId): JsonResponse
+    public function generateJitsi(ConsultationUserTermRequest $request, int $consultationTermId): JsonResponse
     {
         return $this->sendResponse(
-            $this->consultationServiceContract->generateJitsi($consultationTermId),
+            $this->consultationServiceContract->generateJitsi($consultationTermId, new ConsultationUserTermDto($request->all())),
             __('Consultation updated successfully')
         );
     }
@@ -117,5 +121,15 @@ class ConsultationAPIController extends EscolaLmsBaseController implements Consu
     {
         $this->consultationServiceContract->saveScreen(new ConsultationSaveScreenDto($request->all()));
         return $this->sendSuccess(__('Screen saved successfully'));
+    }
+
+    public function finishTerm(FinishTermRequest $request, int $consultationTermId): JsonResponse
+    {
+        $this->consultationServiceContract->finishTerm($consultationTermId, new FinishTermDto($request->all()));
+        $consultationTerms = $this->consultationServiceContract->getConsultationTermsForTutor();
+        return $this->sendResponse(
+            ConsultationTermsResource::collection($consultationTerms),
+            __('Consultation term approved successfully')
+        );
     }
 }
