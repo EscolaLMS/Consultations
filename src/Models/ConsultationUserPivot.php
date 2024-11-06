@@ -16,9 +16,9 @@ use Illuminate\Support\Carbon;
  * @property int $consultation_id
  * @property Consultation $consultation
  *
- * @property @deprecated Carbon $executed_at
- * @property @deprecated ConsultationTermReminderStatusEnum $reminder_status
- * @property @deprecated ConsultationTermStatusEnum $executed_status
+ * @property Carbon $executed_at
+ * @property ConsultationTermReminderStatusEnum $reminder_status
+ * @property ConsultationTermStatusEnum $executed_status
  */
 class ConsultationUserPivot extends Model
 {

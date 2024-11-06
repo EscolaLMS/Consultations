@@ -170,7 +170,7 @@ class ConsultationService implements ConsultationServiceContract
         $userTerms = $dto->getForAllUsers() ? $this->consultationUserTermRepository->getAllUserTermsByConsultationIdAndExecutedAt($consultationTerm->consultation_id, $dto->getTerm())
             : collect([$this->consultationUserTermRepository->getUserTermByConsultationUserIdAndExecutedAt($consultationTermId, $dto->getTerm())]);
 
-        DB::transaction(function () use ($userTerms, $consultationTerm, $authUser) {
+        DB::transaction(function () use ($userTerms, $authUser) {
             /** @var ConsultationUserTerm $userTerm */
             foreach ($userTerms as $userTerm) {
                 /** @var ConsultationUserTerm $userTerm */
@@ -194,7 +194,7 @@ class ConsultationService implements ConsultationServiceContract
         $userTerms = $dto->getForAllUsers() ? $this->consultationUserTermRepository->getAllUserTermsByConsultationIdAndExecutedAt($consultationTerm->consultation_id, $dto->getTerm())
             : collect([$this->consultationUserTermRepository->getUserTermByConsultationUserIdAndExecutedAt($consultationTermId, $dto->getTerm())]);
 
-        DB::transaction(function () use ($userTerms, $consultationTerm, $authUser) {
+        DB::transaction(function () use ($userTerms, $authUser) {
             /** @var ConsultationUserTerm $userTerm */
             foreach ($userTerms as $userTerm) {
                 /** @var ConsultationUserTerm $userTerm */
@@ -432,7 +432,7 @@ class ConsultationService implements ConsultationServiceContract
                 $userTerm
             ));
             $consultation = $userTerm->consultationUser->consultation;
-            if ($consultation->teachers) {
+            if ($consultation->teachers->count() > 0) {
                 $consultation->teachers->each(
                     fn (User $teacher) => event(new ReminderTrainerAboutTerm(
                         $teacher,
@@ -525,6 +525,7 @@ class ConsultationService implements ConsultationServiceContract
     public function getBusyTermsFormatDate(int $consultationId): array
     {
         return $this->consultationUserTermRepository->getBusyTerms($consultationId)->map(
+            // @phpstan-ignore-next-line
             fn (ConsultationUserTerm $term) => Carbon::make($term->executed_at)
         )->unique()->toArray();
     }

@@ -10,7 +10,8 @@ use EscolaLms\Consultations\Models\ConsultationUserTerm;
 use EscolaLms\Consultations\Repositories\Contracts\ConsultationUserTermRepositoryContract;
 use EscolaLms\Core\Repositories\BaseRepository;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Collection;
 
 class ConsultationUserTermRepository extends BaseRepository implements ConsultationUserTermRepositoryContract
 {
@@ -70,7 +71,7 @@ class ConsultationUserTermRepository extends BaseRepository implements Consultat
     }
 
     /**
-     * @return Collection<int, ConsultationUserTerm>
+     * @return Collection<int, Model>
      */
     public function getBusyTerms(int $consultationId, ?string $date = null): Collection
     {
@@ -98,10 +99,12 @@ class ConsultationUserTermRepository extends BaseRepository implements Consultat
 
     public function getUserTermByConsultationUserIdAndExecutedAt(int $consultationUserId, string $executedAt): ConsultationUserTerm
     {
-        return $this->model->newQuery()
+        /** @var ConsultationUserTerm $model */
+        $model = $this->model->newQuery()
             ->where('consultation_user_id', '=', $consultationUserId)
             ->where('executed_at', '=', $executedAt)
             ->firstOrFail();
+        return $model;
     }
 
     public function updateModels(Collection $models, array $data): void
@@ -109,7 +112,7 @@ class ConsultationUserTermRepository extends BaseRepository implements Consultat
         $this->model->newQuery()->whereIn('id', $models->pluck('id'))->update($data);
     }
 
-    public function getByCurrentUserTutor(): \Illuminate\Support\Collection
+    public function getByCurrentUserTutor(): Collection
     {
         $result = collect();
         $terms = $this->model->newQuery()
@@ -124,6 +127,7 @@ class ConsultationUserTermRepository extends BaseRepository implements Consultat
         /** @var ConsultationUserTerm $term */
         foreach ($terms as $term) {
             /** @var ConsultationUserTermResourceDto|null $userTerm */
+            // @phpstan-ignore-next-line
             $userTerm = $result->first(fn (ConsultationUserTermResourceDto $dto) => $dto->consultation_id === $term->consultationUser->consultation_id && $term->executed_at === $dto->executed_at);
 
             if ($userTerm) {
