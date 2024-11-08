@@ -5,7 +5,7 @@ namespace EscolaLms\Consultations\Dto;
 class FinishTermDto extends BaseDto
 {
     protected string $term;
-    protected ?string $finishedAt;
+    protected ?string $finishedAt = null;
 
     protected function setTerm(string $term): void
     {
