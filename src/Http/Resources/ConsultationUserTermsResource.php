@@ -65,6 +65,17 @@ class ConsultationUserTermsResource extends JsonResource
      *             ),
      *          ),
      *      ),
+     *     @OA\Property(
+     *          property="finished_at",
+     *          description="consultation term finished date",
+     *          type="datetime",
+     *          example="2022-04-15T04:00:00.000Z",
+     *      ),
+     *      @OA\Property(
+     *          property="consultation_id",
+     *          description="consultation ID",
+     *          type="int",
+     *      ),
      * )
      *
      */
@@ -100,6 +111,7 @@ class ConsultationUserTermsResource extends JsonResource
             'busy_terms' => ConsultationTermResource::collection($consultationServiceContract->getBusyTermsFormatDate($consultation->getKey())),
             'author' =>  $consultation->author ? ConsultationAuthorResource::make($consultation->author) : null,
             'finished_at' => $this->resource->finished_at,
+            'consultation_id' => $consultation->getKey(),
         ];
         return self::apply($fields, $this);
     }
