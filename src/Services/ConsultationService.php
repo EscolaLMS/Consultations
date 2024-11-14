@@ -486,7 +486,6 @@ class ConsultationService implements ConsultationServiceContract
                 }
                 return true;
             } catch (Exception $e) {
-                dd($e);
                 throw new ChangeTermException(__('Term is not changed'));
             }
         });
