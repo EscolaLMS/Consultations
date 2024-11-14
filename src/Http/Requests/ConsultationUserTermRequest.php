@@ -18,7 +18,7 @@ class ConsultationUserTermRequest extends FormRequest
         return [
             'term' => ['required', 'date', new UserTermExist(request('consultationTermId'))],
             'finished_at' => ['nullable', 'date'],
-            'for_all_users' => ['nullable', 'boolean'],
+            'user_id' => ['nullable', 'exists:users,id'],
         ];
     }
 }

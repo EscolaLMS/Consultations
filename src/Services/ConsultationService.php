@@ -167,8 +167,8 @@ class ConsultationService implements ConsultationServiceContract
         /** @var User $authUser */
         $authUser = auth()->user();
 
-        $userTerms = $dto->getForAllUsers() ? $this->consultationUserTermRepository->getAllUserTermsByConsultationIdAndExecutedAt($consultationTerm->consultation_id, $dto->getTerm())
-            : collect([$this->consultationUserTermRepository->getUserTermByConsultationUserIdAndExecutedAt($consultationTermId, $dto->getTerm())]);
+        $userTerms = $dto->getUserId() ? collect([$this->consultationUserTermRepository->getUserTermByUserIdAndExecutedAt($dto->getUserId(), $dto->getTerm())])
+            : $this->consultationUserTermRepository->getAllUserTermsByConsultationIdAndExecutedAt($consultationTerm->consultation_id, $dto->getTerm());
 
         DB::transaction(function () use ($userTerms, $authUser) {
             /** @var ConsultationUserTerm $userTerm */
@@ -191,8 +191,8 @@ class ConsultationService implements ConsultationServiceContract
         /** @var User $authUser */
         $authUser = auth()->user();
 
-        $userTerms = $dto->getForAllUsers() ? $this->consultationUserTermRepository->getAllUserTermsByConsultationIdAndExecutedAt($consultationTerm->consultation_id, $dto->getTerm())
-            : collect([$this->consultationUserTermRepository->getUserTermByConsultationUserIdAndExecutedAt($consultationTermId, $dto->getTerm())]);
+        $userTerms = $dto->getUserId() ? collect([$this->consultationUserTermRepository->getUserTermByUserIdAndExecutedAt($dto->getUserId(), $dto->getTerm())])
+            : $this->consultationUserTermRepository->getAllUserTermsByConsultationIdAndExecutedAt($consultationTerm->consultation_id, $dto->getTerm());
 
         DB::transaction(function () use ($userTerms, $authUser) {
             /** @var ConsultationUserTerm $userTerm */
@@ -468,8 +468,8 @@ class ConsultationService implements ConsultationServiceContract
                 /** @var ConsultationUserPivot $consultationTerm */
                 $consultationTerm = $this->consultationUserRepositoryContract->find($consultationTermId);
 
-                $userTerms = $dto->getForAllUsers() ? $this->consultationUserTermRepository->getAllUserTermsByConsultationIdAndExecutedAt($consultationTerm->consultation_id, $dto->getTerm())
-                    : collect([$this->consultationUserTermRepository->getUserTermByConsultationUserIdAndExecutedAt($consultationTermId, $dto->getTerm())]);
+                $userTerms = $dto->getUserId() ? collect([$this->consultationUserTermRepository->getUserTermByUserIdAndExecutedAt($dto->getUserId(), $dto->getTerm())])
+                    : $this->consultationUserTermRepository->getAllUserTermsByConsultationIdAndExecutedAt($consultationTerm->consultation_id, $dto->getTerm());
 
                 /** @var ConsultationUserTerm $userTerm */
                 foreach ($userTerms as $userTerm) {
@@ -486,6 +486,7 @@ class ConsultationService implements ConsultationServiceContract
                 }
                 return true;
             } catch (Exception $e) {
+                dd($e);
                 throw new ChangeTermException(__('Term is not changed'));
             }
         });
