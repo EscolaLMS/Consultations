@@ -97,11 +97,11 @@ class ConsultationUserTermRepository extends BaseRepository implements Consultat
             ->get();
     }
 
-    public function getUserTermByConsultationUserIdAndExecutedAt(int $consultationUserId, string $executedAt): ConsultationUserTerm
+    public function getUserTermByUserIdAndExecutedAt(int $userId, string $executedAt): ConsultationUserTerm
     {
         /** @var ConsultationUserTerm $model */
         $model = $this->model->newQuery()
-            ->where('consultation_user_id', '=', $consultationUserId)
+            ->whereHas('consultationUser', fn (Builder $query) => $query->where('user_id', '=', $userId))
             ->where('executed_at', '=', $executedAt)
             ->firstOrFail();
         return $model;

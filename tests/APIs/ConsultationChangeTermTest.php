@@ -57,6 +57,50 @@ class ConsultationChangeTermTest extends TestCase
         Event::assertDispatched(ChangeTerm::class);
     }
 
+    public function testChangeTermForOneUser()
+    {
+        Event::fake();
+        /** @var ConsultationUserPivot $term */
+        $term = $this->consultation->terms()->first();
+
+        $userTerm = $term->userTerms()->create([
+            'executed_at' => now()->format('Y-m-d H:i:s'),
+            'executed_status' => ConsultationTermStatusEnum::REPORTED,
+        ]);
+
+        $user = User::factory()->create();
+        $user->guard_name = 'api';
+        $user->assignRole('student');
+
+        $this->consultation->attachToConsultationPivot([
+            'consultation_id' => $this->consultation->getKey(),
+            'user_id' => $user->getKey(),
+            'executed_status' => ConsultationTermStatusEnum::NOT_REPORTED,
+        ]);
+
+        /** @var ConsultationUserPivot $term */
+        $changedTerm = $this->consultation->terms()->where('user_id', '=', $user->getKey())->first();
+
+        $userChangedTerm = $changedTerm->userTerms()->create([
+            'executed_at' => now()->format('Y-m-d H:i:s'),
+            'executed_status' => ConsultationTermStatusEnum::REPORTED,
+        ]);
+
+        $newTerm = now()->modify('+2 hours')->format('Y-m-d H:i:s');
+        $this->response = $this->actingAs($this->user, 'api')->post(
+            '/api/admin/consultations/change-term/' . $term->getKey(),
+            ['executed_at' => $newTerm, 'term' => $userChangedTerm->executed_at, 'user_id' => $user->getKey()]
+        );
+        $this->response->assertOk();
+        $userTerm->refresh();
+        $userChangedTerm->refresh();
+        $this->assertTrue($userChangedTerm->executed_at === $newTerm);
+        $this->assertTrue($userChangedTerm->executed_status === ConsultationTermStatusEnum::APPROVED);
+        $this->assertTrue($userTerm->executed_at !== $newTerm);
+        $this->assertTrue($userTerm->executed_status === ConsultationTermStatusEnum::REPORTED);
+        Event::assertDispatched(ChangeTerm::class);
+    }
+
     public function testChangeTermWithUser()
     {
         Event::fake();

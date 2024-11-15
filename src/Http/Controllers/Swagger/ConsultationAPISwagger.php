@@ -99,11 +99,11 @@ interface ConsultationAPISwagger
      *          )
      *      ),
      *      @OA\Parameter(
-     *          name="for_all_users",
+     *          name="user_id",
      *          required=false,
      *          in="query",
      *          @OA\Schema(
-     *              type="boolean"
+     *              type="int"
      *          )
      *      ),
      *      @OA\Response(
@@ -166,11 +166,11 @@ interface ConsultationAPISwagger
      *          )
      *      ),
      *      @OA\Parameter(
-     *          name="for_all_users",
+     *          name="user_id",
      *          required=false,
      *          in="query",
      *          @OA\Schema(
-     *              type="boolean"
+     *              type="int"
      *          )
      *      ),
      *      @OA\Response(

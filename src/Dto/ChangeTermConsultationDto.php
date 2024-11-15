@@ -6,7 +6,7 @@ class ChangeTermConsultationDto extends BaseDto
 {
     protected string $executedAt;
     protected string $term;
-    protected bool $forAllUsers = false;
+    protected ?int $userId = null;
 
     protected function setExecutedAt(string $executedAt): void
     {
@@ -28,13 +28,13 @@ class ChangeTermConsultationDto extends BaseDto
         return $this->term;
     }
 
-    protected function setForAllUsers(bool $forAllUsers): void
+    protected function setUserId(int $userId): void
     {
-        $this->forAllUsers = $forAllUsers;
+        $this->userId = $userId;
     }
 
-    public function getForAllUsers(): bool
+    public function getUserId(): ?int
     {
-        return $this->forAllUsers;
+        return $this->userId;
     }
 }

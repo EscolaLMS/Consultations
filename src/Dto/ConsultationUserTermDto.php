@@ -5,7 +5,7 @@ namespace EscolaLms\Consultations\Dto;
 class ConsultationUserTermDto extends BaseDto
 {
     protected string $term;
-    protected bool $forAllUsers = false;
+    protected ?int $userId = null;
 
     protected function setTerm(string $term): void
     {
@@ -17,13 +17,13 @@ class ConsultationUserTermDto extends BaseDto
         return $this->term;
     }
 
-    protected function setForAllUsers(bool $forAllUsers): void
+    protected function setUserId(int $userId): void
     {
-        $this->forAllUsers = $forAllUsers;
+        $this->userId = $userId;
     }
 
-    public function getForAllUsers(): bool
+    public function getUserId(): ?int
     {
-        return $this->forAllUsers;
+        return $this->userId;
     }
 }

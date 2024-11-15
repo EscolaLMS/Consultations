@@ -398,8 +398,8 @@ interface ConsultationSwagger
      *                  example="2024-10-31 10:45",
      *              ),
      *              @OA\Property(
-     *                  property="for_all_users",
-     *                  type="boolean",
+     *                  property="user_id",
+     *                  type="int",
      *              ),
      *          )
      *      ),

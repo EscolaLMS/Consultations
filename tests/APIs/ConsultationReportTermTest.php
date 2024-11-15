@@ -256,7 +256,7 @@ class ConsultationReportTermTest extends TestCase
         $this->response = $this->actingAs($this->user, 'api')->json(
             'GET',
             '/api/consultations/approve-term/' . $this->consultationUserPivot->getKey(),
-            ['term' => $now->format('Y-m-d H:i:s'), 'for_all_users' => true]
+            ['term' => $now->format('Y-m-d H:i:s')]
         )->assertOk();
 
         $this->consultationUserPivot->refresh();
@@ -294,6 +294,97 @@ class ConsultationReportTermTest extends TestCase
             $event->getConsultationTerm()->getKey() === $consultationStudent2->getKey()
         );
         $this->assertTrue($userTermStudent2->executed_status === ConsultationTermStatusEnum::APPROVED);
+    }
+
+    public function testConsultationMultipleTermOneApproved(): void
+    {
+        Event::fake([
+            ApprovedTerm::class,
+            ApprovedTermWithTrainer::class,
+        ]);
+        $this->initVariable();
+        $now = now()->modify('+1 day');
+
+        $this->consultation->update([
+            'max_session_students' => 4,
+        ]);
+
+        $student1 = User::factory()->create();
+        $student1->assignRole('student');
+
+        $student2 = User::factory()->create();
+        $student2->assignRole('student');
+
+        $student3 = User::factory()->create();
+        $student3->assignRole('student');
+
+        /** @var ConsultationUserPivot $consultationStudent1 */
+        $consultationStudent1 = ConsultationUserPivot::factory([
+            'consultation_id' => $this->consultation->getKey(),
+            'user_id' => $student1->getKey()
+        ])->create();
+
+        $userTermStudent1 = $consultationStudent1->userTerms()->create([
+            'executed_at' => $now->format('Y-m-d H:i:s'),
+            'executed_status' => ConsultationTermStatusEnum::REPORTED,
+        ]);
+
+        $consultationStudent2 = ConsultationUserPivot::factory([
+            'consultation_id' => $this->consultation->getKey(),
+            'user_id' => $student2->getKey()
+        ])->create();
+
+        $userTermStudent2 = $consultationStudent2->userTerms()->create([
+            'executed_at' => $now->format('Y-m-d H:i:s'),
+            'executed_status' => ConsultationTermStatusEnum::REPORTED,
+        ]);
+
+        $this->consultationUserTerm = $this->consultationUserPivot->userTerms()->create([
+            'executed_at' => $now->format('Y-m-d H:i:s'),
+            'executed_status' => ConsultationTermStatusEnum::REPORTED,
+        ]);
+
+        $this->response = $this->actingAs($this->user, 'api')->json(
+            'GET',
+            '/api/consultations/approve-term/' . $this->consultationUserPivot->getKey(),
+            ['term' => $now->format('Y-m-d H:i:s'), 'user_id' => $student1->getKey()]
+        )->assertOk();
+
+        $this->consultationUserPivot->refresh();
+        $this->consultationUserTerm->refresh();
+        Event::assertNotDispatched(ApprovedTerm::class, fn (ApprovedTerm $event) =>
+            $event->getUser()->getKey() === $this->user->getKey() &&
+            $event->getConsultationTerm()->getKey() === $this->consultationUserPivot->getKey()
+        );
+        Event::assertNotDispatched(ApprovedTermWithTrainer::class, fn (ApprovedTermWithTrainer $event) =>
+            $event->getUser()->getKey() === $this->user->getKey() &&
+            $event->getConsultationTerm()->getKey() === $this->consultationUserPivot->getKey()
+        );
+        $this->assertTrue($this->consultationUserTerm->executed_status === ConsultationTermStatusEnum::REPORTED);
+
+        $consultationStudent1->refresh();
+        $userTermStudent1->refresh();
+        Event::assertDispatched(ApprovedTerm::class, fn (ApprovedTerm $event) =>
+            $event->getUser()->getKey() === $student1->getKey() &&
+            $event->getConsultationTerm()->getKey() === $consultationStudent1->getKey()
+        );
+        Event::assertDispatched(ApprovedTermWithTrainer::class, fn (ApprovedTermWithTrainer $event) =>
+            $event->getUser()->getKey() === $this->user->getKey() &&
+            $event->getConsultationTerm()->getKey() === $consultationStudent1->getKey()
+        );
+        $this->assertTrue($userTermStudent1->executed_status === ConsultationTermStatusEnum::APPROVED);
+
+        $consultationStudent2->refresh();
+        $userTermStudent2->refresh();
+        Event::assertNotDispatched(ApprovedTerm::class, fn (ApprovedTerm $event) =>
+            $event->getUser()->getKey() === $student2->getKey() &&
+            $event->getConsultationTerm()->getKey() === $consultationStudent2->getKey()
+        );
+        Event::assertNotDispatched(ApprovedTermWithTrainer::class, fn (ApprovedTermWithTrainer $event) =>
+            $event->getUser()->getKey() === $this->user->getKey() &&
+            $event->getConsultationTerm()->getKey() === $consultationStudent2->getKey()
+        );
+        $this->assertTrue($userTermStudent2->executed_status === ConsultationTermStatusEnum::REPORTED);
     }
 
     public function testConsultationTermApprovedUnauthorized(): void
