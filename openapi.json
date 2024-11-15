@@ -86,11 +86,11 @@
                         }
                     },
                     {
-                        "name": "for_all_users",
+                        "name": "user_id",
                         "in": "query",
                         "required": false,
                         "schema": {
-                            "type": "boolean"
+                            "type": "int"
                         }
                     }
                 ],
@@ -141,11 +141,11 @@
                         }
                     },
                     {
-                        "name": "for_all_users",
+                        "name": "user_id",
                         "in": "query",
                         "required": false,
                         "schema": {
-                            "type": "boolean"
+                            "type": "int"
                         }
                     }
                 ],
