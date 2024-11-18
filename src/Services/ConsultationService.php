@@ -487,7 +487,7 @@ class ConsultationService implements ConsultationServiceContract
                     /** @var ConsultationUserTerm $consultationUserTerm */
                     $consultationUserTerm = $this->consultationUserTermRepository->update([
                         'executed_at' => $dto->getExecutedAt(),
-                        'executed_status' => ConsultationTermStatusEnum::REPORTED,
+                        'executed_status' => $dto->getAccept() ? ConsultationTermStatusEnum::APPROVED : ConsultationTermStatusEnum::REPORTED,
                     ], $userTerm->getKey());
 
                     if (!$consultationUserTerm->consultationUser->user) {
