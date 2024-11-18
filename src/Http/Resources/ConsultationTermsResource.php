@@ -89,7 +89,7 @@ class ConsultationTermsResource extends JsonResource
             'date' => Carbon::make($this->resource->executed_at) ?? '',
             'status' => $this->resource->executed_status ?? '',
             'duration' => $this->resource->duration,
-            'users' => ConsultationAuthorResource::collection($this->resource->users),
+            'users' => ConsultationUserResource::collection($this->resource->users),
             'is_started' => $consultationServiceContract->isStarted(
                 $this->resource->executed_at,
                 $this->resource->executed_status,

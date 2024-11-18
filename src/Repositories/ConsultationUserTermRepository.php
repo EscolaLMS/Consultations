@@ -2,6 +2,7 @@
 
 namespace EscolaLms\Consultations\Repositories;
 
+use EscolaLms\Consultations\Dto\ConsultationUserResourceDto;
 use EscolaLms\Consultations\Dto\ConsultationUserTermResourceDto;
 use EscolaLms\Consultations\Dto\FilterConsultationTermsListDto;
 use EscolaLms\Consultations\Enum\ConsultationTermStatusEnum;
@@ -130,8 +131,12 @@ class ConsultationUserTermRepository extends BaseRepository implements Consultat
             // @phpstan-ignore-next-line
             $userTerm = $result->first(fn (ConsultationUserTermResourceDto $dto) => $dto->consultation_id === $term->consultationUser->consultation_id && $term->executed_at === $dto->executed_at);
 
+            $user = $term->consultationUser->user->toArray();
+            $user['categories'] = $term->consultationUser->user->categories->toArray();
+            $user['executed_status'] = $term->executed_status;
             if ($userTerm) {
-                $userTerm->users->push($term->consultationUser->user);
+                $userTerm->executed_status = $term->executed_status === ConsultationTermStatusEnum::APPROVED ? $term->executed_status : $userTerm->executed_status;
+                $userTerm->users->push(new ConsultationUserResourceDto(...$user));
             } else {
                 $result->push(new ConsultationUserTermResourceDto(
                     $term->consultation_user_id,
@@ -141,7 +146,7 @@ class ConsultationUserTermRepository extends BaseRepository implements Consultat
                     $term->consultationUser->consultation->getDuration(),
                     $term->consultationUser->consultation->author,
                     $term->finished_at,
-                    collect([$term->consultationUser->user]),
+                    collect([new ConsultationUserResourceDto(...$user)]),
                 ));
             }
         }
