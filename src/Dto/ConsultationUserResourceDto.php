@@ -29,10 +29,4 @@ class ConsultationUserResourceDto extends BaseDto
     public ?string $avatarUrl = null;
     public ?array $categories = null;
     public ?string $executedStatus = null;
-
-    public function toArray($filters = false): array
-    {
-        $result = $this->fillInArray($this->model()->getFillable());
-        return $filters ? array_filter($result) : $result;
-    }
 }
