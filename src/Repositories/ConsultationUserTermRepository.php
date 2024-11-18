@@ -135,6 +135,7 @@ class ConsultationUserTermRepository extends BaseRepository implements Consultat
             $user['categories'] = $term->consultationUser->user->categories->toArray();
             $user['executed_status'] = $term->executed_status;
             if ($userTerm) {
+                // @phpstan-ignore-next-line
                 $userTerm->executed_status = $term->executed_status === ConsultationTermStatusEnum::APPROVED ? $term->executed_status : $userTerm->executed_status;
                 $userTerm->users->push(new ConsultationUserResourceDto($user));
             } else {
