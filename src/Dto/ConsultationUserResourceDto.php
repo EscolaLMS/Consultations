@@ -4,29 +4,35 @@ namespace EscolaLms\Consultations\Dto;
 
 class ConsultationUserResourceDto extends BaseDto
 {
-    public ?int $id;
-    public ?string $firstName;
-    public ?string $lastName;
-    public ?string $email;
-    public ?string $phone;
-    public ?bool $isActive;
-    public ?string $emailVerifiedAt;
-    public ?string $pathAvatar;
-    public ?string $gender;
-    public ?string $age;
-    public ?string $country;
-    public ?string $city;
-    public ?string $street;
-    public ?string $postcode;
-    public ?string $createdAt;
-    public ?string $updatedAt;
-    public ?int $points;
-    public ?string $notificationChannels;
-    public ?string $accessToDirectories;
-    public ?string $currentTimezone;
-    public ?string $deletedAt;
-    public ?string $deleteUserToken;
-    public ?string $avatarUrl;
-    public ?array $categories;
-    public ?string $executedStatus;
+    public ?int $id = null;
+    public ?string $firstName = null;
+    public ?string $lastName = null;
+    public ?string $email = null;
+    public ?string $phone = null;
+    public ?bool $isActive = null;
+    public ?string $emailVerifiedAt = null;
+    public ?string $pathAvatar = null;
+    public ?string $gender = null;
+    public ?string $age = null;
+    public ?string $country = null;
+    public ?string $city = null;
+    public ?string $street = null;
+    public ?string $postcode = null;
+    public ?string $createdAt = null;
+    public ?string $updatedAt = null;
+    public ?int $points = null;
+    public ?string $notificationChannels = null;
+    public ?string $accessToDirectories = null;
+    public ?string $currentTimezone = null;
+    public ?string $deletedAt = null;
+    public ?string $deleteUserToken = null;
+    public ?string $avatarUrl = null;
+    public ?array $categories = null;
+    public ?string $executedStatus = null;
+
+    public function toArray($filters = false): array
+    {
+        $result = $this->fillInArray($this->model()->getFillable());
+        return $filters ? array_filter($result) : $result;
+    }
 }
