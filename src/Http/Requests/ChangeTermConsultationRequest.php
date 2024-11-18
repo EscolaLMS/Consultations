@@ -21,6 +21,7 @@ class ChangeTermConsultationRequest extends FormRequest
             'term' => ['required', 'date', new UserTermExist(request('consultationTermId') ? (int) request('consultationTermId') : null)],
             'executed_at' => ['required', 'date', 'after_or_equal:now'],
             'user_id' => ['nullable', 'exists:users,id'],
+            'accept' => ['boolean'],
         ];
     }
 }

@@ -223,7 +223,8 @@ class ConsultationService implements ConsultationServiceContract
         if (!$this->canGenerateJitsi(
             $term->executed_at,
             $term->executed_status,
-            $consultationTerm->consultation->getDuration()
+            $consultationTerm->consultation->getDuration(),
+            $consultationTerm->consultation,
         )) {
             throw new NotFoundHttpException(__('Consultation term is not available'));
         }
@@ -257,14 +258,24 @@ class ConsultationService implements ConsultationServiceContract
         );
     }
 
-    public function canGenerateJitsi(?string $executedAt, ?string $status, ?string $duration): bool
+    public function canGenerateJitsi(?string $executedAt, ?string $status, ?string $duration, ?Consultation $consultation = null): bool
     {
         $now = now();
         if (isset($executedAt)) {
             $dateTo = Carbon::make($executedAt);
-            return in_array($status, [ConsultationTermStatusEnum::APPROVED]) &&
-                $now->getTimestamp() >= $dateTo->getTimestamp() &&
-                !$this->isEnded($executedAt, $duration);
+            if ($now->getTimestamp() >= $dateTo->getTimestamp() && !$this->isEnded($executedAt, $duration)) {
+                if ($consultation && (Auth::user()->getKey() === $consultation->author_id || in_array(Auth::user()->getKey(), $consultation->teachers()->pluck('users.id')->toArray()))) {
+                    $terms = $this->consultationUserTermRepository->getAllUserTermsByConsultationIdAndExecutedAt($consultation->getKey(), $executedAt);
+
+                    foreach ($terms as $term) {
+                        if ($term->executed_status === ConsultationTermStatusEnum::APPROVED) {
+                            return true;
+                        }
+                    }
+                } else {
+                    return $status === ConsultationTermStatusEnum::APPROVED;
+                }
+            }
         }
         return false;
     }
@@ -476,7 +487,7 @@ class ConsultationService implements ConsultationServiceContract
                     /** @var ConsultationUserTerm $consultationUserTerm */
                     $consultationUserTerm = $this->consultationUserTermRepository->update([
                         'executed_at' => $dto->getExecutedAt(),
-                        'executed_status' => ConsultationTermStatusEnum::APPROVED,
+                        'executed_status' => $dto->getAccept() ? ConsultationTermStatusEnum::APPROVED : ConsultationTermStatusEnum::REPORTED,
                     ], $userTerm->getKey());
 
                     if (!$consultationUserTerm->consultationUser->user) {

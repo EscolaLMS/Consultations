@@ -48,7 +48,7 @@ class ConsultationChangeTermTest extends TestCase
         $newTerm = now()->modify('+2 hours')->format('Y-m-d H:i:s');
         $this->response = $this->actingAs($this->user, 'api')->post(
             '/api/admin/consultations/change-term/' . $term->getKey(),
-            ['executed_at' => $newTerm, 'term' => $userTerm->executed_at]
+            ['executed_at' => $newTerm, 'term' => $userTerm->executed_at, 'accept' => true]
         );
         $this->response->assertOk();
         $userTerm->refresh();
@@ -89,7 +89,7 @@ class ConsultationChangeTermTest extends TestCase
         $newTerm = now()->modify('+2 hours')->format('Y-m-d H:i:s');
         $this->response = $this->actingAs($this->user, 'api')->post(
             '/api/admin/consultations/change-term/' . $term->getKey(),
-            ['executed_at' => $newTerm, 'term' => $userChangedTerm->executed_at, 'user_id' => $user->getKey()]
+            ['executed_at' => $newTerm, 'term' => $userChangedTerm->executed_at, 'user_id' => $user->getKey(), 'accept' => true]
         );
         $this->response->assertOk();
         $userTerm->refresh();
@@ -120,7 +120,7 @@ class ConsultationChangeTermTest extends TestCase
         $this->response->assertOk();
         $userTerm->refresh();
         $this->assertTrue($userTerm->executed_at === $newTerm);
-        $this->assertTrue($userTerm->executed_status === ConsultationTermStatusEnum::APPROVED);
+        $this->assertTrue($userTerm->executed_status === ConsultationTermStatusEnum::REPORTED);
         Event::assertDispatched(ChangeTerm::class);
     }
 

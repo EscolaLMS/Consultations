@@ -7,6 +7,7 @@ class ChangeTermConsultationDto extends BaseDto
     protected string $executedAt;
     protected string $term;
     protected ?int $userId = null;
+    protected ?bool $accept = null;
 
     protected function setExecutedAt(string $executedAt): void
     {
@@ -36,5 +37,15 @@ class ChangeTermConsultationDto extends BaseDto
     public function getUserId(): ?int
     {
         return $this->userId;
+    }
+
+    protected function setAccept(bool $accept): void
+    {
+        $this->accept = $accept;
+    }
+
+    public function getAccept(): ?bool
+    {
+        return $this->accept;
     }
 }

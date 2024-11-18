@@ -31,7 +31,7 @@ interface ConsultationServiceContract
     public function rejectTerm(int $consultationTermId, ConsultationUserTermDto $dto): bool;
     public function setStatus(ConsultationUserPivot $consultationTerm, string $status, string $executedAt): ConsultationUserTerm;
     public function generateJitsi(int $consultationTermId, ConsultationUserTermDto $dto): array;
-    public function canGenerateJitsi(?string $executedAt, ?string $status, ?string $duration): bool;
+    public function canGenerateJitsi(?string $executedAt, ?string $status, ?string $duration, ?Consultation $consultation): bool;
     public function generateJitsiUrlForEmail(int $consultationTermId, int $userId, string $executedAt): ?string;
     public function proposedTerms(int $consultationTermId): ?array;
     public function setRelations(Consultation $consultation, array $relations = []): void;
