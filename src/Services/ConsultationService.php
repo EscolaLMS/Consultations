@@ -264,7 +264,7 @@ class ConsultationService implements ConsultationServiceContract
         if (isset($executedAt)) {
             $dateTo = Carbon::make($executedAt);
             if ($now->getTimestamp() >= $dateTo->getTimestamp() && !$this->isEnded($executedAt, $duration)) {
-                if ($consultation && Auth::user()->getKey() === $consultation->author_id || in_array(Auth::user()->getKey(), $consultation->teachers()->pluck('users.id')->toArray())) {
+                if ($consultation && (Auth::user()->getKey() === $consultation->author_id || in_array(Auth::user()->getKey(), $consultation->teachers()->pluck('users.id')->toArray()))) {
                     $terms = $this->consultationUserTermRepository->getAllUserTermsByConsultationIdAndExecutedAt($consultation->getKey(), $executedAt);
 
                     foreach ($terms as $term) {
