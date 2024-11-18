@@ -136,7 +136,7 @@ class ConsultationUserTermRepository extends BaseRepository implements Consultat
             $user['executed_status'] = $term->executed_status;
             if ($userTerm) {
                 $userTerm->executed_status = $term->executed_status === ConsultationTermStatusEnum::APPROVED ? $term->executed_status : $userTerm->executed_status;
-                $userTerm->users->push(new ConsultationUserResourceDto(...$user));
+                $userTerm->users->push(new ConsultationUserResourceDto($user));
             } else {
                 $result->push(new ConsultationUserTermResourceDto(
                     $term->consultation_user_id,
@@ -146,7 +146,7 @@ class ConsultationUserTermRepository extends BaseRepository implements Consultat
                     $term->consultationUser->consultation->getDuration(),
                     $term->consultationUser->consultation->author,
                     $term->finished_at,
-                    collect([new ConsultationUserResourceDto(...$user)]),
+                    collect([new ConsultationUserResourceDto($user)]),
                 ));
             }
         }
