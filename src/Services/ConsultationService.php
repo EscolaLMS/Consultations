@@ -258,7 +258,7 @@ class ConsultationService implements ConsultationServiceContract
         );
     }
 
-    public function canGenerateJitsi(?string $executedAt, ?string $status, ?string $duration, ?Consultation $consultation): bool
+    public function canGenerateJitsi(?string $executedAt, ?string $status, ?string $duration, ?Consultation $consultation = null): bool
     {
         $now = now();
         if (isset($executedAt)) {
