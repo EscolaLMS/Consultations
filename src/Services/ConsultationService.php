@@ -268,7 +268,7 @@ class ConsultationService implements ConsultationServiceContract
                     $terms = $this->consultationUserTermRepository->getAllUserTermsByConsultationIdAndExecutedAt($consultation->getKey(), $executedAt);
 
                     foreach ($terms as $term) {
-                        if ($term->status === ConsultationTermStatusEnum::APPROVED) {
+                        if ($term->executed_status === ConsultationTermStatusEnum::APPROVED) {
                             return true;
                         }
                     }
