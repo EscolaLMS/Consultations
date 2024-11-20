@@ -24,7 +24,7 @@ class StoreConsultationRequest extends FormRequest
             'description' => ['required', 'string', 'min:3'],
             'duration' => ['nullable', 'string', 'max:80'],
             'image' => ['nullable', 'file', 'image'],
-            'author_id' => ['required', 'integer', 'exists:users,id'],
+            'author_id' => ['integer', 'exists:users,id'],
             'active_from' => ['date'],
             'active_to' => ['date', 'after_or_equal:active_from'],
             'proposed_dates' => ['array'],
