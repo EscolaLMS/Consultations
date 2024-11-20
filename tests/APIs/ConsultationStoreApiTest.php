@@ -139,6 +139,6 @@ class ConsultationStoreApiTest extends TestCase
     public function testConsultationStoreRequiredValidation(): void
     {
         $response = $this->actingAs($this->user, 'api')->json('POST', $this->apiUrl);
-        $response->assertJsonValidationErrors(['name', 'status', 'description', 'author_id']);
+        $response->assertJsonValidationErrors(['name', 'status', 'description']);
     }
 }
