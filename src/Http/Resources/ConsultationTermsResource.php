@@ -108,6 +108,12 @@ class ConsultationTermsResource extends JsonResource
             'author' =>  $this->resource->author ? ConsultationAuthorResource::make($this->resource->author) : null,
             'finished_at' => $this->resource->finished_at,
             'consultation_id' => $this->resource->consultation_id,
+            'consultation_media' => [
+                'image_path' => $this->resource->image_path,
+                'image_url' => $this->resource->image_url,
+                'logotype_path' => $this->resource->logotype_path,
+                'logotype_url' => $this->resource->logotype_url,
+            ]
         ];
         return self::apply($fields, $this);
     }

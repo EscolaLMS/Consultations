@@ -150,6 +150,10 @@ class ConsultationUserTermRepository extends BaseRepository implements Consultat
                     $term->consultationUser->consultation->author,
                     $term->finished_at,
                     collect([new ConsultationUserResourceDto($user)]),
+                    $term->consultationUser->consultation->image_path,
+                    $term->consultationUser->consultation->image_url,
+                    $term->consultationUser->consultation->logotype_path,
+                    $term->consultationUser->consultation->logotype_url,
                 ));
             }
         }
