@@ -100,6 +100,19 @@ class ConsultationScheduleTermsTest extends TestCase
         ]);
     }
 
+    public function testFilterConsultationScheduleForTutor(): void
+    {
+        $this->initVariable();
+
+        $this->actingAs($this->user, 'api')->get('/api/consultations/my-schedule?ids[]=123')
+            ->assertOk()
+            ->assertJsonCount(0, 'data');
+
+        $this->actingAs($this->user, 'api')->get('/api/consultations/my-schedule?ids[]=' . $this->consultation->getKey())
+            ->assertOk()
+            ->assertJsonCount(1, 'data');
+    }
+
     public function testConsultationScheduleForNotTutor(): void
     {
         $this->initVariable();

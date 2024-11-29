@@ -20,6 +20,8 @@ class ListConsultationsRequest extends FormRequest
             'status' => ['array'],
             'status.*' => ['string'],
             'order_by' => ['sometimes', 'string', 'in:id,name,status,duration,active_from,active_to,created_at'],
+            'ids' => ['sometimes', 'array'],
+            'ids.*' => ['integer'],
         ];
     }
 }

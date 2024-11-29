@@ -20,6 +20,8 @@ class ScheduleConsultationAPIRequest extends ConsultationRequest
             'date_from' => ['date'],
             'date_to' => ['date', 'after_or_equal:date_from'],
             'status' => ['string', Rule::in(ConsultationTermStatusEnum::getValues())],
+            'ids' => ['sometimes', 'array'],
+            'ids.*' => ['integer'],
         ];
     }
 }

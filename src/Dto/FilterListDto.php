@@ -27,6 +27,8 @@ class FilterListDto extends BaseDto
 
     private array $criteria = [];
 
+    private array $ids = [];
+
     public static function prepareFilters(array $search)
     {
         $dto = new self($search);
@@ -58,6 +60,10 @@ class FilterListDto extends BaseDto
         }
         if ($user && $user->can(ConsultationsPermissionsEnum::CONSULTATION_LIST_OWN) && !$user->can(ConsultationsPermissionsEnum::CONSULTATION_LIST)) {
             $dto->addToCriteria(new EqualCriterion('author_id', $user->getKey()));
+        }
+
+        if(count($dto->getIds()) > 0) {
+            $dto->addToCriteria(new InCriterion('consultations.id', $dto->getIds()));
         }
 
         return $dto->criteria;
@@ -156,5 +162,25 @@ class FilterListDto extends BaseDto
     private function addToCriteria($value): void
     {
         $this->criteria[] = $value;
+    }
+
+    public function getCriteria(): array
+    {
+        return $this->criteria;
+    }
+
+    public function setCriteria(array $criteria): void
+    {
+        $this->criteria = $criteria;
+    }
+
+    public function getIds(): array
+    {
+        return $this->ids;
+    }
+
+    public function setIds(array $ids): void
+    {
+        $this->ids = $ids;
     }
 }

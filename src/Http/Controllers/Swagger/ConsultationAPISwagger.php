@@ -430,6 +430,18 @@ interface ConsultationAPISwagger
      *          ),
      *      ),
      *      @OA\Parameter(
+     *          name="ids[]",
+     *          description="Integer array",
+     *          required=false,
+     *          in="query",
+     *          @OA\Schema(
+     *              type="array",
+     *              @OA\Items(
+     *                  type="integer"
+     *              )
+     *          )
+     *      ),
+     *      @OA\Parameter(
      *          name="status",
      *          description="Consultation status == ",
      *          required=false,
@@ -563,6 +575,18 @@ interface ConsultationAPISwagger
      *      security={
      *          {"passport": {}},
      *      },
+     *      @OA\Parameter(
+     *          name="ids[]",
+     *          description="Consultation ID integer array",
+     *          required=false,
+     *          in="query",
+     *          @OA\Schema(
+     *              type="array",
+     *              @OA\Items(
+     *                  type="integer"
+     *              )
+     *          )
+     *       ),
      *      @OA\Response(
      *          response=200,
      *          description="successful operation",

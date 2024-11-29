@@ -4,6 +4,7 @@ namespace EscolaLms\Consultations\Http\Controllers;
 
 use EscolaLms\Consultations\Dto\ConsultationUserTermDto;
 use EscolaLms\Consultations\Dto\ConsultationSaveScreenDto;
+use EscolaLms\Consultations\Dto\FilterScheduleForTutorDto;
 use EscolaLms\Consultations\Dto\FinishTermDto;
 use EscolaLms\Consultations\Enum\ConstantEnum;
 use EscolaLms\Consultations\Http\Controllers\Swagger\ConsultationAPISwagger;
@@ -110,7 +111,11 @@ class ConsultationAPIController extends EscolaLmsBaseController implements Consu
 
     public function schedule(ScheduleConsultationAPIRequest $scheduleConsultationAPIRequest): JsonResponse
     {
-        $consultationTerms = $this->consultationServiceContract->getConsultationTermsForTutor();
+        $consultationTerms = $this->consultationServiceContract
+            ->getConsultationTermsForTutor(
+                FilterScheduleForTutorDto::prepareFilters($scheduleConsultationAPIRequest->validated())
+            );
+
         return $this->sendResponse(
             ConsultationTermsResource::collection($consultationTerms),
             __('Consultation updated successfully')

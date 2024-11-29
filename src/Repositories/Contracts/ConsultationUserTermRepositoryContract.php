@@ -23,7 +23,7 @@ interface ConsultationUserTermRepositoryContract extends BaseRepositoryContract
     public function getAllUserTermsByConsultationIdAndExecutedAt(int $consultationId, string $executedAt): Collection;
     public function getUserTermByUserIdAndExecutedAt(int $userId, string $executedAt): ConsultationUserTerm;
     public function updateModels(Collection $models, array $data): void;
-    public function getByCurrentUserTutor(): Collection;
+    public function getByCurrentUserTutor(array $criteria = []): Collection;
     public function updateModel(ConsultationUserTerm $userTerm, array $data): ConsultationUserTerm;
 
 }

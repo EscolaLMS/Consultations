@@ -113,10 +113,12 @@ class ConsultationUserTermRepository extends BaseRepository implements Consultat
         $this->model->newQuery()->whereIn('id', $models->pluck('id'))->update($data);
     }
 
-    public function getByCurrentUserTutor(): Collection
+    public function getByCurrentUserTutor(array $criteria = []): Collection
     {
         $result = collect();
-        $terms = $this->model->newQuery()
+        $query = $this->model->newQuery();
+
+        $terms = $this->applyCriteria($query, $criteria)
             ->whereHas('consultationUser', fn (Builder $query) => $query
                 ->whereHas('consultation', fn (Builder $query) => $query
                     ->whereAuthorId(auth()->user()->getKey())
