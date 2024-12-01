@@ -11,6 +11,7 @@ use EscolaLms\Consultations\Dto\ConsultationDto;
 use EscolaLms\Consultations\Dto\ConsultationSaveScreenDto;
 use EscolaLms\Consultations\Dto\FilterConsultationTermsListDto;
 use EscolaLms\Consultations\Dto\FilterListDto;
+use EscolaLms\Consultations\Dto\FilterScheduleForTutorDto;
 use EscolaLms\Consultations\Dto\FinishTermDto;
 use EscolaLms\Consultations\Enum\ConstantEnum;
 use EscolaLms\Consultations\Enum\ConsultationStatusEnum;
@@ -503,9 +504,9 @@ class ConsultationService implements ConsultationServiceContract
         return false;
     }
 
-    public function getConsultationTermsForTutor(): Collection
+    public function getConsultationTermsForTutor(?FilterScheduleForTutorDto $filterDto = null): Collection
     {
-        return $this->consultationUserTermRepository->getByCurrentUserTutor();
+        return $this->consultationUserTermRepository->getByCurrentUserTutor($filterDto?->getCriteria() ?? []);
     }
 
     public function termIsBusy(int $consultationId, string $date): bool

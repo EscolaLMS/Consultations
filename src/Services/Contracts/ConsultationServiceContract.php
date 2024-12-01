@@ -7,6 +7,7 @@ use EscolaLms\Consultations\Dto\ChangeTermConsultationDto;
 use EscolaLms\Consultations\Dto\ConsultationUserTermDto;
 use EscolaLms\Consultations\Dto\ConsultationDto;
 use EscolaLms\Consultations\Dto\ConsultationSaveScreenDto;
+use EscolaLms\Consultations\Dto\FilterScheduleForTutorDto;
 use EscolaLms\Consultations\Dto\FinishTermDto;
 use EscolaLms\Consultations\Http\Requests\ListConsultationsRequest;
 use EscolaLms\Consultations\Models\Consultation;
@@ -99,7 +100,7 @@ interface ConsultationServiceContract
     public function reminderAboutConsultation(string $reminderStatus): void;
     public function setReminderStatus(ConsultationUserPivot $consultationTerm, string $status, ?ConsultationUserTerm $userTerm = null): void;
     public function changeTerm(int $consultationTermId, ChangeTermConsultationDto $dto): bool;
-    public function getConsultationTermsForTutor(): Collection;
+    public function getConsultationTermsForTutor(?FilterScheduleForTutorDto $filterDto = null): Collection;
     public function termIsBusy(int $consultationId, string $date): bool;
     public function termIsBusyForUser(int $consultationId, string $date, int $userId): bool;
     public function getBusyTermsFormatDate(int $consultationId): array;

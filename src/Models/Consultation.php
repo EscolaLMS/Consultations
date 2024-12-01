@@ -166,6 +166,7 @@ use EscolaLms\Core\Models\User as CoreUser;
  * @property int $max_session_students
  * @property string $name
  * @property string $logotype_path
+ * @property ?string $image_path
  */
 class Consultation extends Model
 {
