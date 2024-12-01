@@ -388,6 +388,18 @@
                         }
                     },
                     {
+                        "name": "ids[]",
+                        "in": "query",
+                        "description": "Integer array",
+                        "required": false,
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "integer"
+                            }
+                        }
+                    },
+                    {
                         "name": "status",
                         "in": "query",
                         "description": "Consultation status == ",
@@ -486,6 +498,20 @@
                 ],
                 "description": "Get Consultation schedule for tutor",
                 "operationId": "848beb73a29b5e048e9de91c30aeaddf",
+                "parameters": [
+                    {
+                        "name": "ids[]",
+                        "in": "query",
+                        "description": "Consultation ID integer array",
+                        "required": false,
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "integer"
+                            }
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "successful operation",
