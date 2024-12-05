@@ -156,7 +156,10 @@ class ConsultationService implements ConsultationServiceContract
             $userTerm = $this->consultationUserTermRepository->createUserTerm($consultationTerm, $data);
 
             $consultationTerm->consultation->teachers
-                ->push($consultationTerm->consultation->author)
+                ->when(
+                    $consultationTerm->consultation->author_id !== null,
+                    fn ($teachers) => $teachers->push($consultationTerm->consultation->author)
+                )
                 ->filter()
                 ->each(function ($author) use ($consultationTerm, $userTerm) {
                     event(new ReportTerm($author, $consultationTerm, $userTerm));

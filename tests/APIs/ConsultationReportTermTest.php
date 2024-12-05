@@ -4,6 +4,8 @@ namespace EscolaLms\Consultations\Tests\APIs;
 
 use EscolaLms\Consultations\Events\ApprovedTermWithTrainer;
 use EscolaLms\Consultations\Events\RejectTermWithTrainer;
+use EscolaLms\Consultations\Events\ReportTerm;
+use EscolaLms\Consultations\Models\ConsultationProposedTerm;
 use EscolaLms\Consultations\Models\ConsultationUserTerm;
 use EscolaLms\Consultations\Tests\Models\User;
 use EscolaLms\Consultations\Enum\ConsultationTermStatusEnum;
@@ -57,6 +59,35 @@ class ConsultationReportTermTest extends TestCase
         $this->assertTrue($userTerm->executed_at === $now->format('Y-m-d H:i:s'));
         $this->assertTrue($userTerm->executed_status === ConsultationTermStatusEnum::REPORTED);
         $this->response->assertOk();
+    }
+
+    public function testConsultationReportProposedTerm(): void
+    {
+        Event::fake([ReportTerm::class]);
+        $this->initVariable();
+        $this->consultation->update(['author_id' => null]);
+        $this->consultation->teachers()->attach([
+            User::factory()->create()->getKey(),
+            User::factory()->create()->getKey(),
+        ]);
+
+        $proposedTerm = ConsultationProposedTerm::factory()
+            ->state([
+                'proposed_at' => now()->addDays(2),
+            ])
+            ->for($this->consultation)
+            ->create();
+
+        $this->response = $this->actingAs($this->user, 'api')
+            ->json('POST',
+                '/api/consultations/report-term/' . $this->consultationUserPivot->getKey(),
+                [
+                    'term' => $proposedTerm->proposed_at,
+                ]
+            )
+            ->assertOk();
+
+        Event::assertDispatchedTimes(ReportTerm::class, 2);
     }
 
     public function testConsultationReportTermMultipleTerm(): void
