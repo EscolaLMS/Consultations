@@ -241,7 +241,16 @@ class ConsultationService implements ConsultationServiceContract
         $isModerator = false;
         $configOverwrite = [];
         $configInterface = [];
-        if ($consultationTerm->consultation->author->getKey() === auth()->user()->getKey() || in_array(auth()->user()->getKey(), $consultationTerm->consultation->teachers()->pluck('users.id')->toArray())) {
+
+        $authorIds = $consultationTerm->consultation->teachers
+            ->when(
+                $consultationTerm->consultation->author_id !== null,
+                fn ($teachers) => $teachers->push($consultationTerm->consultation->author)
+            )
+            ->pluck('user_id')
+            ->toArray();
+
+        if (in_array(auth()->user()->getKey(), $authorIds)) {
             $configOverwrite = [
                 "disableModeratorIndicator" => true,
                 "startScreenSharing" => false,
