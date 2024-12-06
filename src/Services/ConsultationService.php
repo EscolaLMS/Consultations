@@ -247,9 +247,9 @@ class ConsultationService implements ConsultationServiceContract
                 $consultationTerm->consultation->author_id !== null,
                 fn ($teachers) => $teachers->push($consultationTerm->consultation->author)
             )
-            ->pluck('user_id')
+            ->pluck('id')
             ->toArray();
-
+        
         if (in_array(auth()->user()->getKey(), $authorIds)) {
             $configOverwrite = [
                 "disableModeratorIndicator" => true,
