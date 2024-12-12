@@ -239,9 +239,13 @@ class ConsultationApiTest extends TestCase
             'consultation_id' => $consultation->getKey(),
             'user_email' => $student->email,
             'user_termin_id' => $consultationUser->getKey(),
-            'file' => UploadedFile::fake()->image('image.jpg'),
-            'timestamp' => $screenTime->format('Y-m-d H:i:s'),
             'executed_at' => $userTerm->executed_at->format('Y-m-d H:i:s'),
+            'files' => [
+                [
+                    'file' => UploadedFile::fake()->image('image.jpg'),
+                    'timestamp' => $screenTime->format('Y-m-d H:i:s'),
+                ],
+            ],
         ])
             ->assertOk();
 
@@ -251,20 +255,29 @@ class ConsultationApiTest extends TestCase
 
         $this->response = $this->json('POST', '/api/consultations/save-screen', [
             'consultation_id' => $consultation->getKey(),
-            'user_email' => $admin->email,
+            'user_email' => 'abc@example.com',
             'user_termin_id' => $consultationUser->getKey(),
-            'file' => UploadedFile::fake()->image('image.jpg'),
-            'timestamp' => $time->format('Y-m-d H:i:s'),
             'executed_at' => $userTerm->executed_at->format('Y-m-d H:i:s'),
-        ])->assertNotFound();
+            'files' => [
+                [
+                    'file' => UploadedFile::fake()->image('image.jpg'),
+                    'timestamp' => $time->format('Y-m-d H:i:s'),
+                ],
+            ],
+        ])
+            ->assertNotFound();
 
         $this->response = $this->json('POST', '/api/consultations/save-screen', [
             'consultation_id' => $consultation->getKey(),
             'user_email' => $student->email,
-            'user_termin_id' => $consultationUser->getKey() + 1,
-            'file' => UploadedFile::fake()->image('image.jpg'),
-            'timestamp' => $time->format('Y-m-d H:i:s'),
+            'user_termin_id' => null,
             'executed_at' => $userTerm->executed_at->format('Y-m-d H:i:s'),
+            'files' => [
+                [
+                    'file' => UploadedFile::fake()->image('image.jpg'),
+                    'timestamp' => $time->format('Y-m-d H:i:s'),
+                ],
+            ],
         ])
             ->assertUnprocessable()
             ->assertJsonValidationErrors(['user_termin_id']);

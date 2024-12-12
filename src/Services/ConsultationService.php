@@ -249,7 +249,7 @@ class ConsultationService implements ConsultationServiceContract
             )
             ->pluck('id')
             ->toArray();
-        
+
         if (in_array(auth()->user()->getKey(), $authorIds)) {
             $configOverwrite = [
                 "disableModeratorIndicator" => true,
@@ -594,23 +594,16 @@ class ConsultationService implements ConsultationServiceContract
 
     public function saveScreen(ConsultationSaveScreenDto $dto): void
     {
-        /** @var ConsultationUserPivot $consultationUser */
-        $consultationUser = ConsultationUserPivot::query()->where('consultation_id', '=', $dto->getConsultationId())->where('id', '=', $dto->getUserTerminId())->firstOrFail();
         $user = User::query()->where('email', '=', $dto->getUserEmail())->firstOrFail();
-
-        /** @var ConsultationUserTerm $userTerm */
-        $userTerm = $consultationUser->userTerms()->where('executed_at', '=', $dto->getExecutedAt())->firstOrFail();
-
-        if ($user->getKey() !== $consultationUser->user_id) {
-            throw new NotFoundHttpException(__('Consultation term for this user is not available'));
-        }
-
-        $termin = Carbon::make($userTerm->executed_at);
+        $term = Carbon::make($dto->getExecutedAt());
         // consultation_id/term_start_timestamp/user_id/timestamp.jpg
-        $folder = ConstantEnum::DIRECTORY . "/{$dto->getConsultationId()}/{$termin->getTimestamp()}/{$user->getKey()}";
+        $folder = ConstantEnum::DIRECTORY . "/{$dto->getConsultationId()}/{$term->getTimestamp()}/{$user->getKey()}";
 
-        $extension = $dto->getFile() instanceof UploadedFile ? $dto->getFile()->getClientOriginalExtension() : Str::between($dto->getFile(), 'data:image/', ';base64');
-        Storage::putFileAs($folder, $dto->getFile(), Carbon::make($dto->getTimestamp())->getTimestamp() . '.' . $extension);
+        foreach ($dto->getFiles() as $file) {
+            $screen = $file['file'];
+            $extension = $screen instanceof UploadedFile ? $screen->getClientOriginalExtension() : Str::between($screen, 'data:image/', ';base64');
+            Storage::putFileAs($folder, $screen, Carbon::make($file['timestamp'])->getTimestamp() . '.' . $extension);
+        }
     }
 
     public function finishTerm(int $consultationTermId, FinishTermDto $dto): bool
