@@ -646,15 +646,21 @@ interface ConsultationAPISwagger
      *                      example="2024-10-04 12:02:12"
      *                  ),
      *                  @OA\Property(
-     *                      property="file",
-     *                      type="string",
-     *                      format="binary"
-     *                  ),
-     *                  @OA\Property(
-     *                      property="executed_at",
-     *                      type="string",
-     *                      example="2024-10-04 12:02:12"
-     *                  )
+     *                      property="files",
+     *                      type="array",
+     *                      @OA\Items(
+     *                          @OA\Property(
+     *                              property="file",
+     *                              type="string",
+     *                              format="binary"
+     *                          ),
+     *                          @OA\Property(
+     *                              property="timestamp",
+     *                              type="string",
+     *                              example="2024-10-04 12:02:12"
+     *                          )
+     *                       )
+     *                 )
      *              )
      *          )
      *      ),

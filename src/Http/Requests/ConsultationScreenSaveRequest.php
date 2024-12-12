@@ -9,12 +9,13 @@ class ConsultationScreenSaveRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'consultation_id' => ['required', 'exists:consultations,id'],
-            'user_termin_id' => ['required', 'exists:consultation_user,id'],
-            'file' => ['required'],
-            'user_email' => ['required', 'email', 'exists:users,email'],
-            'timestamp' => ['required', 'date_format:Y-m-d H:i:s'],
+            'consultation_id' => ['required', 'integer'],
+            'user_termin_id' => ['required', 'integer'],
+            'user_email' => ['required', 'email'],
             'executed_at' => ['required'],
+            'files' => ['array', 'min:1'],
+            'files.*.file' => ['required'],
+            'files.*.timestamp' => ['required', 'date_format:Y-m-d H:i:s'],
         ];
     }
 }
