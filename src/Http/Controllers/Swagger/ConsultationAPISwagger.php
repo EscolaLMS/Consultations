@@ -638,7 +638,13 @@ interface ConsultationAPISwagger
      *                  ),
      *                  @OA\Property(
      *                      property="user_email",
+     *                      description="required_without:user_id",
      *                      type="string"
+     *                  ),
+     *                  @OA\Property(
+     *                      property="user_id",
+     *                      description="required_without:user_email",
+     *                      type="integer"
      *                  ),
      *                  @OA\Property(
      *                      property="timestamp",

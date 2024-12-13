@@ -594,10 +594,16 @@ class ConsultationService implements ConsultationServiceContract
 
     public function saveScreen(ConsultationSaveScreenDto $dto): void
     {
-        $user = User::query()->where('email', '=', $dto->getUserEmail())->firstOrFail();
+        $userId = $dto->getUserId()
+            ?? User::query()
+                ->select(['id'])
+                ->where('email', '=', $dto->getUserEmail())
+                ->firstOrFail()
+                ->getKey();
+
         $term = Carbon::make($dto->getExecutedAt());
         // consultation_id/term_start_timestamp/user_id/timestamp.jpg
-        $folder = ConstantEnum::DIRECTORY . "/{$dto->getConsultationId()}/{$term->getTimestamp()}/{$user->getKey()}";
+        $folder = ConstantEnum::DIRECTORY . "/{$dto->getConsultationId()}/{$term->getTimestamp()}/{$userId}";
 
         foreach ($dto->getFiles() as $file) {
             $screen = $file['file'];

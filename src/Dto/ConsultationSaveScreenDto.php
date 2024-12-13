@@ -8,9 +8,10 @@ class ConsultationSaveScreenDto extends BaseDto
 {
     protected int $consultationId;
     protected int $userTerminId;
-    protected string $userEmail;
     protected string $executedAt;
     protected array $files;
+    protected ?string $userEmail = null;
+    protected ?int $userId = null;
 
     public function getConsultationId(): int
     {
@@ -30,6 +31,11 @@ class ConsultationSaveScreenDto extends BaseDto
     public function getExecutedAt(): string
     {
         return $this->executedAt;
+    }
+
+    public function getUserId(): ?int
+    {
+        return $this->userId;
     }
 
     public function setFiles(array $files): void
