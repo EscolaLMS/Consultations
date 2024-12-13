@@ -11,7 +11,8 @@ class ConsultationScreenSaveRequest extends FormRequest
         return [
             'consultation_id' => ['required', 'integer'],
             'user_termin_id' => ['required', 'integer'],
-            'user_email' => ['required', 'email'],
+            'user_email' => ['required_without:user_id', 'email'],
+            'user_id' => ['required_without:user_email', 'integer'],
             'executed_at' => ['required'],
             'files' => ['array', 'min:1'],
             'files.*.file' => ['required'],
