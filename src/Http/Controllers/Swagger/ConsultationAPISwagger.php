@@ -5,6 +5,7 @@ namespace EscolaLms\Consultations\Http\Controllers\Swagger;
 use EscolaLms\Consultations\Http\Requests\ConsultationUserTermRequest;
 use EscolaLms\Consultations\Http\Requests\ConsultationScreenSaveRequest;
 use EscolaLms\Consultations\Http\Requests\FinishTermRequest;
+use EscolaLms\Consultations\Http\Requests\GenerateSignedScreenUrlsRequest;
 use EscolaLms\Consultations\Http\Requests\ListAPIConsultationsRequest;
 use EscolaLms\Consultations\Http\Requests\ListConsultationsRequest;
 use EscolaLms\Consultations\Http\Requests\ReportTermConsultationRequest;
@@ -702,6 +703,82 @@ interface ConsultationAPISwagger
      * )
      */
     public function screenSave(ConsultationScreenSaveRequest $request): JsonResponse;
+
+    /**
+     * @OA\Post(
+     *      path="/api/consultations/signed-screen-urls",
+     *      security={
+     *          {"passport": {}},
+     *      },
+     *      summary="Generate signed url to save screens from jitsi meeting",
+     *      tags={"Consultations"},
+     *      @OA\RequestBody(
+     *          required=true,
+     *          @OA\MediaType(
+     *              mediaType="application/json",
+     *              @OA\Schema(
+     *                  @OA\Property(
+     *                      property="consultation_id",
+     *                      type="int"
+     *                  ),
+     *                  @OA\Property(
+     *                      property="user_termin_id",
+     *                      type="int"
+     *                  ),
+     *                  @OA\Property(
+     *                      property="user_id",
+     *                      type="integer"
+     *                  ),
+     *                  @OA\Property(
+     *                      property="executed_at",
+     *                      type="string",
+     *                      example="2024-10-04 12:02:12"
+     *                  ),
+     *                  @OA\Property(
+     *                      property="files",
+     *                      type="array",
+     *                      @OA\Items(
+     *                          @OA\Property(
+     *                              property="filename",
+     *                              type="string",
+     *                          ),
+     *                       )
+     *                 )
+     *              )
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="successful operation",
+     *          @OA\MediaType(
+     *              mediaType="application/json"
+     *          ),
+     *          @OA\Schema(
+     *              type="object",
+     *              @OA\Property(
+     *                  property="success",
+     *                  type="boolean"
+     *              ),
+     *              @OA\Property(
+     *                  property="data",
+     *                  type="string"
+     *              ),
+     *              @OA\Property(
+     *                  property="message",
+     *                  type="string"
+     *              )
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=404,
+     *          description="Bad request",
+     *          @OA\MediaType(
+     *              mediaType="application/json"
+     *          )
+     *      )
+     * )
+     */
+    public function generateSignedScreenUrls(GenerateSignedScreenUrlsRequest $request): JsonResponse;
 
     /**
      * @OA\Post(

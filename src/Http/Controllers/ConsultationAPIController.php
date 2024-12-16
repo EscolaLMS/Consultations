@@ -6,11 +6,13 @@ use EscolaLms\Consultations\Dto\ConsultationUserTermDto;
 use EscolaLms\Consultations\Dto\ConsultationSaveScreenDto;
 use EscolaLms\Consultations\Dto\FilterScheduleForTutorDto;
 use EscolaLms\Consultations\Dto\FinishTermDto;
+use EscolaLms\Consultations\Dto\GenerateSignedScreenUrlsDto;
 use EscolaLms\Consultations\Enum\ConstantEnum;
 use EscolaLms\Consultations\Http\Controllers\Swagger\ConsultationAPISwagger;
 use EscolaLms\Consultations\Http\Requests\ConsultationUserTermRequest;
 use EscolaLms\Consultations\Http\Requests\ConsultationScreenSaveRequest;
 use EscolaLms\Consultations\Http\Requests\FinishTermRequest;
+use EscolaLms\Consultations\Http\Requests\GenerateSignedScreenUrlsRequest;
 use EscolaLms\Consultations\Http\Requests\ListAPIConsultationsRequest;
 use EscolaLms\Consultations\Http\Requests\ListConsultationsRequest;
 use EscolaLms\Consultations\Http\Requests\ReportTermConsultationRequest;
@@ -126,6 +128,15 @@ class ConsultationAPIController extends EscolaLmsBaseController implements Consu
     {
         $this->consultationServiceContract->saveScreen(new ConsultationSaveScreenDto($request->all()));
         return $this->sendSuccess(__('Screen saved successfully'));
+    }
+
+    public function generateSignedScreenUrls(GenerateSignedScreenUrlsRequest $request): JsonResponse
+    {
+        $data = $this
+            ->consultationServiceContract
+            ->generateSignedScreenUrls(new GenerateSignedScreenUrlsDto($request->validated()));
+
+        return $this->sendResponse($data, __('Urls generated successfully'));
     }
 
     public function finishTerm(FinishTermRequest $request, int $consultationTermId): JsonResponse

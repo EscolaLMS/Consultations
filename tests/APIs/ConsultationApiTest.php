@@ -282,4 +282,58 @@ class ConsultationApiTest extends TestCase
             ->assertUnprocessable()
             ->assertJsonValidationErrors(['user_termin_id']);
     }
+
+    public function testGenerateSignedUrls(): void
+    {
+        config(['filesystems.default' => 's3']);
+
+        Storage::shouldReceive('temporaryUploadUrl')
+            ->withArgs(function ($path, $expiration) {
+                return true;
+            })
+            ->andReturnUsing(function ($path, $expiration) {
+                return [
+                    'upload_url' => "https://example.com/{$path}",
+                ];
+            });
+
+        $this->response = $this->json('POST', '/api/consultations/signed-screen-urls', [
+            'consultation_id' => 1,
+            'user_id' => 1,
+            'user_termin_id' => 1,
+            'executed_at' => now()->format('Y-m-d H:i:s'),
+            'files' => [
+                [
+                    'filename' => now()->format('Y-m-d H:i:s'),
+                ],
+            ],
+        ])
+            ->assertOk()
+            ->assertJsonStructure([
+                'data' => [
+                    [
+                        'filename',
+                        'upload_url',
+                    ]
+                ]
+            ]);
+    }
+
+    public function testGenerateSignedUrlsNotSupported(): void
+    {
+        config(['filesystems.default' => 'local']);
+
+        $this->response = $this->json('POST', '/api/consultations/signed-screen-urls', [
+            'consultation_id' => 1,
+            'user_id' => 1,
+            'user_termin_id' => 1,
+            'executed_at' => now()->format('Y-m-d H:i:s'),
+            'files' => [
+                [
+                    'filename' => now()->format('Y-m-d H:i:s'),
+                ],
+            ],
+        ])
+            ->assertStatus(400);
+    }
 }
