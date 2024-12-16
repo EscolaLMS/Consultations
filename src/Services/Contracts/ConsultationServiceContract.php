@@ -9,6 +9,7 @@ use EscolaLms\Consultations\Dto\ConsultationDto;
 use EscolaLms\Consultations\Dto\ConsultationSaveScreenDto;
 use EscolaLms\Consultations\Dto\FilterScheduleForTutorDto;
 use EscolaLms\Consultations\Dto\FinishTermDto;
+use EscolaLms\Consultations\Dto\GenerateSignedScreenUrlsDto;
 use EscolaLms\Consultations\Http\Requests\ListConsultationsRequest;
 use EscolaLms\Consultations\Models\Consultation;
 use EscolaLms\Consultations\Models\ConsultationUserPivot;
@@ -106,5 +107,6 @@ interface ConsultationServiceContract
     public function getBusyTermsFormatDate(int $consultationId): array;
     public function updateModelFieldsFromRequest(Consultation $consultation, FormRequest $request): void;
     public function saveScreen(ConsultationSaveScreenDto $dto): void;
+    public function generateSignedScreenUrls(GenerateSignedScreenUrlsDto $dto): array;
     public function finishTerm(int $consultationTermId, FinishTermDto $dto): bool;
 }

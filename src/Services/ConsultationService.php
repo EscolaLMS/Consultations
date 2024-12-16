@@ -13,6 +13,7 @@ use EscolaLms\Consultations\Dto\FilterConsultationTermsListDto;
 use EscolaLms\Consultations\Dto\FilterListDto;
 use EscolaLms\Consultations\Dto\FilterScheduleForTutorDto;
 use EscolaLms\Consultations\Dto\FinishTermDto;
+use EscolaLms\Consultations\Dto\GenerateSignedScreenUrlsDto;
 use EscolaLms\Consultations\Enum\ConstantEnum;
 use EscolaLms\Consultations\Enum\ConsultationStatusEnum;
 use EscolaLms\Consultations\Enum\ConsultationTermStatusEnum;
@@ -610,6 +611,31 @@ class ConsultationService implements ConsultationServiceContract
             $extension = $screen instanceof UploadedFile ? $screen->getClientOriginalExtension() : Str::between($screen, 'data:image/', ';base64');
             Storage::putFileAs($folder, $screen, Carbon::make($file['timestamp'])->getTimestamp() . '.' . $extension);
         }
+    }
+
+    public function generateSignedScreenUrls(GenerateSignedScreenUrlsDto $dto): array
+    {
+        if (config('filesystems.default') !== 's3') {
+            abort(400, 'The file driver does not support this method.');
+        }
+
+        $term = Carbon::make($dto->getExecutedAt());
+        $directory = sprintf(
+            '%s/%s/%s/%s/',
+            ConstantEnum::DIRECTORY,
+            $dto->getConsultationId(),
+            $term->getTimestamp(),
+            $dto->getUserId()
+        );
+
+        return array_map(function ($file) use ($directory) {
+            $filename = $file['filename'];
+
+            return array_merge(
+                ['filename' => $filename],
+                Storage::temporaryUploadUrl($directory . $filename, now()->addMinutes(5))
+            );
+        }, $dto->getFiles());
     }
 
     public function finishTerm(int $consultationTermId, FinishTermDto $dto): bool
