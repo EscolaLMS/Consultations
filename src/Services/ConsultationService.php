@@ -632,10 +632,12 @@ class ConsultationService implements ConsultationServiceContract
         return array_map(function ($file) use ($directory) {
             $filename = $file['filename'];
 
-            $key = 'signed_urls:' . md5($directory);
-            Redis::command('SETEX', [$key, ConstantEnum::REDIS_IMAGES_TTL, $directory . $filename]);
-            Redis::command('HSET', [ConstantEnum::REDIS_IMAGES_KEY, $key, 1]);
-            Redis::command('EXPIRE', [ConstantEnum::REDIS_IMAGES_KEY, ConstantEnum::REDIS_IMAGES_TTL]);
+            if (config('cache.default') === 'redis') {
+                $key = 'signed_urls:' . md5($directory);
+                Redis::command('SETEX', [$key, ConstantEnum::REDIS_IMAGES_TTL, $directory . $filename]);
+                Redis::command('HSET', [ConstantEnum::REDIS_IMAGES_KEY, $key, 1]);
+                Redis::command('EXPIRE', [ConstantEnum::REDIS_IMAGES_KEY, ConstantEnum::REDIS_IMAGES_TTL]);
+            }
 
             return array_merge(
                 ['filename' => $filename],
