@@ -63,6 +63,7 @@ jobs:
         run: git config --global safe.directory '*'
 
       - name: Convert
+        shell: bash
         run: ./cc-test-reporter format-coverage coverage.xml -t clover -o codeclimate.0.json
 
       - name: Upload
