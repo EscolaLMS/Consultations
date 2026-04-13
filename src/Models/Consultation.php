@@ -160,6 +160,11 @@ use EscolaLms\Core\Models\User as CoreUser;
  *          description="max_session_students",
  *          type="integer",
  *      ),
+ *     @OA\Property(
+ *           property="analyze_enabled",
+ *           description="analyze_enabled",
+ *           type="bool",
+ *       ),
  * )
  *
  * @property int $author_id
@@ -185,6 +190,7 @@ class Consultation extends Model
         'active_from',
         'active_to',
         'max_session_students',
+        'analyze_enabled',
     ];
 
     public function author(): BelongsTo
