@@ -1380,6 +1380,10 @@
                     "max_session_students": {
                         "description": "max_session_students",
                         "type": "integer"
+                    },
+                    "analyze_enabled": {
+                        "description": "analyze_enabled",
+                        "type": "boolean"
                     }
                 },
                 "type": "object"
