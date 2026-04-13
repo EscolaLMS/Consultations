@@ -15,13 +15,14 @@ class ConsultationDto extends BaseDto implements ModelDtoContract
     protected string $name;
     protected string $status;
     protected string $description;
-    protected ?string $shortDesc;
-    protected ?string $activeTo;
-    protected ?string $activeFrom;
-    protected ?string $duration;
-    protected ?int $authorId;
-    protected $imagePath = false;
-    protected $logotypePath = false;
+    protected ?string $shortDesc = null;
+    protected ?string $activeTo = null;
+    protected ?string $activeFrom = null;
+    protected ?string $duration = null;
+    protected ?int $authorId = null;
+    protected $imagePath = null;
+    protected $logotypePath = null;
+    protected ?bool $analyzeEnabled;
 
     public function model(): Consultation
     {
@@ -37,22 +38,22 @@ class ConsultationDto extends BaseDto implements ModelDtoContract
 
     public function getImagePath()
     {
-        if ($this->imagePath !== false) {
+        if ($this->imagePath !== null) {
             return $this->imagePath === null ? '' : Str::after($this->imagePath, Str::after(env('AWS_URL'), 'https://') . '/');
         }
-        return false;
+        return null;
     }
 
     public function getLogotypePath()
     {
-        if ($this->logotypePath !== false) {
+        if ($this->logotypePath !== null) {
             if ($this->logotypePath) {
                 $logotypePath = Str::after($this->logotypePath, Str::after(env('AWS_URL'), 'https://') . '/');
                 return Str::startsWith($logotypePath, ConstantEnum::DIRECTORY) ? $logotypePath : ConstantEnum::DIRECTORY . '/' .$logotypePath;
             }
             return '';
         }
-        return false;
+        return null;
     }
 
     protected function setProposedTerms(array $proposedTerms): void
@@ -98,5 +99,10 @@ class ConsultationDto extends BaseDto implements ModelDtoContract
     protected function setTeachers(array $teachers): void
     {
         $this->relations['teachers'] = $teachers;
+    }
+
+    public function setAnalyzeEnabled(bool $analyzeEnabled): void
+    {
+        $this->analyzeEnabled = $analyzeEnabled;
     }
 }

@@ -34,6 +34,7 @@ class StoreConsultationRequest extends FormRequest
             'max_session_students' => ['integer', 'min:1', 'max:99'],
             'teachers' => ['array'],
             'teachers.*' => ['integer', 'exists:users,id'],
+            'analyze_enabled' => ['boolean', 'nullable'],
         ], ModelFields::getFieldsMetadataRules(Consultation::class));
     }
 }
